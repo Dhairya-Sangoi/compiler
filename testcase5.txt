@@ -1,0 +1,30 @@
+_main
+	record #marks
+		type real : maths; 
+		type int: physics; 
+		type real: chemistry;
+	endrecord;
+	record #mark
+		type real : maths; 
+		type int: physics; 
+		type int: chemistry;
+	endrecord;
+	type record #marks : b5c6;
+	type real : b5;
+	type real : d5;
+	type record #mark : b5c7;
+	type int : c5;
+	
+	while( (b5<=d5) @@@ (b5 > d5) )
+		d5 <--- d5 +1.00;
+		if (c5 < 3)
+		then
+		c5<--- 2;
+		endif
+	endwhile
+	
+	return;
+end
+
+
+

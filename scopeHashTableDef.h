@@ -6,6 +6,7 @@ typedef struct scopeDataNode{
     parseTreeNode *head;
     int isChanged;
     int offset;
+    int regIfPresent;
 }scopeDataNode;
 
 typedef struct scopeHashNode{

@@ -169,7 +169,7 @@ scopeHashNode *createScopeHashNode(char *key, char *typeName, parseTreeNode *hea
     else {
         shn->data->offset = 0;
     }
-
+    shn->data->regIfPresent = -1;
     return shn;
 }
 
@@ -177,6 +177,7 @@ scopeHashNode *createScopeHashNode(char *key, char *typeName, parseTreeNode *hea
 void printScopeDataNode(scopeDataNode *sdn){
     printf("typename: %s",sdn->typeName);
     printf(" offset: %d",sdn->offset);
+    printf(" regIfPresent: %d", sdn->regIfPresent);
 }
 
 void printScopeHashNode(scopeHashNode *shn){

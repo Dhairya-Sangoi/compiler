@@ -16,6 +16,10 @@
 #include "lexerDef.h"
 #include "lexer.h"
 
+#include "registerDef.h"
+#include "register.h"
+#include "registers.h"
+
 #include "dynamicArrayDef.h"
 #include "dynamicArray.h"
 
@@ -2466,5 +2470,39 @@ void makeScopeTables(ASTNode *head, recordsHashTable *rht, allFunctionsHashTable
     //printDynamicArray(da);
     sortDynamicArray(da);
     //printDynamicArray(da);
+
+
+    //making datastructure for registers
+
+    reg *rg[20];
+    rg[0] = createRegisterEntry(EAX,"EAX");
+    rg[1] = createRegisterEntry(EBX,"EBX");
+    rg[2] = createRegisterEntry(ECX,"ECX");
+    rg[3] = createRegisterEntry(EDX,"EDX");
+    rg[4] = createRegisterEntry(AX,"AX");
+    rg[5] = createRegisterEntry(BX,"BX");
+    rg[6] = createRegisterEntry(CX,"CX");
+    rg[7] = createRegisterEntry(DX,"DX");
+    rg[8] = createRegisterEntry(AH,"AH");
+    rg[9] = createRegisterEntry(AL,"AL");
+    rg[10] = createRegisterEntry(BH,"BH");
+    rg[11] = createRegisterEntry(BL,"BL");
+    rg[12] = createRegisterEntry(CH,"CH");
+    rg[13] = createRegisterEntry(CL,"CL");
+    rg[14] = createRegisterEntry(DH,"DH");
+    rg[15] = createRegisterEntry(DL,"DL");
+    rg[16] = createRegisterEntry(ESI,"ESI");
+    rg[17] = createRegisterEntry(EDI,"EDI");
+    rg[18] = createRegisterEntry(ESP,"ESP");
+    rg[19] = createRegisterEntry(EBP,"EBP");
+
+    int i;
+    for (i=0;i<20;i++){
+        printRegister(rg[i]);
+    }
+
+
+
+
 }
 

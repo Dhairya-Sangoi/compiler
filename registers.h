@@ -1,0 +1,21 @@
+enum { EAX = 0 
+ , EBX = 1 
+ , ECX = 2
+ , EDX = 3
+ , AX = 4
+ , BX = 5
+ , CX = 6
+ , DX = 7
+ , AH = 8
+ , AL = 9
+ , BH = 10
+ , BL = 11
+ , CH = 12
+ , CL = 13
+ , DH = 14
+ , DL = 15
+ , ESI = 16
+ , EDI = 17
+ , ESP = 18
+ , EBP = 19
+ } ;

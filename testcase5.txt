@@ -4,14 +4,8 @@ _main
 	type int : b5;
 	type int : d5;
 	type int : c5;
-	b5 <--- d5 + b5 - 5 + b5 - d5 + 2;
-	while( (b5<=d5) @@@ (b5 > d5) )
-		d5 <--- 1;
-		if (c5 < 3)
-		then
-		c5<--- 2 + b5;
-		endif
-	endwhile
+	b5 <--- 5 + b5 + 3 + d5;
+	
 	
 	return;
 end

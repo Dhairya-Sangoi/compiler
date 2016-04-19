@@ -2489,47 +2489,6 @@ void makeCode(quadruple *q, scopeHashTable *currentScope, scopeHashTable *global
                         reg1 = EDI;
                     }
                     registers[reg1]->offsetIfPresent = -1;
-
-/*                    int reg2 = getEmptyRegister(registers);
-                    if (reg2 == -1){
-                        reg2 = (reg1 == EDI) ? ESI : EDI;
-                    }
-                    registers[reg2]->offsetIfPresent = -1;
-*/
-                    fprintf(fp,"\tmov %s, %d\n", registers[reg1]->regName ,qn->arg1->data->int_val);
-                    fprintf(fp,"\tcmp %s, %d\n", registers[reg1]->regName ,qn->arg2->data->int_val);
-                    switch(qn->opcode){
-                    case JLT_INT:
-                        {
-                            fprintf(fp,"\tjlt l%d\n", qn->result->data->jump_label);
-                            break;
-                        }
-                    case JLE_INT:
-                        {
-                            fprintf(fp,"\tjle l%d\n", qn->result->data->jump_label);
-                            break;
-                        }
-                    case JGT_INT:
-                        {
-                            fprintf(fp,"\tjgt l%d\n", qn->result->data->jump_label);
-                            break;
-                        }
-                    case JGE_INT:
-                        {
-                            fprintf(fp,"\tjge l%d\n", qn->result->data->jump_label);
-                            break;
-                        }
-                    case JEQ_INT:
-                        {
-                            fprintf(fp,"\tjeq l%d\n", qn->result->data->jump_label);
-                            break;
-                        }
-                    case JNE_INT:
-                        {
-                            fprintf(fp,"\tjne l%d\n", qn->result->data->jump_label);
-                            break;
-                        }
-                    }
                 }
                 else if (qn->arg1->type != UNION_INT){ 
                     int offset1 = getOffset(qn->arg1,qn->opcode,currentScope,globalScope,rht,NULL);
@@ -2664,7 +2623,10 @@ void makeCode(quadruple *q, scopeHashTable *currentScope, scopeHashTable *global
                     registers[reg1]->offsetIfPresent = -1;
                     fprintf(fp,"\tmov %s, %d\n", registers[reg1]->regName ,qn->arg1->data->int_val);                        
                     fprintf(fp,"\tadd %s, %d\n", registers[reg1]->regName, qn->arg2->data->int_val);
-                    fprintf(fp,"\tmov [%d], %s\n", getOffset(qn->result,qn->opcode,currentScope,globalScope,rht,NULL), registers[reg1]->regName );
+                    int offset2 = getOffset(qn->result,qn->opcode,currentScope,globalScope,rht,NULL);
+                    fprintf(fp,"\tmov [%d], %s\n", offset2, registers[reg1]->regName );
+                    registers[reg1]->offsetIfPresent = offset2;
+
                 }
                 else if (qn->arg1->type != UNION_INT && qn->arg2->type == UNION_INT){
                     int offset1 = getOffset(qn->arg1,qn->opcode,currentScope,globalScope,rht,NULL);
@@ -2725,6 +2687,84 @@ void makeCode(quadruple *q, scopeHashTable *currentScope, scopeHashTable *global
                 }
                 break;
             }
+        case MULT_INT:
+            {
+                if (searchEntryDynamicArray(qn->label,usedLabels) == 1){
+                    fprintf(fp,"l%d:\n",qn->label);
+                }
+                if (qn->arg1->type == UNION_INT && qn->arg2->type == UNION_INT){                                    
+                    int reg1 = getEmptyRegister(registers);
+                    if (reg1 == -1){
+                        reg1 = EDI;
+                    }
+                    registers[reg1]->offsetIfPresent = -1;
+                    fprintf(fp,"\tmov %s, %d\n", registers[reg1]->regName ,qn->arg1->data->int_val);                        
+                    fprintf(fp,"\timul %s, %s, %d\n", registers[reg1]->regName, registers[reg1]->regName, qn->arg2->data->int_val);
+                    int offset2 = getOffset(qn->result,qn->opcode,currentScope,globalScope,rht,NULL);
+                    fprintf(fp,"\tmov [%d], %s\n", offset2, registers[reg1]->regName );
+                    registers[reg1]->offsetIfPresent = offset2;
+                }
+                else if (qn->arg1->type != UNION_INT && qn->arg2->type == UNION_INT){
+                    int offset1 = getOffset(qn->arg1,qn->opcode,currentScope,globalScope,rht,NULL);
+                    int reg1 = searchRegister(registers,total_registers,offset1);
+                    int flag = (reg1 != -1) ? 0 : 1;
+                    if (reg1 == -1){
+                        reg1 = getEmptyRegister(registers);
+                    }
+                    if (reg1 == -1){
+                        reg1 = EDI;
+                    }
+                    if (flag == 1){
+                        fprintf(fp,"\timul %s, [%d], %d\n", registers[reg1]->regName , offset1, qn->arg2->data->int_val);
+                    }
+                    else {
+                        fprintf(fp,"\timul %s, %s, %d\n", registers[reg1]->regName , registers[reg1]->regName, qn->arg2->data->int_val);
+                    }
+                    int offset2 = getOffset(qn->result,qn->opcode,currentScope,globalScope,rht,NULL);
+                    fprintf(fp,"\tmov [%d], %s\n", offset2, registers[reg1]->regName );
+                    registers[reg1]->offsetIfPresent = offset2; // adding changes the value of the register
+                }
+                else if (qn->arg1->type == UNION_INT && qn->arg2->type != UNION_INT){
+                    int offset1 = getOffset(qn->arg2,qn->opcode,currentScope,globalScope,rht,NULL);
+                    int reg1 = searchRegister(registers,total_registers,offset1);
+                    int flag = (reg1 != -1) ? 0 : 1;
+                    if (reg1 == -1){
+                        reg1 = getEmptyRegister(registers);
+                    }
+                    if (reg1 == -1){
+                        reg1 = EDI;
+                    }
+                    if (flag == 1){
+                        fprintf(fp,"\timul %s, [%d], %d\n", registers[reg1]->regName , offset1, qn->arg1->data->int_val);
+                    }
+                    else {
+                        fprintf(fp,"\timul %s, %s, %d\n", registers[reg1]->regName , registers[reg1]->regName, qn->arg1->data->int_val);
+                    }
+                    int offset2 = getOffset(qn->result,qn->opcode,currentScope,globalScope,rht,NULL);
+                    fprintf(fp,"\tmov [%d], %s\n", offset2, registers[reg1]->regName );
+                    registers[reg1]->offsetIfPresent = offset2;
+                }
+                else {
+                    int offset1 = getOffset(qn->arg1,qn->opcode,currentScope,globalScope,rht,NULL);
+                    int reg1 = searchRegister(registers,total_registers,offset1);
+                    int flag = (reg1 != -1) ? 0 : 1;
+                    if (reg1 == -1){
+                        reg1 = getEmptyRegister(registers);
+                    }
+                    if (reg1 == -1){
+                        reg1 = EDI;
+                    }
+                    registers[reg1]->offsetIfPresent = offset1;
+                    if (flag == 1){
+                        fprintf(fp,"\tmov %s, [%d]\n", registers[reg1]->regName ,registers[reg1]->offsetIfPresent);
+                    }
+                    fprintf(fp,"\timul %s, [%d]\n", registers[reg1]->regName,  getOffset(qn->arg2,qn->opcode,currentScope,globalScope,rht,NULL));
+                    int offset2 = getOffset(qn->result,qn->opcode,currentScope,globalScope,rht,NULL);
+                    fprintf(fp,"\tmov [%d], %s\n", offset2, registers[reg1]->regName );
+                    registers[reg1]->offsetIfPresent = offset2; // adding changes the value of the register
+                }
+                break;
+            }
         case ASSIGN_INT:
             {
                 if (searchEntryDynamicArray(qn->label,usedLabels)){
@@ -2754,7 +2794,740 @@ void makeCode(quadruple *q, scopeHashTable *currentScope, scopeHashTable *global
                 break;
             }
 
+        //CODE FOR MULT , DIV INT TO BE WRITTEN
 
+        case JEQ_REAL:
+            {
+                if (searchEntryDynamicArray(qn->label,usedLabels) == 1){
+                    fprintf(fp,"l%d:\n",qn->label);
+                }
+                if (qn->arg1->type == UNION_REAL && qn->arg2->type == UNION_REAL){
+                    int reg1 = getEmptyRegister(registers);
+                    if (reg1 == -1){
+                        reg1 = EDI;
+                    }
+                    registers[reg1]->offsetIfPresent = 1;
+
+                    int reg2 = getEmptyRegister(registers);
+                    if (reg2 == -1){
+                        reg2 = (reg1 == EDI) ? ESI : EDI;
+                    }
+                    registers[reg2]->offsetIfPresent = -1;
+                    registers[reg1]->offsetIfPresent = -1;
+                    float data1 = qn->arg1->data->real_val;
+                    float data2 = qn->arg2->data->real_val;
+                    int intpart1,intpart2,fracpart1,fracpart2;
+                    intpart1 = (int)data1;
+                    fracpart1 = ((int)(data1*100))%100;
+                    intpart2 = (int)data2;
+                    fracpart2 = ((int)(data2*100))%100;
+                    fprintf(fp,"\tmov %s, %d\n", registers[reg1]->regName, intpart1);
+                    fprintf(fp,"\tmov %s, %d\n", registers[reg2]->regName, fracpart1);    
+                    fprintf(fp,"\tcmp %s, %d\n", registers[reg1]->regName, intpart2);
+                    fprintf(fp,"\tjne l%d\n", *nextlabel);
+                    fprintf(fp,"\tcmp %s, %d\n", registers[reg2]->regName, fracpart2);
+                    fprintf(fp,"\tjeq l%d\n", qn->result->data->jump_label);
+                    fprintf(fp,"l%d:\n",*nextlabel);
+                    *nextlabel++;
+                }
+                else if (qn->arg1->type != UNION_REAL && qn->arg2->type != UNION_REAL){
+                    int offset1 = getOffset(qn->arg1,qn->opcode,currentScope,globalScope,rht,NULL);
+                    int reg1 = searchRegister(registers,total_registers,offset1);
+                    int flag1 = (reg1 != -1) ? 0 : 1;
+                    if (reg1 == -1){
+                        reg1 = getEmptyRegister(registers);
+                    }
+                    if (reg1 == -1){
+                        reg1 = EDI;
+                    }
+                    registers[reg1]->offsetIfPresent = offset1;
+                    if (flag1 == 1){
+                        fprintf(fp,"\tmov %s, [%d]\n", registers[reg1]->regName ,registers[reg1]->offsetIfPresent);
+                    }
+                    int offset2 = offset1 + 4;
+                    int reg2 = searchRegister(registers,total_registers,offset2);
+                    int flag2 = (reg2 != -1) ? 0 : 1;
+                    if (reg2 == -1){
+                        reg2 = getEmptyRegister(registers);
+                    }
+                    if (reg2 == -1){
+                        reg2 = (reg1 == EDI) ? ESI : EDI;
+                    }
+                    registers[reg2]->offsetIfPresent = offset2;
+                    if (flag2 == 1){
+                        fprintf(fp,"\tmov %s, [%d]\n", registers[reg2]->regName ,registers[reg2]->offsetIfPresent);
+                    }
+                    int offset3 = getOffset(qn->arg2,qn->opcode,currentScope,globalScope,rht,NULL);   
+                    fprintf(fp,"\tcmp %s, [%d]\n", registers[reg1]->regName, offset3);
+                    fprintf(fp,"\tjne l%d\n", *nextlabel);
+                    fprintf(fp,"\tcmp %s, [%d]\n", registers[reg2]->regName, offset3 + 4);
+                    fprintf(fp,"\tjeq l%d\n", qn->result->data->jump_label);
+                    fprintf(fp,"l%d:\n",*nextlabel);
+                    *nextlabel++;
+                }
+                else {
+                    float data2;
+                    if (qn->arg1->type != UNION_REAL){
+                        data2 = qn->arg2->data->real_val;
+                    }
+                    else {
+                        data2 = qn->arg1->data->real_val;
+                    }
+                    int intpart2, fracpart2;
+                    intpart2 = (int)data2;
+                    fracpart2 = ((int)(data2*100))%100;
+                    int offset1;
+                    if (qn->arg1->type != UNION_REAL){
+                        offset1 = getOffset(qn->arg1,qn->opcode,currentScope,globalScope,rht,NULL);    
+                    }
+                    else {
+                        offset1 = getOffset(qn->arg2,qn->opcode,currentScope,globalScope,rht,NULL);
+                    }
+                    int reg1 = searchRegister(registers,total_registers,offset1);
+                    int flag1 = (reg1 != -1) ? 0 : 1;
+                    if (reg1 == -1){
+                        reg1 = getEmptyRegister(registers);
+                    }
+                    if (reg1 == -1){
+                        reg1 = EDI;
+                    }
+                    registers[reg1]->offsetIfPresent = offset1;
+                    if (flag1 == 1){
+                        fprintf(fp,"\tmov %s, [%d]\n", registers[reg1]->regName ,registers[reg1]->offsetIfPresent);
+                    }
+                    int offset2 = offset1 + 4;
+                    int reg2 = searchRegister(registers,total_registers,offset2);
+                    int flag2 = (reg2 != -1) ? 0 : 1;
+                    if (reg2 == -1){
+                        reg2 = getEmptyRegister(registers);
+                    }
+                    if (reg2 == -1){
+                        reg2 = (reg1 == EDI) ? ESI : EDI;
+                    }
+                    registers[reg2]->offsetIfPresent = offset2;
+                    if (flag2 == 1){
+                        fprintf(fp,"\tmov %s, [%d]\n", registers[reg2]->regName ,registers[reg2]->offsetIfPresent);
+                    }
+                    fprintf(fp,"\tcmp %s, %d\n", registers[reg1]->regName, intpart2);
+                    fprintf(fp,"\tjne l%d\n", *nextlabel);
+                    fprintf(fp,"\tcmp %s, %d\n", registers[reg2]->regName, fracpart2);
+                    fprintf(fp,"\tjeq l%d\n", qn->result->data->jump_label);
+                    fprintf(fp,"l%d:\n",*nextlabel);
+                    *nextlabel++;
+                }
+                break;
+            }
+        case JNE_REAL:
+            {
+                if (searchEntryDynamicArray(qn->label,usedLabels) == 1){
+                    fprintf(fp,"l%d:\n",qn->label);
+                }
+                if (qn->arg1->type == UNION_REAL && qn->arg2->type == UNION_REAL){
+                    int reg1 = getEmptyRegister(registers);
+                    if (reg1 == -1){
+                        reg1 = EDI;
+                    }
+                    registers[reg1]->offsetIfPresent = 1;
+
+                    int reg2 = getEmptyRegister(registers);
+                    if (reg2 == -1){
+                        reg2 = (reg1 == EDI) ? ESI : EDI;
+                    }
+                    registers[reg2]->offsetIfPresent = -1;
+                    registers[reg1]->offsetIfPresent = -1;
+                    float data1 = qn->arg1->data->real_val;
+                    float data2 = qn->arg2->data->real_val;
+                    int intpart1,intpart2,fracpart1,fracpart2;
+                    intpart1 = (int)data1;
+                    fracpart1 = ((int)(data1*100))%100;
+                    intpart2 = (int)data2;
+                    fracpart2 = ((int)(data2*100))%100;
+                    fprintf(fp,"\tmov %s, %d\n", registers[reg1]->regName, intpart1);
+                    fprintf(fp,"\tmov %s, %d\n", registers[reg2]->regName, fracpart1);    
+                    fprintf(fp,"\tcmp %s, %d\n", registers[reg1]->regName, intpart2);
+                    fprintf(fp,"\tjne l%d\n", qn->result->data->jump_label);
+                    fprintf(fp,"\tcmp %s, %d\n", registers[reg2]->regName, fracpart2);
+                    fprintf(fp,"\tjne l%d\n", qn->result->data->jump_label);
+                }
+                else if (qn->arg1->type != UNION_REAL && qn->arg2->type != UNION_REAL){
+                    int offset1 = getOffset(qn->arg1,qn->opcode,currentScope,globalScope,rht,NULL);
+                    int reg1 = searchRegister(registers,total_registers,offset1);
+                    int flag1 = (reg1 != -1) ? 0 : 1;
+                    if (reg1 == -1){
+                        reg1 = getEmptyRegister(registers);
+                    }
+                    if (reg1 == -1){
+                        reg1 = EDI;
+                    }
+                    registers[reg1]->offsetIfPresent = offset1;
+                    if (flag1 == 1){
+                        fprintf(fp,"\tmov %s, [%d]\n", registers[reg1]->regName ,registers[reg1]->offsetIfPresent);
+                    }
+                    int offset2 = offset1 + 4;
+                    int reg2 = searchRegister(registers,total_registers,offset2);
+                    int flag2 = (reg2 != -1) ? 0 : 1;
+                    if (reg2 == -1){
+                        reg2 = getEmptyRegister(registers);
+                    }
+                    if (reg2 == -1){
+                        reg2 = (reg1 == EDI) ? ESI : EDI;
+                    }
+                    registers[reg2]->offsetIfPresent = offset2;
+                    if (flag2 == 1){
+                        fprintf(fp,"\tmov %s, [%d]\n", registers[reg2]->regName ,registers[reg2]->offsetIfPresent);
+                    }
+                    int offset3 = getOffset(qn->arg2,qn->opcode,currentScope,globalScope,rht,NULL);
+                    fprintf(fp,"\tcmp %s, [%d]\n", registers[reg1]->regName, offset3);
+                    fprintf(fp,"\tjne l%d\n", qn->result->data->jump_label);
+                    fprintf(fp,"\tcmp %s, [%d]\n", registers[reg2]->regName, offset3 + 4);
+                    fprintf(fp,"\tjne l%d\n", qn->result->data->jump_label);
+                }
+                else {
+                    float data2;
+                    if (qn->arg1->type != UNION_REAL){
+                        data2 = qn->arg2->data->real_val;
+                    }
+                    else {
+                        data2 = qn->arg1->data->real_val;
+                    }
+                    int intpart2, fracpart2;
+                    intpart2 = (int)data2;
+                    fracpart2 = ((int)(data2*100))%100;
+                    int offset1;
+                    if (qn->arg1->type != UNION_REAL){
+                        offset1 = getOffset(qn->arg1,qn->opcode,currentScope,globalScope,rht,NULL);    
+                    }
+                    else {
+                        offset1 = getOffset(qn->arg2,qn->opcode,currentScope,globalScope,rht,NULL);
+                    }
+                    int reg1 = searchRegister(registers,total_registers,offset1);
+                    int flag1 = (reg1 != -1) ? 0 : 1;
+                    if (reg1 == -1){
+                        reg1 = getEmptyRegister(registers);
+                    }
+                    if (reg1 == -1){
+                        reg1 = EDI;
+                    }
+                    registers[reg1]->offsetIfPresent = offset1;
+                    if (flag1 == 1){
+                        fprintf(fp,"\tmov %s, [%d]\n", registers[reg1]->regName ,registers[reg1]->offsetIfPresent);
+                    }
+                    int offset2 = offset1 + 4;
+                    int reg2 = searchRegister(registers,total_registers,offset2);
+                    int flag2 = (reg2 != -1) ? 0 : 1;
+                    if (reg2 == -1){
+                        reg2 = getEmptyRegister(registers);
+                    }
+                    if (reg2 == -1){
+                        reg2 = (reg1 == EDI) ? ESI : EDI;
+                    }
+                    registers[reg2]->offsetIfPresent = offset2;
+                    if (flag2 == 1){
+                        fprintf(fp,"\tmov %s, [%d]\n", registers[reg2]->regName ,registers[reg2]->offsetIfPresent);
+                    }
+                    fprintf(fp,"\tcmp %s, %d\n", registers[reg1]->regName, intpart2);
+                    fprintf(fp,"\tjne l%d\n", qn->result->data->jump_label);
+                    fprintf(fp,"\tcmp %s, %d\n", registers[reg2]->regName, fracpart2);
+                    fprintf(fp,"\tjne l%d\n", qn->result->data->jump_label);
+                }
+                break;
+            }
+        case JLT_REAL:
+            {
+                if (searchEntryDynamicArray(qn->label,usedLabels) == 1){
+                    fprintf(fp,"l%d:\n",qn->label);
+                }
+                if (qn->arg1->type == UNION_REAL && qn->arg2->type == UNION_REAL){
+                    int reg1 = getEmptyRegister(registers);
+                    if (reg1 == -1){
+                        reg1 = EDI;
+                    }
+                    registers[reg1]->offsetIfPresent = 1;
+
+                    int reg2 = getEmptyRegister(registers);
+                    if (reg2 == -1){
+                        reg2 = (reg1 == EDI) ? ESI : EDI;
+                    }
+                    registers[reg2]->offsetIfPresent = -1;
+                    registers[reg1]->offsetIfPresent = -1;
+                    float data1 = qn->arg1->data->real_val;
+                    float data2 = qn->arg2->data->real_val;
+                    int intpart1,intpart2,fracpart1,fracpart2;
+                    intpart1 = (int)data1;
+                    fracpart1 = ((int)(data1*100))%100;
+                    intpart2 = (int)data2;
+                    fracpart2 = ((int)(data2*100))%100;
+                    fprintf(fp,"\tmov %s, %d\n", registers[reg1]->regName, intpart1);
+                    fprintf(fp,"\tmov %s, %d\n", registers[reg2]->regName, fracpart1);    
+                    fprintf(fp,"\tcmp %s, %d\n", registers[reg1]->regName, intpart2);
+                    fprintf(fp,"\tjlt l%d\n", qn->result->data->jump_label);
+                    fprintf(fp,"\tjgt l%d\n", *nextlabel);
+                    fprintf(fp,"\tcmp %s, %d\n", registers[reg2]->regName, fracpart2);
+                    fprintf(fp,"\tjlt l%d\n", qn->result->data->jump_label);
+                    fprintf(fp,"l%d:\n",*nextlabel);
+                    *nextlabel++;
+                }
+                else if (qn->arg1->type != UNION_REAL && qn->arg2->type != UNION_REAL){
+                    int offset1 = getOffset(qn->arg1,qn->opcode,currentScope,globalScope,rht,NULL);
+                    int reg1 = searchRegister(registers,total_registers,offset1);
+                    int flag1 = (reg1 != -1) ? 0 : 1;
+                    if (reg1 == -1){
+                        reg1 = getEmptyRegister(registers);
+                    }
+                    if (reg1 == -1){
+                        reg1 = EDI;
+                    }
+                    registers[reg1]->offsetIfPresent = offset1;
+                    if (flag1 == 1){
+                        fprintf(fp,"\tmov %s, [%d]\n", registers[reg1]->regName ,registers[reg1]->offsetIfPresent);
+                    }
+                    int offset2 = offset1 + 4;
+                    int reg2 = searchRegister(registers,total_registers,offset2);
+                    int flag2 = (reg2 != -1) ? 0 : 1;
+                    if (reg2 == -1){
+                        reg2 = getEmptyRegister(registers);
+                    }
+                    if (reg2 == -1){
+                        reg2 = (reg1 == EDI) ? ESI : EDI;
+                    }
+                    registers[reg2]->offsetIfPresent = offset2;
+                    if (flag2 == 1){
+                        fprintf(fp,"\tmov %s, [%d]\n", registers[reg2]->regName ,registers[reg2]->offsetIfPresent);
+                    }
+                    int offset3 = getOffset(qn->arg2,qn->opcode,currentScope,globalScope,rht,NULL); 
+                    fprintf(fp,"\tcmp %s, [%d]\n", registers[reg1]->regName, offset3);
+                    fprintf(fp,"\tjlt l%d\n", qn->result->data->jump_label);
+                    fprintf(fp,"\tjgt l%d\n", *nextlabel);
+                    fprintf(fp,"\tcmp %s, [%d]\n", registers[reg2]->regName, offset3 + 4);
+                    fprintf(fp,"\tjlt l%d\n", qn->result->data->jump_label);
+                    fprintf(fp,"l%d:\n",*nextlabel);
+                    *nextlabel++;
+                }
+                else {
+                    float data2;
+                    if (qn->arg1->type != UNION_REAL){
+                        data2 = qn->arg2->data->real_val;
+                    }
+                    else {
+                        data2 = qn->arg1->data->real_val;
+                    }
+                    int intpart2, fracpart2;
+                    intpart2 = (int)data2;
+                    fracpart2 = ((int)(data2*100))%100;
+                    int offset1;
+                    if (qn->arg1->type != UNION_REAL){
+                        offset1 = getOffset(qn->arg1,qn->opcode,currentScope,globalScope,rht,NULL);    
+                    }
+                    else {
+                        offset1 = getOffset(qn->arg2,qn->opcode,currentScope,globalScope,rht,NULL);
+                    }
+                    int reg1 = searchRegister(registers,total_registers,offset1);
+                    int flag1 = (reg1 != -1) ? 0 : 1;
+                    if (reg1 == -1){
+                        reg1 = getEmptyRegister(registers);
+                    }
+                    if (reg1 == -1){
+                        reg1 = EDI;
+                    }
+                    registers[reg1]->offsetIfPresent = offset1;
+                    if (flag1 == 1){
+                        fprintf(fp,"\tmov %s, [%d]\n", registers[reg1]->regName ,registers[reg1]->offsetIfPresent);
+                    }
+                    int offset2 = offset1 + 4;
+                    int reg2 = searchRegister(registers,total_registers,offset2);
+                    int flag2 = (reg2 != -1) ? 0 : 1;
+                    if (reg2 == -1){
+                        reg2 = getEmptyRegister(registers);
+                    }
+                    if (reg2 == -1){
+                        reg2 = (reg1 == EDI) ? ESI : EDI;
+                    }
+                    registers[reg2]->offsetIfPresent = offset2;
+                    if (flag2 == 1){
+                        fprintf(fp,"\tmov %s, [%d]\n", registers[reg2]->regName ,registers[reg2]->offsetIfPresent);
+                    }
+                    fprintf(fp,"\tcmp %s, %d\n", registers[reg1]->regName, intpart2);
+                    fprintf(fp,"\tjlt l%d\n", qn->result->data->jump_label);
+                    fprintf(fp,"\tjgt l%d\n", *nextlabel);
+                    fprintf(fp,"\tcmp %s, %d\n", registers[reg2]->regName, fracpart2);
+                    fprintf(fp,"\tjlt l%d\n", qn->result->data->jump_label);
+                    fprintf(fp,"l%d:\n",*nextlabel);
+                    *nextlabel++;
+                }
+                break;
+            }
+        case JLE_REAL:
+            {
+                if (searchEntryDynamicArray(qn->label,usedLabels) == 1){
+                    fprintf(fp,"l%d:\n",qn->label);
+                }
+                if (qn->arg1->type == UNION_REAL && qn->arg2->type == UNION_REAL){
+                    int reg1 = getEmptyRegister(registers);
+                    if (reg1 == -1){
+                        reg1 = EDI;
+                    }
+                    registers[reg1]->offsetIfPresent = 1;
+
+                    int reg2 = getEmptyRegister(registers);
+                    if (reg2 == -1){
+                        reg2 = (reg1 == EDI) ? ESI : EDI;
+                    }
+                    registers[reg2]->offsetIfPresent = -1;
+                    registers[reg1]->offsetIfPresent = -1;
+                    float data1 = qn->arg1->data->real_val;
+                    float data2 = qn->arg2->data->real_val;
+                    int intpart1,intpart2,fracpart1,fracpart2;
+                    intpart1 = (int)data1;
+                    fracpart1 = ((int)(data1*100))%100;
+                    intpart2 = (int)data2;
+                    fracpart2 = ((int)(data2*100))%100;
+                    fprintf(fp,"\tmov %s, %d\n", registers[reg1]->regName, intpart1);
+                    fprintf(fp,"\tmov %s, %d\n", registers[reg2]->regName, fracpart1);    
+                    fprintf(fp,"\tcmp %s, %d\n", registers[reg1]->regName, intpart2);
+                    fprintf(fp,"\tjlt l%d\n", qn->result->data->jump_label);
+                    fprintf(fp,"\tjgt l%d\n", *nextlabel);
+                    fprintf(fp,"\tcmp %s, %d\n", registers[reg2]->regName, fracpart2);
+                    fprintf(fp,"\tjle l%d\n", qn->result->data->jump_label);
+                    fprintf(fp,"l%d:\n",*nextlabel);
+                    *nextlabel++;
+                }
+                else if (qn->arg1->type != UNION_REAL && qn->arg2->type != UNION_REAL){
+                    int offset1 = getOffset(qn->arg1,qn->opcode,currentScope,globalScope,rht,NULL);
+                    int reg1 = searchRegister(registers,total_registers,offset1);
+                    int flag1 = (reg1 != -1) ? 0 : 1;
+                    if (reg1 == -1){
+                        reg1 = getEmptyRegister(registers);
+                    }
+                    if (reg1 == -1){
+                        reg1 = EDI;
+                    }
+                    registers[reg1]->offsetIfPresent = offset1;
+                    if (flag1 == 1){
+                        fprintf(fp,"\tmov %s, [%d]\n", registers[reg1]->regName ,registers[reg1]->offsetIfPresent);
+                    }
+                    int offset2 = offset1 + 4;
+                    int reg2 = searchRegister(registers,total_registers,offset2);
+                    int flag2 = (reg2 != -1) ? 0 : 1;
+                    if (reg2 == -1){
+                        reg2 = getEmptyRegister(registers);
+                    }
+                    if (reg2 == -1){
+                        reg2 = (reg1 == EDI) ? ESI : EDI;
+                    }
+                    registers[reg2]->offsetIfPresent = offset2;
+                    if (flag2 == 1){
+                        fprintf(fp,"\tmov %s, [%d]\n", registers[reg2]->regName ,registers[reg2]->offsetIfPresent);
+                    }
+                    int offset3 = getOffset(qn->arg2,qn->opcode,currentScope,globalScope,rht,NULL)  ; 
+                    fprintf(fp,"\tcmp %s, [%d]\n", registers[reg1]->regName, offset3);
+                    fprintf(fp,"\tjlt l%d\n", qn->result->data->jump_label);
+                    fprintf(fp,"\tjgt l%d\n", *nextlabel);
+                    fprintf(fp,"\tcmp %s, [%d]\n", registers[reg2]->regName, offset3);
+                    fprintf(fp,"\tjle l%d\n", qn->result->data->jump_label);
+                    fprintf(fp,"l%d:\n",*nextlabel);
+                    *nextlabel++;
+                }
+                else {
+                    float data2;
+                    if (qn->arg1->type != UNION_REAL){
+                        data2 = qn->arg2->data->real_val;
+                    }
+                    else {
+                        data2 = qn->arg1->data->real_val;
+                    }
+                    int intpart2, fracpart2;
+                    intpart2 = (int)data2;
+                    fracpart2 = ((int)(data2*100))%100;
+                    int offset1;
+                    if (qn->arg1->type != UNION_REAL){
+                        offset1 = getOffset(qn->arg1,qn->opcode,currentScope,globalScope,rht,NULL);    
+                    }
+                    else {
+                        offset1 = getOffset(qn->arg2,qn->opcode,currentScope,globalScope,rht,NULL);
+                    }
+                    int reg1 = searchRegister(registers,total_registers,offset1);
+                    int flag1 = (reg1 != -1) ? 0 : 1;
+                    if (reg1 == -1){
+                        reg1 = getEmptyRegister(registers);
+                    }
+                    if (reg1 == -1){
+                        reg1 = EDI;
+                    }
+                    registers[reg1]->offsetIfPresent = offset1;
+                    if (flag1 == 1){
+                        fprintf(fp,"\tmov %s, [%d]\n", registers[reg1]->regName ,registers[reg1]->offsetIfPresent);
+                    }
+                    int offset2 = offset1 + 4;
+                    int reg2 = searchRegister(registers,total_registers,offset2);
+                    int flag2 = (reg2 != -1) ? 0 : 1;
+                    if (reg2 == -1){
+                        reg2 = getEmptyRegister(registers);
+                    }
+                    if (reg2 == -1){
+                        reg2 = (reg1 == EDI) ? ESI : EDI;
+                    }
+                    registers[reg2]->offsetIfPresent = offset2;
+                    if (flag2 == 1){
+                        fprintf(fp,"\tmov %s, [%d]\n", registers[reg2]->regName ,registers[reg2]->offsetIfPresent);
+                    }
+                    fprintf(fp,"\tcmp %s, %d\n", registers[reg1]->regName, intpart2);
+                    fprintf(fp,"\tjlt l%d\n", qn->result->data->jump_label);
+                    fprintf(fp,"\tjgt l%d\n", *nextlabel);
+                    fprintf(fp,"\tcmp %s, %d\n", registers[reg2]->regName, fracpart2);
+                    fprintf(fp,"\tjle l%d\n", qn->result->data->jump_label);
+                    fprintf(fp,"l%d:\n",*nextlabel);
+                    *nextlabel++;
+                }
+                break;
+            }
+        case JGT_REAL:
+            {
+                if (searchEntryDynamicArray(qn->label,usedLabels) == 1){
+                    fprintf(fp,"l%d:\n",qn->label);
+                }
+                if (qn->arg1->type == UNION_REAL && qn->arg2->type == UNION_REAL){
+                    int reg1 = getEmptyRegister(registers);
+                    if (reg1 == -1){
+                        reg1 = EDI;
+                    }
+                    registers[reg1]->offsetIfPresent = 1;
+
+                    int reg2 = getEmptyRegister(registers);
+                    if (reg2 == -1){
+                        reg2 = (reg1 == EDI) ? ESI : EDI;
+                    }
+                    registers[reg2]->offsetIfPresent = -1;
+                    registers[reg1]->offsetIfPresent = -1;
+                    float data1 = qn->arg1->data->real_val;
+                    float data2 = qn->arg2->data->real_val;
+                    int intpart1,intpart2,fracpart1,fracpart2;
+                    intpart1 = (int)data1;
+                    fracpart1 = ((int)(data1*100))%100;
+                    intpart2 = (int)data2;
+                    fracpart2 = ((int)(data2*100))%100;
+                    fprintf(fp,"\tmov %s, %d\n", registers[reg1]->regName, intpart1);
+                    fprintf(fp,"\tmov %s, %d\n", registers[reg2]->regName, fracpart1);    
+                    fprintf(fp,"\tcmp %s, %d\n", registers[reg1]->regName, intpart2);
+                    fprintf(fp,"\tjgt l%d\n", qn->result->data->jump_label);
+                    fprintf(fp,"\tjlt l%d\n", *nextlabel);
+                    fprintf(fp,"\tcmp %s, %d\n", registers[reg2]->regName, fracpart2);
+                    fprintf(fp,"\tjgt l%d\n", qn->result->data->jump_label);
+                    fprintf(fp,"l%d:\n",*nextlabel);
+                    *nextlabel++;
+                }
+                else if (qn->arg1->type != UNION_REAL && qn->arg2->type != UNION_REAL){
+                    int offset1 = getOffset(qn->arg1,qn->opcode,currentScope,globalScope,rht,NULL);
+                    int reg1 = searchRegister(registers,total_registers,offset1);
+                    int flag1 = (reg1 != -1) ? 0 : 1;
+                    if (reg1 == -1){
+                        reg1 = getEmptyRegister(registers);
+                    }
+                    if (reg1 == -1){
+                        reg1 = EDI;
+                    }
+                    registers[reg1]->offsetIfPresent = offset1;
+                    if (flag1 == 1){
+                        fprintf(fp,"\tmov %s, [%d]\n", registers[reg1]->regName ,registers[reg1]->offsetIfPresent);
+                    }
+                    int offset2 = offset1 + 4;
+                    int reg2 = searchRegister(registers,total_registers,offset2);
+                    int flag2 = (reg2 != -1) ? 0 : 1;
+                    if (reg2 == -1){
+                        reg2 = getEmptyRegister(registers);
+                    }
+                    if (reg2 == -1){
+                        reg2 = (reg1 == EDI) ? ESI : EDI;
+                    }
+                    registers[reg2]->offsetIfPresent = offset2;
+                    if (flag2 == 1){
+                        fprintf(fp,"\tmov %s, [%d]\n", registers[reg2]->regName ,registers[reg2]->offsetIfPresent);
+                    }
+                    int offset3 = getOffset(qn->arg2,qn->opcode,currentScope,globalScope,rht,NULL)   ;
+                    fprintf(fp,"\tcmp %s, [%d]\n", registers[reg1]->regName, offset3);
+                    fprintf(fp,"\tjgt l%d\n", qn->result->data->jump_label);
+                    fprintf(fp,"\tjlt l%d\n", *nextlabel);
+                    fprintf(fp,"\tcmp %s, [%d]\n", registers[reg2]->regName, offset3 + 4);
+                    fprintf(fp,"\tjgt l%d\n", qn->result->data->jump_label);
+                    fprintf(fp,"l%d:\n",*nextlabel);
+                    *nextlabel++;
+                }
+                else {
+                    float data2;
+                    if (qn->arg1->type != UNION_REAL){
+                        data2 = qn->arg2->data->real_val;
+                    }
+                    else {
+                        data2 = qn->arg1->data->real_val;
+                    }
+                    int intpart2, fracpart2;
+                    intpart2 = (int)data2;
+                    fracpart2 = ((int)(data2*100))%100;
+                    int offset1;
+                    if (qn->arg1->type != UNION_REAL){
+                        offset1 = getOffset(qn->arg1,qn->opcode,currentScope,globalScope,rht,NULL);    
+                    }
+                    else {
+                        offset1 = getOffset(qn->arg2,qn->opcode,currentScope,globalScope,rht,NULL);
+                    }
+                    int reg1 = searchRegister(registers,total_registers,offset1);
+                    int flag1 = (reg1 != -1) ? 0 : 1;
+                    if (reg1 == -1){
+                        reg1 = getEmptyRegister(registers);
+                    }
+                    if (reg1 == -1){
+                        reg1 = EDI;
+                    }
+                    registers[reg1]->offsetIfPresent = offset1;
+                    if (flag1 == 1){
+                        fprintf(fp,"\tmov %s, [%d]\n", registers[reg1]->regName ,registers[reg1]->offsetIfPresent);
+                    }
+                    int offset2 = offset1 + 4;
+                    int reg2 = searchRegister(registers,total_registers,offset2);
+                    int flag2 = (reg2 != -1) ? 0 : 1;
+                    if (reg2 == -1){
+                        reg2 = getEmptyRegister(registers);
+                    }
+                    if (reg2 == -1){
+                        reg2 = (reg1 == EDI) ? ESI : EDI;
+                    }
+                    registers[reg2]->offsetIfPresent = offset2;
+                    if (flag2 == 1){
+                        fprintf(fp,"\tmov %s, [%d]\n", registers[reg2]->regName ,registers[reg2]->offsetIfPresent);
+                    }
+                    fprintf(fp,"\tcmp %s, %d\n", registers[reg1]->regName, intpart2);
+                    fprintf(fp,"\tjgt l%d\n", qn->result->data->jump_label);
+                    fprintf(fp,"\tjlt l%d\n", *nextlabel);
+                    fprintf(fp,"\tcmp %s, %d\n", registers[reg2]->regName, fracpart2);
+                    fprintf(fp,"\tjgt l%d\n", qn->result->data->jump_label);
+                    fprintf(fp,"l%d:\n",*nextlabel);
+                    *nextlabel++;
+                }
+                break;
+            }
+        case JGE_REAL:
+            {
+                if (searchEntryDynamicArray(qn->label,usedLabels) == 1){
+                    fprintf(fp,"l%d:\n",qn->label);
+                }
+                if (qn->arg1->type == UNION_REAL && qn->arg2->type == UNION_REAL){
+                    int reg1 = getEmptyRegister(registers);
+                    if (reg1 == -1){
+                        reg1 = EDI;
+                    }
+                    registers[reg1]->offsetIfPresent = 1;
+
+                    int reg2 = getEmptyRegister(registers);
+                    if (reg2 == -1){
+                        reg2 = (reg1 == EDI) ? ESI : EDI;
+                    }
+                    registers[reg2]->offsetIfPresent = -1;
+                    registers[reg1]->offsetIfPresent = -1;
+                    float data1 = qn->arg1->data->real_val;
+                    float data2 = qn->arg2->data->real_val;
+                    int intpart1,intpart2,fracpart1,fracpart2;
+                    intpart1 = (int)data1;
+                    fracpart1 = ((int)(data1*100))%100;
+                    intpart2 = (int)data2;
+                    fracpart2 = ((int)(data2*100))%100;
+                    fprintf(fp,"\tmov %s, %d\n", registers[reg1]->regName, intpart1);
+                    fprintf(fp,"\tmov %s, %d\n", registers[reg2]->regName, fracpart1);    
+                    fprintf(fp,"\tcmp %s, %d\n", registers[reg1]->regName, intpart2);
+                    fprintf(fp,"\tjgt l%d\n", qn->result->data->jump_label);
+                    fprintf(fp,"\tjlt l%d\n", *nextlabel);
+                    fprintf(fp,"\tcmp %s, %d\n", registers[reg2]->regName, fracpart2);
+                    fprintf(fp,"\tjge l%d\n", qn->result->data->jump_label);
+                    fprintf(fp,"l%d:\n",*nextlabel);
+                    *nextlabel++;
+                }
+                else if (qn->arg1->type != UNION_REAL && qn->arg2->type != UNION_REAL){
+                    int offset1 = getOffset(qn->arg1,qn->opcode,currentScope,globalScope,rht,NULL);
+                    int reg1 = searchRegister(registers,total_registers,offset1);
+                    int flag1 = (reg1 != -1) ? 0 : 1;
+                    if (reg1 == -1){
+                        reg1 = getEmptyRegister(registers);
+                    }
+                    if (reg1 == -1){
+                        reg1 = EDI;
+                    }
+                    registers[reg1]->offsetIfPresent = offset1;
+                    if (flag1 == 1){
+                        fprintf(fp,"\tmov %s, [%d]\n", registers[reg1]->regName ,registers[reg1]->offsetIfPresent);
+                    }
+                    int offset2 = offset1 + 4;
+                    int reg2 = searchRegister(registers,total_registers,offset2);
+                    int flag2 = (reg2 != -1) ? 0 : 1;
+                    if (reg2 == -1){
+                        reg2 = getEmptyRegister(registers);
+                    }
+                    if (reg2 == -1){
+                        reg2 = (reg1 == EDI) ? ESI : EDI;
+                    }
+                    registers[reg2]->offsetIfPresent = offset2;
+                    if (flag2 == 1){
+                        fprintf(fp,"\tmov %s, [%d]\n", registers[reg2]->regName ,registers[reg2]->offsetIfPresent);
+                    }
+                    int offset3 = getOffset(qn->arg2,qn->opcode,currentScope,globalScope,rht,NULL)  ; 
+                    fprintf(fp,"\tcmp %s, [%d]\n", registers[reg1]->regName, offset3);
+                    fprintf(fp,"\tjgt l%d\n", qn->result->data->jump_label);
+                    fprintf(fp,"\tjlt l%d\n", *nextlabel);
+                    fprintf(fp,"\tcmp %s, [%d]\n", registers[reg2]->regName, offset3 + 4);
+                    fprintf(fp,"\tjge l%d\n", qn->result->data->jump_label);
+                    fprintf(fp,"l%d:\n",*nextlabel);
+                    *nextlabel++;
+                }
+                else {
+                    float data2;
+                    if (qn->arg1->type != UNION_REAL){
+                        data2 = qn->arg2->data->real_val;
+                    }
+                    else {
+                        data2 = qn->arg1->data->real_val;
+                    }
+                    int intpart2, fracpart2;
+                    intpart2 = (int)data2;
+                    fracpart2 = ((int)(data2*100))%100;
+                    int offset1;
+                    if (qn->arg1->type != UNION_REAL){
+                        offset1 = getOffset(qn->arg1,qn->opcode,currentScope,globalScope,rht,NULL);    
+                    }
+                    else {
+                        offset1 = getOffset(qn->arg2,qn->opcode,currentScope,globalScope,rht,NULL);
+                    }
+                    int reg1 = searchRegister(registers,total_registers,offset1);
+                    int flag1 = (reg1 != -1) ? 0 : 1;
+                    if (reg1 == -1){
+                        reg1 = getEmptyRegister(registers);
+                    }
+                    if (reg1 == -1){
+                        reg1 = EDI;
+                    }
+                    registers[reg1]->offsetIfPresent = offset1;
+                    if (flag1 == 1){
+                        fprintf(fp,"\tmov %s, [%d]\n", registers[reg1]->regName ,registers[reg1]->offsetIfPresent);
+                    }
+                    int offset2 = offset1 + 4;
+                    int reg2 = searchRegister(registers,total_registers,offset2);
+                    int flag2 = (reg2 != -1) ? 0 : 1;
+                    if (reg2 == -1){
+                        reg2 = getEmptyRegister(registers);
+                    }
+                    if (reg2 == -1){
+                        reg2 = (reg1 == EDI) ? ESI : EDI;
+                    }
+                    registers[reg2]->offsetIfPresent = offset2;
+                    if (flag2 == 1){
+                        fprintf(fp,"\tmov %s, [%d]\n", registers[reg2]->regName ,registers[reg2]->offsetIfPresent);
+                    }
+                    fprintf(fp,"\tcmp %s, %d\n", registers[reg1]->regName, intpart2);
+                    fprintf(fp,"\tjgt l%d\n", qn->result->data->jump_label);
+                    fprintf(fp,"\tjlt l%d\n", *nextlabel);
+                    fprintf(fp,"\tcmp %s, %d\n", registers[reg2]->regName, fracpart2);
+                    fprintf(fp,"\tjge l%d\n", qn->result->data->jump_label);
+                    fprintf(fp,"l%d:\n",*nextlabel);
+                    *nextlabel++;
+                }
+                break;
+            }
         
         }//end switch for opcode
 
@@ -2857,11 +3630,6 @@ void makeScopeTables(ASTNode *head, recordsHashTable *rht, allFunctionsHashTable
     */
     FILE *fp = fopen("code.txt","w");
     makeCode(q, currentScope, globalScope, rht, da, rg, 20, ptrAvailableLabels, fp);
-
-
-
-
-
 
 }
 

@@ -1,8 +1,8 @@
 #ifndef REGISTER_H_INCLUDED
 #define REGISTER_H_INCLUDED
 
-#define INT_SIZE 2
-#define REAL_SIZE 4
+#define INT_SIZE 4
+#define REAL_SIZE 8
 
 reg *createRegisterEntry(int regNum, char *regName);
 int searchRegister(reg **rgs, int size, int offset);

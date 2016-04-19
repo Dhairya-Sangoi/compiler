@@ -32,16 +32,12 @@ int searchEntryDynamicArrayAux(int lbl, int *arr, int start, int end){
     else if (start == end){
         //printf("here start = %d\n", start);
         int ret = (arr[start] == lbl) ? 1 : 0;
-        if (ret == 1){
-            printf("here start = %d\n", start);
-        }
         return ret;
     }
     else {
         mid = start + end;
         mid /= 2;
         if (arr[mid] == lbl){
-            printf("here index = %d\n", mid);
             return 1;
         }
         else if (arr[mid] > lbl){

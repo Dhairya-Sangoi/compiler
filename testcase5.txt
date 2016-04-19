@@ -1,10 +1,15 @@
 _main
 	
 	
-	type int : b5;
-	type int : d5;
-	type int : c5;
-	b5 <--- 5 + b5 + 3 + d5;
+	type real : b5;
+	type real : c5;
+	type real : d5;
+	% b5 <--- 15 * b5 * d5 * 30;
+	type int : c4;
+	if ( (b5 < 3.01) &&& (d5 >= 50.91) )
+	then
+		c4<--- 22;
+	endif
 	
 	
 	return;

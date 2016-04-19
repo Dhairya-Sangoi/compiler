@@ -1,9 +1,18 @@
 	mov EAX, [0]
-	add EAX, 1
-	mov [6], EAX
-	add EAX, 2
-	mov [8], EAX
-	add EAX, [2]
-	mov [10], EAX
-	mov [0], EAX
+	mov EBX, [4]
+	cmp EAX, 3
+	jgt l1
+	jlt l4
+	cmp EBX, 1
+	jge l1
+l4:
+	mov ECX, [16]
+	mov EDX, [20]
+	cmp ECX, 50
+	jlt l1
+	jgt l0
+	cmp EDX, 91
+	jlt l1
+l0:
+	mov [24], 22
 l1:

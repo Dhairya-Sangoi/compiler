@@ -1,8 +1,8 @@
 #ifndef SCOPEHASHTABLE_H_INCLUDED
 #define SCOPEHASHTABLE_H_INCLUDED
 
-#define INT_SIZE 2
-#define REAL_SIZE 4
+#define INT_SIZE 4
+#define REAL_SIZE 8
 
 scopeHashTable *createScopeHashTable(int size, int multiplier);
 void rehashScopeHashTable(scopeHashTable *ht, int start, int end);

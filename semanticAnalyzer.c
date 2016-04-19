@@ -614,6 +614,7 @@ void dfsForScopeTables(ASTNode *head, recordsHashTable *rht, allFunctionsHashTab
 
     }
 }
+////////////////////////////////////////////////////
 
 void dfsForSemanticAnalysis(ASTNode *head, recordsHashTable *rht, allFunctionsHashTable *afht, scopeHashTable *currentScope, scopeHashTable *globalScope, char *fname, char **argtype, whileScopeList *headWhile, whileScopeList *tailWhile, int mylabel, int nextlabel, int grandnextlabel, int *ptrAvailableLabels, int *ptrAvailableTemporary, int jumpIfTrue, int jumpIfFalse, int shouldOutputLabel, int *success, quadruple *q, dynamicArray *da){
     switch (head->index){
@@ -2454,6 +2455,203 @@ void dfsForSemanticAnalysis(ASTNode *head, recordsHashTable *rht, allFunctionsHa
     }
 }
 
+void makeCode(quadruple *q, scopeHashTable *currentScope, scopeHashTable *globalScope, recordsHashTable *rht, dynamicArray *usedLabels, reg **registers, int total_registers, int *nextlabel, FILE *fp){
+    int i;
+    for (i=0; i<q->index; i++){
+        quadrupleNode *qn = q->instructions[i];
+        switch(qn->opcode){
+        case LABEL:
+            {
+                fprintf(fp,"l%d:\n",qn->label);
+                break;
+            }
+        case JUMP:
+            {
+                fprintf(fp,"\tjmp l%d\n", qn->arg1->data->jump_label);
+                break;
+            }
+        case JLT_INT:
+        case JLE_INT:
+        case JGT_INT:
+        case JGE_INT:
+        case JEQ_INT:
+        case JNE_INT:
+            {
+                if (qn->arg1->type == UNION_INT && qn->arg2->type == UNION_INT){
+                    int reg1 = getEmptyRegister(registers);
+                    if (reg1 == -1){
+                        reg1 = EDI;
+                    }
+                    registers[reg1]->offsetIfPresent = -1;
+
+/*                    int reg2 = getEmptyRegister(registers);
+                    if (reg2 == -1){
+                        reg2 = (reg1 == EDI) ? ESI : EDI;
+                    }
+                    registers[reg2]->offsetIfPresent = -1;
+*/
+                    fprintf(fp,"\tmov %s, %d\n", registers[reg1]->regName ,qn->arg1->data->int_val);
+                    fprintf(fp,"\tcmp %s, %d\n", registers[reg1]->regName ,qn->arg2->data->int_val);
+                    switch(qn->opcode){
+                    case JLT_INT:
+                        {
+                            fprintf(fp,"\tjlt l%d\n", qn->result->data->jump_label);
+                            break;
+                        }
+                    case JLE_INT:
+                        {
+                            fprintf(fp,"\tjle l%d\n", qn->result->data->jump_label);
+                            break;
+                        }
+                    case JGT_INT:
+                        {
+                            fprintf(fp,"\tjgt l%d\n", qn->result->data->jump_label);
+                            break;
+                        }
+                    case JGE_INT:
+                        {
+                            fprintf(fp,"\tjge l%d\n", qn->result->data->jump_label);
+                            break;
+                        }
+                    case JEQ_INT:
+                        {
+                            fprintf(fp,"\tjeq l%d\n", qn->result->data->jump_label);
+                            break;
+                        }
+                    case JNE_INT:
+                        {
+                            fprintf(fp,"\tjne l%d\n", qn->result->data->jump_label);
+                            break;
+                        }
+                    }
+                }
+                else if (qn->arg1->type != UNION_INT){ 
+                    int offset1 = getOffset(qn->arg1,qn->opcode,currentScope,globalScope,rht,NULL);
+                    int reg1 = searchRegister(registers,total_registers,offset1);
+                    int flag = (reg1 != -1) ? 0 : 1;
+                    if (reg1 == -1){
+                        reg1 = getEmptyRegister(registers);
+                    }
+                    if (reg1 == -1){
+                        reg1 = EDI;
+                    }
+                    registers[reg1]->offsetIfPresent = offset1;
+
+                    /*
+                    int reg2 = getEmptyRegister(registers);
+                    if (reg2 == -1){
+                        reg2 = (reg1 == EDI) ? ESI : EDI;
+                    }
+                    registers[reg2]->offsetIfPresent = getOffset(qn->arg2);
+                    */
+                    if (flag == 1){
+                        fprintf(fp,"\tmov %s, [%d]\n", registers[reg1]->regName ,registers[reg1]->offsetIfPresent);
+                    }
+                    if (qn->arg2->type != UNION_INT){
+                        int offset2 = getOffset(qn->arg2,qn->opcode,currentScope,globalScope,rht,NULL);
+                        int reg2 = searchRegister(registers,total_registers,offset1);
+                        if (reg2 == -1){
+                            fprintf(fp,"\tcmp %s, [%d]\n", registers[reg1]->regName ,offset2);    
+                        }
+                        else {
+                            fprintf(fp,"\tcmp %s, %s\n", registers[reg1]->regName ,registers[reg2]->regName);   
+                        }
+                        
+                    }
+                    else {
+                        fprintf(fp,"\tcmp %s, %d\n", registers[reg1]->regName ,qn->arg2->data->int_val);
+                    }
+                    switch(qn->opcode){
+                    case JLT_INT:
+                        {
+                            fprintf(fp,"\tjlt l%d\n", qn->result->data->jump_label);
+                            break;
+                        }
+                    case JLE_INT:
+                        {
+                            fprintf(fp,"\tjle l%d\n", qn->result->data->jump_label);
+                            break;
+                        }
+                    case JGT_INT:
+                        {
+                            fprintf(fp,"\tjgt l%d\n", qn->result->data->jump_label);
+                            break;
+                        }
+                    case JGE_INT:
+                        {
+                            fprintf(fp,"\tjge l%d\n", qn->result->data->jump_label);
+                            break;
+                        }
+                    case JEQ_INT:
+                        {
+                            fprintf(fp,"\tjeq l%d\n", qn->result->data->jump_label);
+                            break;
+                        }
+                    case JNE_INT:
+                        {
+                            fprintf(fp,"\tjne l%d\n", qn->result->data->jump_label);
+                            break;
+                        }
+                    }
+                }
+                else {
+                    int offset1 = getOffset(qn->arg2,qn->opcode,currentScope,globalScope,rht,NULL);
+                    int reg1 = searchRegister(registers,total_registers,offset1);
+                    int flag = (reg1 == -1) ? 1 : 0;
+                    if (reg1 == -1){
+                        reg1 = getEmptyRegister(registers);
+                    }
+                    if (reg1 == -1){
+                        reg1 = EDI;
+                    }
+                    registers[reg1]->offsetIfPresent = offset1;
+                    if (flag == 1){
+                        fprintf(fp,"\tmov %s, [%d]\n", registers[reg1]->regName ,registers[reg1]->offsetIfPresent);    
+                    }
+                    fprintf(fp,"\tcmp %s, %d\n", registers[reg1]->regName ,qn->arg1->data->int_val);
+                    switch(qn->opcode){
+                    case JLT_INT:
+                        {
+                            fprintf(fp,"\tjgt l%d\n", qn->result->data->jump_label);
+                            break;
+                        }
+                    case JLE_INT:
+                        {
+                            fprintf(fp,"\tjge l%d\n", qn->result->data->jump_label);
+                            break;
+                        }
+                    case JGT_INT:
+                        {
+                            fprintf(fp,"\tjlt l%d\n", qn->result->data->jump_label);
+                            break;
+                        }
+                    case JGE_INT:
+                        {
+                            fprintf(fp,"\tjle l%d\n", qn->result->data->jump_label);
+                            break;
+                        }
+                    case JEQ_INT:
+                        {
+                            fprintf(fp,"\tjeq l%d\n", qn->result->data->jump_label);
+                            break;
+                        }
+                    case JNE_INT:
+                        {
+                            fprintf(fp,"\tjne l%d\n", qn->result->data->jump_label);
+                            break;
+                        }
+                    }
+                }
+                break;
+            }
+
+
+        }
+    }
+}
+
+
+
 void makeScopeTables(ASTNode *head, recordsHashTable *rht, allFunctionsHashTable *afht, scopeHashTable *globalScope, quadruple *q){
     int *offset = (int *)malloc(sizeof(int));
     *offset = -1;
@@ -2472,6 +2670,7 @@ void makeScopeTables(ASTNode *head, recordsHashTable *rht, allFunctionsHashTable
     sortDynamicArray(da);
     //printDynamicArray(da);
 
+    //printf("label:%d\n",*ptrAvailableLabels);
 
     //making datastructure for registers
 
@@ -2509,7 +2708,7 @@ void makeScopeTables(ASTNode *head, recordsHashTable *rht, allFunctionsHashTable
                 }
             }
             
-            printf("Arg1_Offset: %d ", getOffset(qn->arg1,qn->opcode,currentScope,globalScope,rht,type));
+            printf("Arg1_Offset: %d ", getOffset(qn->arg1,qn->opcode,currentScope,globalScope,rht,NULL));
             printf("Arg2_Offset: %d ", getOffset(qn->arg2,qn->opcode,currentScope,globalScope,rht,type));
             printf("Res_Offset: %d\n", getOffset(qn->result,qn->opcode,currentScope,globalScope,rht,type));
         }
@@ -2545,6 +2744,9 @@ void makeScopeTables(ASTNode *head, recordsHashTable *rht, allFunctionsHashTable
         printRegister(rg[i]);
     }
     */
+
+
+
 
 
 

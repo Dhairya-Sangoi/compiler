@@ -12,6 +12,7 @@
 
 #include "enum.h"
 #include "operators.h"
+#include "registers.h"
 
 reg *createRegisterEntry(int regNum, char *regName){
 	reg *rg = (reg *)malloc(sizeof(reg));
@@ -140,6 +141,30 @@ int getOffset(typedUnion *arg, int opcode, scopeHashTable *currentScope, scopeHa
 		return -1;
 	}
 	return -1;
+}
+
+int getEmptyRegister(reg **rgs){
+	if (rgs[EAX]->offsetIfPresent == -1){
+		return EAX;
+	}
+	else if (rgs[EBX]->offsetIfPresent == -1){
+		return EBX;
+	}
+	else if (rgs[ECX]->offsetIfPresent == -1){
+		return ECX;
+	}
+	else if (rgs[EDX]->offsetIfPresent == -1){
+		return EDX;
+	}
+	else if (rgs[ESI]->offsetIfPresent == -1){
+		return ESI;
+	}
+	else if (rgs[EDI]->offsetIfPresent == -1){
+		return EDI;
+	}
+	else {
+		return -1;
+	}
 }
 
 void printRegister(reg *rg){

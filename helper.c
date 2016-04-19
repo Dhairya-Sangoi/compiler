@@ -27,6 +27,9 @@
 #include "allFunctionsHashTable.h"
 #include "recordsHashTableDef.h"
 #include "recordsHashTable.h"
+
+#include "registerDef.h"
+
 #include "semanticAnalyzerDef.h"
 #include "semanticAnalyzer.h"
 

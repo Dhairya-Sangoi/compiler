@@ -1,27 +1,15 @@
 _main
-	record #marks
-		type real : maths; 
-		type int: physics; 
-		type real: chemistry;
-	endrecord;
-	record #mark
-		type real : maths; 
-		type int: physics; 
-		type int: chemistry;
-	endrecord;
-	type record #marks : b5c6;
-	type record #marks : b5c5;
-	type real : b5;
-	type real : d5;
-	type record #marks : b5c7;
-	type int : c5;
-	b5c5 <--- b5c7 + b5c6 * c5 + b5c5 - b5c7 * 2.00;
 	
+	
+	type int : b5;
+	type int : d5;
+	type int : c5;
+	b5 <--- d5 + b5 - 5 + b5 - d5 + 2;
 	while( (b5<=d5) @@@ (b5 > d5) )
-		d5 <--- b5c7.maths * b5c6.chemistry +1.00;
+		d5 <--- 1;
 		if (c5 < 3)
 		then
-		c5<--- 2 + b5c5.physics * b5c5.physics + b5c5.physics;
+		c5<--- 2 + b5;
 		endif
 	endwhile
 	

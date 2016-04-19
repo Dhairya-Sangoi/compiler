@@ -1,0 +1,28 @@
+	mov EAX, [2]
+	add EAX, [0]
+	mov [6], EAX
+	add EAX, 2
+	mov [8], EAX
+	add EAX, [0]
+	mov [10], EAX
+	add EAX, [2]
+	mov [12], EAX
+	add EAX, 5
+	mov [14], EAX
+	mov [0], EAX
+l1:
+	cmp EAX, [2]
+	jle l4
+	cmp EAX, [2]
+	jle l2
+l4:
+	mov [2], 1
+	mov EBX, [4]
+	cmp EBX, 3
+	jge l6
+	add EAX, 1
+	mov [6], EAX
+	mov [4], EAX
+l6:
+	jmp l1
+l2:

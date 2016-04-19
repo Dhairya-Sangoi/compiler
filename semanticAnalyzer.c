@@ -2467,6 +2467,9 @@ void makeCode(quadruple *q, scopeHashTable *currentScope, scopeHashTable *global
             }
         case JUMP:
             {
+                if (searchEntryDynamicArray(qn->label,usedLabels) == 1){
+                    fprintf(fp,"l%d:\n",qn->label);
+                }
                 fprintf(fp,"\tjmp l%d\n", qn->arg1->data->jump_label);
                 break;
             }
@@ -2477,6 +2480,9 @@ void makeCode(quadruple *q, scopeHashTable *currentScope, scopeHashTable *global
         case JEQ_INT:
         case JNE_INT:
             {
+                if (searchEntryDynamicArray(qn->label,usedLabels) == 1){
+                    fprintf(fp,"l%d:\n",qn->label);
+                }
                 if (qn->arg1->type == UNION_INT && qn->arg2->type == UNION_INT){
                     int reg1 = getEmptyRegister(registers);
                     if (reg1 == -1){
@@ -2549,7 +2555,7 @@ void makeCode(quadruple *q, scopeHashTable *currentScope, scopeHashTable *global
                     }
                     if (qn->arg2->type != UNION_INT){
                         int offset2 = getOffset(qn->arg2,qn->opcode,currentScope,globalScope,rht,NULL);
-                        int reg2 = searchRegister(registers,total_registers,offset1);
+                        int reg2 = searchRegister(registers,total_registers,offset2);
                         if (reg2 == -1){
                             fprintf(fp,"\tcmp %s, [%d]\n", registers[reg1]->regName ,offset2);    
                         }
@@ -2644,10 +2650,115 @@ void makeCode(quadruple *q, scopeHashTable *currentScope, scopeHashTable *global
                 }
                 break;
             }
+        case PLUS_INT:
+        case MINUS_INT:
+            {
+                if (searchEntryDynamicArray(qn->label,usedLabels) == 1){
+                    fprintf(fp,"l%d:\n",qn->label);
+                }
+                if (qn->arg1->type == UNION_INT && qn->arg2->type == UNION_INT){                                    
+                    int reg1 = getEmptyRegister(registers);
+                    if (reg1 == -1){
+                        reg1 = EDI;
+                    }
+                    registers[reg1]->offsetIfPresent = -1;
+                    fprintf(fp,"\tmov %s, %d\n", registers[reg1]->regName ,qn->arg1->data->int_val);                        
+                    fprintf(fp,"\tadd %s, %d\n", registers[reg1]->regName, qn->arg2->data->int_val);
+                    fprintf(fp,"\tmov [%d], %s\n", getOffset(qn->result,qn->opcode,currentScope,globalScope,rht,NULL), registers[reg1]->regName );
+                }
+                else if (qn->arg1->type != UNION_INT && qn->arg2->type == UNION_INT){
+                    int offset1 = getOffset(qn->arg1,qn->opcode,currentScope,globalScope,rht,NULL);
+                    int reg1 = searchRegister(registers,total_registers,offset1);
+                    int flag = (reg1 != -1) ? 0 : 1;
+                    if (reg1 == -1){
+                        reg1 = getEmptyRegister(registers);
+                    }
+                    if (reg1 == -1){
+                        reg1 = EDI;
+                    }
+                    registers[reg1]->offsetIfPresent = offset1;
+                    if (flag == 1){
+                        fprintf(fp,"\tmov %s, [%d]\n", registers[reg1]->regName ,registers[reg1]->offsetIfPresent);
+                    }
+                    fprintf(fp,"\tadd %s, %d\n", registers[reg1]->regName, qn->arg2->data->int_val);
+                    int offset2 = getOffset(qn->result,qn->opcode,currentScope,globalScope,rht,NULL);
+                    fprintf(fp,"\tmov [%d], %s\n", offset2, registers[reg1]->regName );
+                    registers[reg1]->offsetIfPresent = offset2; // adding changes the value of the register
+                }
+                else if (qn->arg1->type == UNION_INT && qn->arg2->type != UNION_INT){
+                    int offset1 = getOffset(qn->arg2,qn->opcode,currentScope,globalScope,rht,NULL);
+                    int reg1 = searchRegister(registers,total_registers,offset1);
+                    int flag = (reg1 != -1) ? 0 : 1;
+                    if (reg1 == -1){
+                        reg1 = getEmptyRegister(registers);
+                    }
+                    if (reg1 == -1){
+                        reg1 = EDI;
+                    }
+                    registers[reg1]->offsetIfPresent = offset1;
+                    if (flag == 1){
+                        fprintf(fp,"\tmov %s, [%d]\n", registers[reg1]->regName ,registers[reg1]->offsetIfPresent);
+                    }
+                    fprintf(fp,"\tadd %s, %d\n", registers[reg1]->regName, qn->arg1->data->int_val);
+                    int offset2 = getOffset(qn->result,qn->opcode,currentScope,globalScope,rht,NULL);
+                    fprintf(fp,"\tmov [%d], %s\n", offset2, registers[reg1]->regName );
+                    registers[reg1]->offsetIfPresent = offset2; // adding changes the value of the register
+                }
+                else {
+                    int offset1 = getOffset(qn->arg1,qn->opcode,currentScope,globalScope,rht,NULL);
+                    int reg1 = searchRegister(registers,total_registers,offset1);
+                    int flag = (reg1 != -1) ? 0 : 1;
+                    if (reg1 == -1){
+                        reg1 = getEmptyRegister(registers);
+                    }
+                    if (reg1 == -1){
+                        reg1 = EDI;
+                    }
+                    registers[reg1]->offsetIfPresent = offset1;
+                    if (flag == 1){
+                        fprintf(fp,"\tmov %s, [%d]\n", registers[reg1]->regName ,registers[reg1]->offsetIfPresent);
+                    }
+                    fprintf(fp,"\tadd %s, [%d]\n", registers[reg1]->regName, getOffset(qn->arg2,qn->opcode,currentScope,globalScope,rht,NULL) );
+                    int offset2 = getOffset(qn->result,qn->opcode,currentScope,globalScope,rht,NULL);
+                    fprintf(fp,"\tmov [%d], %s\n", offset2, registers[reg1]->regName );
+                    registers[reg1]->offsetIfPresent = offset2; // adding changes the value of the register
+                }
+                break;
+            }
+        case ASSIGN_INT:
+            {
+                if (searchEntryDynamicArray(qn->label,usedLabels)){
+                    fprintf(fp,"l%d:\n",qn->label);
+                }
+                if (qn->arg1->type == UNION_INT){
+                    fprintf(fp,"\tmov [%d], %d\n", getOffset(qn->result,qn->opcode,currentScope,globalScope,rht,NULL), qn->arg1->data->int_val);
+                }
+                else {
+                    int offset1 = getOffset(qn->arg1,qn->opcode,currentScope,globalScope,rht,NULL);
+                    int reg1 = searchRegister(registers,total_registers,offset1);
+                    int flag = (reg1 != -1) ? 0 : 1;
+                    if (reg1 == -1){
+                        reg1 = getEmptyRegister(registers);
+                    }
+                    if (reg1 == -1){
+                        reg1 = EDI;
+                    }
+                    registers[reg1]->offsetIfPresent = offset1;
+                    if (flag == 1){
+                        fprintf(fp,"\tmov %s, [%d]\n", registers[reg1]->regName ,registers[reg1]->offsetIfPresent);
+                    }
+                    int offset2 = getOffset(qn->result,qn->opcode,currentScope,globalScope,rht,NULL);
+                    fprintf(fp,"\tmov [%d], %s\n", offset2, registers[reg1]->regName );
+                    registers[reg1]->offsetIfPresent = offset2;
+                }
+                break;
+            }
 
 
-        }
-    }
+        
+        }//end switch for opcode
+
+    }//end for
 }
 
 
@@ -2668,7 +2779,7 @@ void makeScopeTables(ASTNode *head, recordsHashTable *rht, allFunctionsHashTable
     dfsForSemanticAnalysis(head,rht,afht,NULL,globalScope,NULL,NULL,NULL,NULL,0,0,-1,ptrAvailableLabels,ptrAvailableTemporary,-1,-1,1,success,q,da);
     //printDynamicArray(da);
     sortDynamicArray(da);
-    //printDynamicArray(da);
+    printDynamicArray(da);
 
     //printf("label:%d\n",*ptrAvailableLabels);
 
@@ -2744,7 +2855,8 @@ void makeScopeTables(ASTNode *head, recordsHashTable *rht, allFunctionsHashTable
         printRegister(rg[i]);
     }
     */
-
+    FILE *fp = fopen("code.txt","w");
+    makeCode(q, currentScope, globalScope, rht, da, rg, 20, ptrAvailableLabels, fp);
 
 
 

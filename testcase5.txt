@@ -10,16 +10,18 @@ _main
 		type int: chemistry;
 	endrecord;
 	type record #marks : b5c6;
+	type record #marks : b5c5;
 	type real : b5;
 	type real : d5;
-	type record #mark : b5c7;
+	type record #marks : b5c7;
 	type int : c5;
+	b5c5 <--- b5c7 + b5c6 * c5 + b5c5 - b5c7 * 2.00;
 	
 	while( (b5<=d5) @@@ (b5 > d5) )
-		d5 <--- d5 +1.00;
+		d5 <--- b5c7.maths * b5c6.chemistry +1.00;
 		if (c5 < 3)
 		then
-		c5<--- 2;
+		c5<--- 2 + b5c5.physics * b5c5.physics + b5c5.physics;
 		endif
 	endwhile
 	

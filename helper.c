@@ -44,7 +44,7 @@ char *strupr(char *inp){
 
 int isPrime(int n){
     int i;
-    int j = (int) sqrt(n);
+    int j = (int) sqrt((float)n);
     for (i=2;i<=j;i++){
         if (n%i == 0){
             return 0;

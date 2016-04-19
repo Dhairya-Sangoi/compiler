@@ -39,7 +39,9 @@ int main(int argc, char *argv[])
 
 	if (argc != 3){
 		printf("Usage: %s <testCase.txt> <parseTreeOutFile.txt>\n",argv[0]);
-		exit(0);
+		//argv[1] = "testcase5.txt";
+        //argv[2] = "parsedoutput.txt";
+        exit(0);
 	}
 
     char *filename = "rule.txt";

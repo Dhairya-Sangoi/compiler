@@ -3,6 +3,7 @@
 #include <string.h>
 
 #include "dynamicArrayDef.h"
+#include "dynamicArray.h"
 #include "parseTreeDef.h"
 #include "quadrupleDef.h"
 #include "enum.h"

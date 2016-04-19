@@ -16,9 +16,7 @@
 #include "lexerDef.h"
 #include "lexer.h"
 
-#include "registerDef.h"
-#include "register.h"
-#include "registers.h"
+
 
 #include "dynamicArrayDef.h"
 #include "dynamicArray.h"
@@ -42,6 +40,9 @@
 #include "quadrupleDef.h"
 #include "quadruple.h"
 
+#include "registerDef.h"
+#include "register.h"
+#include "registers.h"
 
 
 void makeAST(parseTreeNode *head, ruleq **newRules, parseTreeNode *param){
@@ -447,7 +448,7 @@ void dfsForScopeTables(ASTNode *head, recordsHashTable *rht, allFunctionsHashTab
             char *fn = (char *)malloc(sizeof(char)*6);
             strcpy(fn,"_main");
             currentScope = createScopeHashTable(5,7);
-            //printf("%d %d \n",currentScope->elements, currentScope->tableSize);
+            //printf("%d %d \n",currentScope->elements, currentScope->f);
             allFunctionsHashNode *temp = createAllFunctionsHashNode(fn,currentScope);
             insertAllFunctionsHashTable(temp,afht);
             *offset = -1; // change to 0 to work if only main function
@@ -463,7 +464,7 @@ void dfsForScopeTables(ASTNode *head, recordsHashTable *rht, allFunctionsHashTab
             ASTNode *child3 = child2->next;
             ASTNode *child4 = child3->next;
             currentScope = createScopeHashTable(5,7);
-            //printf("%d %d \n",currentScope->elements, currentScope->tableSize);
+            //printf("%d %d \n",currentScope->elements, currentScope->f);
             allFunctionsHashNode *temp = createAllFunctionsHashNode(child1->lexemeCurrentNode,currentScope);
             int inserted = insertAllFunctionsHashTable(temp,afht);
             if (inserted == 0){
@@ -480,7 +481,7 @@ void dfsForScopeTables(ASTNode *head, recordsHashTable *rht, allFunctionsHashTab
             ASTNode *child1 = head->child;
             ASTNode *child2 = child1->next;
             ASTNode *child3 = child2->next;
-            //printf("%d %d \n",currentScope->elements, currentScope->tableSize);
+            //printf("%d %d \n",currentScope->elements, currentScope->f);
             scopeHashNode *temp = createScopeHashNode(child2->lexemeCurrentNode,child1->lexemeCurrentNode,child2,offset);
             int inserted = insertScopeHashTable(temp,currentScope);
             if (inserted == 0){
@@ -497,7 +498,7 @@ void dfsForScopeTables(ASTNode *head, recordsHashTable *rht, allFunctionsHashTab
             ASTNode *child1 = head->child;
             ASTNode *child2 = child1->next;
             ASTNode *child3 = child2->next;
-            //printf("%d %d \n",currentScope->elements, currentScope->tableSize);
+            //printf("%d %d \n",currentScope->elements, currentScope->f);
             scopeHashNode *temp = createScopeHashNode(child2->lexemeCurrentNode,child1->lexemeCurrentNode,child2,offset);
             switch (child1->index){
             case TK_INT:
@@ -541,7 +542,7 @@ void dfsForScopeTables(ASTNode *head, recordsHashTable *rht, allFunctionsHashTab
             recordHashNode *temp = createRecordHashNode(child1->lexemeCurrentNode);
             insertRecordsHashTable(temp,rht);
             dfsForScopeTables(child2,rht,afht,currentScope,globalScope,&(temp->data->type),&(temp->data->width),NULL,temp->data->fields,fname, offset);
-            //printf("%d %d \n",currentScope->elements, currentScope->tableSize);
+            //printf("%d %d \n",currentScope->elements, currentScope->f);
             break;
         }
 
@@ -565,7 +566,7 @@ void dfsForScopeTables(ASTNode *head, recordsHashTable *rht, allFunctionsHashTab
             tn = &((*tn)->next);
             *recWidth = *recWidth + ((child2->child->index == TK_INT) ? INT_SIZE : REAL_SIZE) ;
             recFields->offset = *recWidth;
-            //printf("%d %d \n",currentScope->elements, currentScope->tableSize);
+            //printf("%d %d \n",currentScope->elements, currentScope->f);
             dfsForScopeTables(child3,rht,afht,currentScope,globalScope,tn,recWidth,NULL,recFields,fname, offset);
             break;
         }
@@ -581,7 +582,7 @@ void dfsForScopeTables(ASTNode *head, recordsHashTable *rht, allFunctionsHashTab
             tn = &((*tn)->next);
             *recWidth = *recWidth + ((child1->child->index == TK_INT) ? INT_SIZE : REAL_SIZE );
             recFields->offset = *recWidth;
-            //printf("%d %d \n",currentScope->elements, currentScope->tableSize);
+            //printf("%d %d \n",currentScope->elements, currentScope->f);
             dfsForScopeTables(child2,rht,afht,currentScope,globalScope,tn,recWidth,NULL,recFields,fname, offset);
             break;
         }
@@ -597,7 +598,7 @@ void dfsForScopeTables(ASTNode *head, recordsHashTable *rht, allFunctionsHashTab
             if (temp == NULL){
                 printf("Error:14 Function definition must precede the use\n");
             }
-            //printf("%d %d \n",currentScope->elements, currentScope->tableSize);
+            //printf("%d %d \n",currentScope->elements, currentScope->f);
         }
     default:
         {
@@ -605,7 +606,7 @@ void dfsForScopeTables(ASTNode *head, recordsHashTable *rht, allFunctionsHashTab
             while (curr!=NULL){
                 //parseTreeNode *next = curr->next;
                 dfsForScopeTables(curr,rht,afht,currentScope,globalScope,tn,recWidth,ion,NULL,fname, offset);
-                //printf("%d %d \n",(currentScope != NULL ) ? (currentScope->elements, currentScope->tableSize) : (0,0));
+                //printf("%d %d \n",(currentScope != NULL ) ? (currentScope->elements, currentScope->f) : (0,0));
                 curr = curr->next;
             }
             break;
@@ -665,7 +666,7 @@ void dfsForSemanticAnalysis(ASTNode *head, recordsHashTable *rht, allFunctionsHa
             ASTNode *child1 = head->child;
             ASTNode *child2 = child1->next;
             ASTNode *child3 = child2->next;
-            //printf("%d %d \n",currentScope->elements, currentScope->tableSize);
+            //printf("%d %d \n",currentScope->elements, currentScope->f);
             //scopeHashNode *temp = createScopeHashNode(child2->lexemeCurrentNode,child1->lexemeCurrentNode,child2,offset);
             //int inserted = insertScopeHashTable(temp,currentScope);
 //            if (inserted == 0){
@@ -733,7 +734,7 @@ void dfsForSemanticAnalysis(ASTNode *head, recordsHashTable *rht, allFunctionsHa
             }
 
 
-            //printf("%d %d   ",currentScope->elements,currentScope->tableSize);
+            //printf("%d %d   ",currentScope->elements,currentScope->f);
             break;
         }
 
@@ -2457,7 +2458,7 @@ void makeScopeTables(ASTNode *head, recordsHashTable *rht, allFunctionsHashTable
     int *offset = (int *)malloc(sizeof(int));
     *offset = -1;
     dfsForScopeTables(head,rht,afht,NULL,globalScope,NULL,NULL,NULL,NULL,NULL,offset);
-    //printf("%d %d %d\n",rht->tableSize,afht->tableSize,globalScope->tableSize);
+    //printf("%d %d %d\n",rht->f,afht->f,globalScope->f);
     //printAllFunctionsHashTable(afht);
     int *ptrAvailableLabels = (int *)malloc(sizeof(int));
     int *ptrAvailableTemporary = (int *)malloc(sizeof(int));
@@ -2473,6 +2474,47 @@ void makeScopeTables(ASTNode *head, recordsHashTable *rht, allFunctionsHashTable
 
 
     //making datastructure for registers
+
+    scopeHashTable *currentScope = searchEntryAllFunctionsHashTable("_main",afht)->data->scope;
+    /*
+    //printing offsets for operands in quadruple
+    {
+        int i;
+        char *type = NULL;
+        for (i=0; i<q->index; i++){
+            
+            quadrupleNode *qn = q->instructions[i];
+            ASTNode *temp = NULL;
+            if (qn->arg1 != NULL && qn->arg1->type == UNION_ID){
+                temp = qn->arg1->data->identifier;
+                scopeHashNode *shn = searchEntryScopeHashTable(temp->lexemeCurrentNode,currentScope);
+                if (shn == NULL){
+                    shn = searchEntryScopeHashTable(temp->lexemeCurrentNode,globalScope);
+                }
+                if (shn != NULL){
+                    if (strcmp(shn->data->typeName,"int") != 0 && strcmp(shn->data->typeName,"real") != 0 )
+                    	type = shn->data->typeName;
+                }
+            
+            }
+            if (qn->arg2 != NULL && qn->arg2->type == UNION_ID){
+                temp = qn->arg2->data->identifier;
+                scopeHashNode *shn = searchEntryScopeHashTable(temp->lexemeCurrentNode,currentScope);
+                if (shn == NULL){
+                    shn = searchEntryScopeHashTable(temp->lexemeCurrentNode,globalScope);
+                }
+                if (shn != NULL){
+                    if (strcmp(shn->data->typeName,"int") != 0 && strcmp(shn->data->typeName,"real") != 0 )
+                    	type = shn->data->typeName;
+                }
+            }
+            
+            printf("Arg1_Offset: %d ", getOffset(qn->arg1,qn->opcode,currentScope,globalScope,rht,type));
+            printf("Arg2_Offset: %d ", getOffset(qn->arg2,qn->opcode,currentScope,globalScope,rht,type));
+            printf("Res_Offset: %d\n", getOffset(qn->result,qn->opcode,currentScope,globalScope,rht,type));
+        }
+    }
+    */
 
     reg *rg[20];
     rg[0] = createRegisterEntry(EAX,"EAX");
@@ -2496,10 +2538,13 @@ void makeScopeTables(ASTNode *head, recordsHashTable *rht, allFunctionsHashTable
     rg[18] = createRegisterEntry(ESP,"ESP");
     rg[19] = createRegisterEntry(EBP,"EBP");
 
+    /*
+    //printing registers
     int i;
     for (i=0;i<20;i++){
         printRegister(rg[i]);
     }
+    */
 
 
 

@@ -62,6 +62,7 @@ int insertScopeHashTable(scopeHashNode *temp, scopeHashTable *ht){
         rehashScopeHashTable(ht,0,prevSize-1);
         ht->loadfactor = (float)ht->elements / ht->tableSize;
     }
+    //printf("ts:%d\n", ht->tableSize);
     return retval;
 }
 

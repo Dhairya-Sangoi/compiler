@@ -3769,8 +3769,14 @@ void makeCode(quadruple *q, scopeHashTable *currentScope, scopeHashTable *global
                     fprintf(fp,"\tjlt %d\n", *nextlabel);
                     fprintf(fp,"\tsub %s, 100\n", registers[reg2]->regName);
                     fprintf(fp,"\tinc %s\n", registers[reg1]->regName);
+                    fprintf(fp,"\tjmp %d\n", *nextlabel + 1);
                     fprintf(fp,"\tl%d:\n", *nextlabel);
-                    *nextlabel++;
+                    fprintf(fp,"\tcmp %s, -100\n", registers[reg2]->regName);
+                    fprintf(fp,"\tjgt %d\n", *nextlabel + 1);
+                    fprintf(fp,"\tadd %s, 100\n", registers[reg2]->regName);
+                    fprintf(fp,"\tdec %s\n", registers[reg1]->regName);
+                    fprintf(fp,"\tl%d:\n", *nextlabel + 1);
+                    *nextlabel += 2;
                     int offset2 = getOffset(qn->result,qn->opcode,currentScope,globalScope,rht,NULL);
                     fprintf(fp,"\tmov [%d], %s\n", offset2, registers[reg1]->regName );
                     fprintf(fp,"\tmov [%d], %s\n", offset2 + 4, registers[reg2]->regName );
@@ -3818,7 +3824,14 @@ void makeCode(quadruple *q, scopeHashTable *currentScope, scopeHashTable *global
                     fprintf(fp,"\tjlt %d\n", *nextlabel);
                     fprintf(fp,"\tsub %s, 100\n", registers[reg2]->regName);
                     fprintf(fp,"\tinc %s\n", registers[reg1]->regName);
+                    fprintf(fp,"\tjmp %d\n", *nextlabel + 1);
                     fprintf(fp,"\tl%d:\n", *nextlabel);
+                    fprintf(fp,"\tcmp %s, -100\n", registers[reg2]->regName);
+                    fprintf(fp,"\tjgt %d\n", *nextlabel + 1);
+                    fprintf(fp,"\tadd %s, 100\n", registers[reg2]->regName);
+                    fprintf(fp,"\tdec %s\n", registers[reg1]->regName);
+                    fprintf(fp,"\tl%d:\n", *nextlabel + 1);
+                    *nextlabel += 2;
 
                     int offset3 = getOffset(qn->result,qn->opcode,currentScope,globalScope,rht,NULL);
                     fprintf(fp,"\tmov [%d], %s\n", offset3, registers[reg1]->regName );
@@ -3866,7 +3879,14 @@ void makeCode(quadruple *q, scopeHashTable *currentScope, scopeHashTable *global
                     fprintf(fp,"\tjlt %d\n", *nextlabel);
                     fprintf(fp,"\tsub %s, 100\n", registers[reg2]->regName);
                     fprintf(fp,"\tinc %s\n", registers[reg1]->regName);
+                    fprintf(fp,"\tjmp %d\n", *nextlabel + 1);
                     fprintf(fp,"\tl%d:\n", *nextlabel);
+                    fprintf(fp,"\tcmp %s, -100\n", registers[reg2]->regName);
+                    fprintf(fp,"\tjgt %d\n", *nextlabel + 1);
+                    fprintf(fp,"\tadd %s, 100\n", registers[reg2]->regName);
+                    fprintf(fp,"\tdec %s\n", registers[reg1]->regName);
+                    fprintf(fp,"\tl%d:\n", *nextlabel + 1);
+                    *nextlabel += 2;
 
                     int offset3 = getOffset(qn->result,qn->opcode,currentScope,globalScope,rht,NULL);
                     fprintf(fp,"\tmov [%d], %s\n", offset3, registers[reg1]->regName );
@@ -3911,7 +3931,14 @@ void makeCode(quadruple *q, scopeHashTable *currentScope, scopeHashTable *global
                     fprintf(fp,"\tjlt %d\n", *nextlabel);
                     fprintf(fp,"\tsub %s, 100\n", registers[reg2]->regName);
                     fprintf(fp,"\tinc %s\n", registers[reg1]->regName);
+                    fprintf(fp,"\tjmp %d\n", *nextlabel + 1);
                     fprintf(fp,"\tl%d:\n", *nextlabel);
+                    fprintf(fp,"\tcmp %s, -100\n", registers[reg2]->regName);
+                    fprintf(fp,"\tjgt %d\n", *nextlabel + 1);
+                    fprintf(fp,"\tadd %s, 100\n", registers[reg2]->regName);
+                    fprintf(fp,"\tdec %s\n", registers[reg1]->regName);
+                    fprintf(fp,"\tl%d:\n", *nextlabel + 1);
+                    *nextlabel += 2;
 
                     int offset4 = getOffset(qn->result,qn->opcode,currentScope,globalScope,rht,NULL);
                     fprintf(fp,"\tmov [%d], %s\n", offset4, registers[reg1]->regName );
@@ -3921,7 +3948,6 @@ void makeCode(quadruple *q, scopeHashTable *currentScope, scopeHashTable *global
                 }
                 break;
             }
-
         case MINUS_REAL:
             {
                 if (searchEntryDynamicArray(qn->label,usedLabels) == 1){
@@ -3951,12 +3977,18 @@ void makeCode(quadruple *q, scopeHashTable *currentScope, scopeHashTable *global
                     fprintf(fp,"\tmov %s, %d\n", registers[reg2]->regName ,fracpart1);
                     fprintf(fp,"\tsub %s, %d\n", registers[reg1]->regName, intpart2);
                     fprintf(fp,"\tsub %s, %d\n", registers[reg2]->regName, fracpart2);
-                    fprintf(fp,"\tcmp %s, 0\n", registers[reg2]->regName);
-                    fprintf(fp,"\tjge %d\n", *nextlabel);
+                    fprintf(fp,"\tcmp %s, 100\n", registers[reg2]->regName);
+                    fprintf(fp,"\tjlt %d\n", *nextlabel);
+                    fprintf(fp,"\tsub %s, 100\n", registers[reg2]->regName);
+                    fprintf(fp,"\tinc %s\n", registers[reg1]->regName);
+                    fprintf(fp,"\tjmp %d\n", *nextlabel + 1);
+                    fprintf(fp,"\tl%d:\n", *nextlabel);
+                    fprintf(fp,"\tcmp %s, -100\n", registers[reg2]->regName);
+                    fprintf(fp,"\tjgt %d\n", *nextlabel + 1);
                     fprintf(fp,"\tadd %s, 100\n", registers[reg2]->regName);
                     fprintf(fp,"\tdec %s\n", registers[reg1]->regName);
-                    fprintf(fp,"\tl%d:\n", *nextlabel);
-                    *nextlabel++;
+                    fprintf(fp,"\tl%d:\n", *nextlabel + 1);
+                    *nextlabel += 2;
                     int offset2 = getOffset(qn->result,qn->opcode,currentScope,globalScope,rht,NULL);
                     fprintf(fp,"\tmov [%d], %s\n", offset2, registers[reg1]->regName );
                     fprintf(fp,"\tmov [%d], %s\n", offset2 + 4, registers[reg2]->regName );
@@ -4000,11 +4032,18 @@ void makeCode(quadruple *q, scopeHashTable *currentScope, scopeHashTable *global
 
                     fprintf(fp,"\tsub %s, %d\n", registers[reg1]->regName, intpart2);
                     fprintf(fp,"\tsub %s, %d\n", registers[reg2]->regName, fracpart2);
-                    fprintf(fp,"\tcmp %s, 0\n", registers[reg2]->regName);
-                    fprintf(fp,"\tjge %d\n", *nextlabel);
+                    fprintf(fp,"\tcmp %s, 100\n", registers[reg2]->regName);
+                    fprintf(fp,"\tjlt %d\n", *nextlabel);
+                    fprintf(fp,"\tsub %s, 100\n", registers[reg2]->regName);
+                    fprintf(fp,"\tinc %s\n", registers[reg1]->regName);
+                    fprintf(fp,"\tjmp %d\n", *nextlabel + 1);
+                    fprintf(fp,"\tl%d:\n", *nextlabel);
+                    fprintf(fp,"\tcmp %s, -100\n", registers[reg2]->regName);
+                    fprintf(fp,"\tjgt %d\n", *nextlabel + 1);
                     fprintf(fp,"\tadd %s, 100\n", registers[reg2]->regName);
                     fprintf(fp,"\tdec %s\n", registers[reg1]->regName);
-                    fprintf(fp,"\tl%d:\n", *nextlabel);
+                    fprintf(fp,"\tl%d:\n", *nextlabel + 1);
+                    *nextlabel += 2;
 
                     int offset3 = getOffset(qn->result,qn->opcode,currentScope,globalScope,rht,NULL);
                     fprintf(fp,"\tmov [%d], %s\n", offset3, registers[reg1]->regName );
@@ -4036,11 +4075,18 @@ void makeCode(quadruple *q, scopeHashTable *currentScope, scopeHashTable *global
                     int offset3 = getOffset(qn->arg2,qn->opcode,currentScope,globalScope,rht,NULL);
                     fprintf(fp,"\tsub %s, [%d]\n", registers[reg1]->regName, offset3 );
                     fprintf(fp,"\tsub %s, [%d]\n", registers[reg2]->regName, offset3 + 4 );
-                    fprintf(fp,"\tcmp %s, 0\n", registers[reg2]->regName);
-                    fprintf(fp,"\tjge %d\n", *nextlabel);
+                    fprintf(fp,"\tcmp %s, 100\n", registers[reg2]->regName);
+                    fprintf(fp,"\tjlt %d\n", *nextlabel);
+                    fprintf(fp,"\tsub %s, 100\n", registers[reg2]->regName);
+                    fprintf(fp,"\tinc %s\n", registers[reg1]->regName);
+                    fprintf(fp,"\tjmp %d\n", *nextlabel + 1);
+                    fprintf(fp,"\tl%d:\n", *nextlabel);
+                    fprintf(fp,"\tcmp %s, -100\n", registers[reg2]->regName);
+                    fprintf(fp,"\tjgt %d\n", *nextlabel + 1);
                     fprintf(fp,"\tadd %s, 100\n", registers[reg2]->regName);
                     fprintf(fp,"\tdec %s\n", registers[reg1]->regName);
-                    fprintf(fp,"\tl%d:\n", *nextlabel);
+                    fprintf(fp,"\tl%d:\n", *nextlabel + 1);
+                    *nextlabel += 2;
 
                     int offset4 = getOffset(qn->result,qn->opcode,currentScope,globalScope,rht,NULL);
                     fprintf(fp,"\tmov [%d], %s\n", offset4, registers[reg1]->regName );
@@ -4080,11 +4126,18 @@ void makeCode(quadruple *q, scopeHashTable *currentScope, scopeHashTable *global
                     int offset3 = getOffset(qn->arg2,qn->opcode,currentScope,globalScope,rht,NULL);
                     fprintf(fp,"\tsub %s, [%d]\n", registers[reg1]->regName, offset3 );
                     fprintf(fp,"\tsub %s, [%d]\n", registers[reg2]->regName, offset3 + 4 );
-                    fprintf(fp,"\tcmp %s, 0\n", registers[reg2]->regName);
-                    fprintf(fp,"\tjge %d\n", *nextlabel);
+                    fprintf(fp,"\tcmp %s, 100\n", registers[reg2]->regName);
+                    fprintf(fp,"\tjlt %d\n", *nextlabel);
+                    fprintf(fp,"\tsub %s, 100\n", registers[reg2]->regName);
+                    fprintf(fp,"\tinc %s\n", registers[reg1]->regName);
+                    fprintf(fp,"\tjmp %d\n", *nextlabel + 1);
+                    fprintf(fp,"\tl%d:\n", *nextlabel);
+                    fprintf(fp,"\tcmp %s, -100\n", registers[reg2]->regName);
+                    fprintf(fp,"\tjgt %d\n", *nextlabel + 1);
                     fprintf(fp,"\tadd %s, 100\n", registers[reg2]->regName);
                     fprintf(fp,"\tdec %s\n", registers[reg1]->regName);
-                    fprintf(fp,"\tl%d:\n", *nextlabel);
+                    fprintf(fp,"\tl%d:\n", *nextlabel + 1);
+                    *nextlabel += 2;
 
                     int offset4 = getOffset(qn->result,qn->opcode,currentScope,globalScope,rht,NULL);
                     fprintf(fp,"\tmov [%d], %s\n", offset4, registers[reg1]->regName );
@@ -4095,7 +4148,7 @@ void makeCode(quadruple *q, scopeHashTable *currentScope, scopeHashTable *global
                 break;
             }
 
-
+        
         }//end switch for opcode
 
     }//end for

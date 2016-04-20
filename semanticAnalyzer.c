@@ -3784,7 +3784,7 @@ void makeCode(quadruple *q, scopeHashTable *currentScope, scopeHashTable *global
                     registers[reg2]->offsetIfPresent = offset2 + 4;
 
                 }
-                else if (qn->arg1->type != UNION_INT && qn->arg2->type == UNION_INT){
+                else if (qn->arg1->type != UNION_REAL && qn->arg2->type == UNION_REAL){
                     int offset1 = getOffset(qn->arg1,qn->opcode,currentScope,globalScope,rht,NULL);
                     int reg1 = searchRegister(registers,total_registers,offset1);
                     int flag1 = (reg1 != -1) ? 0 : 1;
@@ -3839,7 +3839,7 @@ void makeCode(quadruple *q, scopeHashTable *currentScope, scopeHashTable *global
                     registers[reg1]->offsetIfPresent = offset3;
                     registers[reg2]->offsetIfPresent = offset3 + 4;
                 }
-                else if (qn->arg1->type == UNION_INT && qn->arg2->type != UNION_INT){
+                else if (qn->arg1->type == UNION_REAL && qn->arg2->type != UNION_REAL){
                     int offset1 = getOffset(qn->arg2,qn->opcode,currentScope,globalScope,rht,NULL);
                     int reg1 = searchRegister(registers,total_registers,offset1);
                     int flag = (reg1 != -1) ? 0 : 1;
@@ -3996,7 +3996,7 @@ void makeCode(quadruple *q, scopeHashTable *currentScope, scopeHashTable *global
                     registers[reg2]->offsetIfPresent = offset2 + 4;
 
                 }
-                else if (qn->arg1->type != UNION_INT && qn->arg2->type == UNION_INT){
+                else if (qn->arg1->type != UNION_REAL && qn->arg2->type == UNION_REAL){
                     int offset1 = getOffset(qn->arg1,qn->opcode,currentScope,globalScope,rht,NULL);
                     int reg1 = searchRegister(registers,total_registers,offset1);
                     int flag1 = (reg1 != -1) ? 0 : 1;
@@ -4051,7 +4051,7 @@ void makeCode(quadruple *q, scopeHashTable *currentScope, scopeHashTable *global
                     registers[reg1]->offsetIfPresent = offset3;
                     registers[reg2]->offsetIfPresent = offset3 + 4;
                 }
-                else if (qn->arg1->type == UNION_INT && qn->arg2->type != UNION_INT){
+                else if (qn->arg1->type == UNION_REAL && qn->arg2->type != UNION_REAL){
                     int reg1 = getEmptyRegister(registers);
                     if (reg1 == -1){
                         reg1 = EDI;
@@ -4147,7 +4147,231 @@ void makeCode(quadruple *q, scopeHashTable *currentScope, scopeHashTable *global
                 }
                 break;
             }
+        case MULT_REAL:
+            {
+                if (searchEntryDynamicArray(qn->label,usedLabels) == 1){
+                    fprintf(fp,"l%d:\n",qn->label);
+                }
+                if (qn->arg1->type == UNION_REAL || qn->arg2->type == UNION_REAL){
+                    float data2;
+                    int intpart2, fracpart2;
+                    if (qn->arg1->type == UNION_REAL && qn->arg2->type == UNION_REAL){
+                        registers[ECX]->offsetIfPresent = -1;
+                        registers[EBX]->offsetIfPresent = -1;
+                        float data1 = qn->arg1->data->real_val;
+                        int intpart1 = (int)data1;
+                        int fracpart1 = ((int)(data1*100))%100;
+                        fprintf(fp,"\tmov ECX, %d\n", intpart1);
+                        fprintf(fp,"\tmov EBX, %d\n", fracpart1);
+                        data2 = qn->arg2->data->real_val;
+                        intpart2 = (int)data2;
+                        fracpart2 = ((int)(data2*100))%100;
+                    }
+                    else if (qn->arg1->type != UNION_REAL){
+                        int offset1 = getOffset(qn->arg1,qn->opcode,currentScope,globalScope,rht,NULL);
+                        registers[ECX]->offsetIfPresent = offset1;
+                        registers[EBX]->offsetIfPresent = offset1 + 4;
+                        fprintf(fp,"\tmov ECX, [%d]\n", offset1);
+                        fprintf(fp,"\tmov EBX, [%d]\n", offset1 + 4);
+                        data2 = qn->arg2->data->real_val;
+                        intpart2 = (int)data2;
+                        fracpart2 = ((int)(data2*100))%100;
+                    }
+                    else {
+                        int offset2 = getOffset(qn->arg2,qn->opcode,currentScope,globalScope,rht,NULL);
+                        registers[ECX]->offsetIfPresent = offset2;
+                        registers[EBX]->offsetIfPresent = offset2 + 4;
+                        fprintf(fp,"\tmov ECX, [%d]\n", offset2);
+                        fprintf(fp,"\tmov EBX, [%d]\n", offset2 + 4);
+                        data2 = qn->arg1->data->real_val;
+                        intpart2 = (int)data2;
+                        fracpart2 = ((int)(data2*100))%100;
+                    }
 
+
+
+                    fprintf(fp,"\tmov ESI, 0\n");
+                    fprintf(fp,"\tmov EDI, 0\n");
+
+                    fprintf(fp,"\tmov EDX, 0\n");
+                    fprintf(fp,"\tmov EAX, ECX\n");
+                    fprintf(fp,"\timul EAX, EAX, %d\n",intpart2);
+                    fprintf(fp,"\tadd ESI, EAX\n");
+
+                    fprintf(fp,"\tmov EDX, 0\n");
+                    fprintf(fp,"\tmov EAX, ECX\n");
+                    fprintf(fp,"\timul EAX, EAX, %d\n", fracpart2);
+                    fprintf(fp,"\tidiv 100\n");
+                    fprintf(fp,"\tadd ESI, EAX\n");
+                    fprintf(fp,"\tadd EDI, EDX\n");
+                    fprintf(fp,"\tcmp EDI, 100\n");
+                    fprintf(fp,"\tjlt %d\n",*nextlabel);
+                    fprintf(fp,"\tsub EDI, 100\n");
+                    fprintf(fp,"\tinc ESI\n");
+                    fprintf(fp,"\tjmp %d\n", *nextlabel + 1);
+                    fprintf(fp,"\tl%d:\n", *nextlabel);
+                    fprintf(fp,"\tcmp EDI, -100\n");
+                    fprintf(fp,"\tjgt %d\n", *nextlabel + 1);
+                    fprintf(fp,"\tadd EDI, 100\n");
+                    fprintf(fp,"\tdec ESI\n");
+                    fprintf(fp,"\tl%d:\n", *nextlabel + 1);
+                    *nextlabel += 2;
+
+                    fprintf(fp,"\tmov EDX, 0\n");
+                    fprintf(fp,"\tmov EAX, EBX\n");
+                    fprintf(fp,"\timul EAX, EAX, %d\n",intpart2);
+                    fprintf(fp,"\tidiv 100\n");
+                    fprintf(fp,"\tadd ESI, EAX\n");
+                    fprintf(fp,"\tadd EDI, EDX\n");
+                    fprintf(fp,"\tcmp EDI, 100\n");
+                    fprintf(fp,"\tjlt %d\n",*nextlabel);
+                    fprintf(fp,"\tsub EDI, 100\n");
+                    fprintf(fp,"\tinc ESI\n");
+                    fprintf(fp,"\tjmp %d\n", *nextlabel + 1);
+                    fprintf(fp,"\tl%d:\n", *nextlabel);
+                    fprintf(fp,"\tcmp EDI, -100\n");
+                    fprintf(fp,"\tjgt %d\n", *nextlabel + 1);
+                    fprintf(fp,"\tadd EDI, 100\n");
+                    fprintf(fp,"\tdec ESI\n");
+                    fprintf(fp,"\tl%d:\n", *nextlabel + 1);
+                    *nextlabel += 2;
+
+                    fprintf(fp,"\tmov EDX, 0\n");
+                    fprintf(fp,"\tmov EAX, EBX\n");
+                    fprintf(fp,"\timul EAX, EAX, %d\n", fracpart2);
+                    fprintf(fp,"\tidiv 100\n");
+                    fprintf(fp,"\tcmp EDX, 50\n");
+                    fprintf(fp,"\tjlt %d\n", *nextlabel);
+                    fprintf(fp,"\tinc EDI\n");
+                    fprintf(fp,"\tjmp %d\n", *nextlabel + 1);
+                    fprintf(fp,"\tl%d:\n", *nextlabel);
+                    fprintf(fp,"\tcmp EDX, -50\n");
+                    fprintf(fp,"\tjgt %d\n", *nextlabel + 1);
+                    fprintf(fp,"\tdec EDI\n");
+                    fprintf(fp,"\tl%d:\n", *nextlabel + 1);
+                    *nextlabel += 2;
+
+                    fprintf(fp,"\tmov EDX, 0\n");
+                    fprintf(fp,"\tidiv 100\n");
+                    fprintf(fp,"\tadd ESI, EAX\n");
+                    fprintf(fp,"\tadd EDI, EDX\n");
+                    fprintf(fp,"\tcmp EDI, 100\n");
+                    fprintf(fp,"\tjlt %d\n",*nextlabel);
+                    fprintf(fp,"\tsub EDI, 100\n");
+                    fprintf(fp,"\tinc ESI\n");
+                    fprintf(fp,"\tjmp %d\n", *nextlabel + 1);
+                    fprintf(fp,"\tl%d:\n", *nextlabel);
+                    fprintf(fp,"\tcmp EDI, -100\n");
+                    fprintf(fp,"\tjgt %d\n", *nextlabel + 1);
+                    fprintf(fp,"\tadd EDI, 100\n");
+                    fprintf(fp,"\tdec ESI\n");
+                    fprintf(fp,"\tl%d:\n", *nextlabel + 1);
+                    *nextlabel += 2;
+                    
+                    int offset2 = getOffset(qn->result,qn->opcode,currentScope,globalScope,rht,NULL);
+                    fprintf(fp,"\tmov [%d], ESI\n", offset2 );
+                    fprintf(fp,"\tmov [%d], EDI\n", offset2 + 4 );
+                    registers[ESI]->offsetIfPresent = offset2;
+                    registers[EDI]->offsetIfPresent = offset2 + 4;
+
+                }
+                else {
+                    int offset1 = getOffset(qn->arg1,qn->opcode,currentScope,globalScope,rht,NULL);
+                    registers[ECX]->offsetIfPresent = offset1;
+                    registers[EBX]->offsetIfPresent = offset1 + 4;
+                    fprintf(fp,"\tmov ECX, [%d]\n", offset1);
+                    fprintf(fp,"\tmov EBX, [%d]\n", offset1 + 4);
+
+                    int intpart2 = getOffset(qn->arg2,qn->opcode,currentScope,globalScope,rht,NULL);
+                    int fracpart2 = intpart2 + 4;
+
+                    fprintf(fp,"\tmov ESI, 0\n");
+                    fprintf(fp,"\tmov EDI, 0\n");
+
+                    fprintf(fp,"\tmov EDX, 0\n");
+                    fprintf(fp,"\tmov EAX, ECX\n");
+                    fprintf(fp,"\timul EAX, [%d]\n",intpart2);
+                    fprintf(fp,"\tadd ESI, EAX\n");
+
+                    fprintf(fp,"\tmov EDX, 0\n");
+                    fprintf(fp,"\tmov EAX, ECX\n");
+                    fprintf(fp,"\timul EAX, [%d]\n", fracpart2);
+                    fprintf(fp,"\tidiv 100\n");
+                    fprintf(fp,"\tadd ESI, EAX\n");
+                    fprintf(fp,"\tadd EDI, EDX\n");
+                    fprintf(fp,"\tcmp EDI, 100\n");
+                    fprintf(fp,"\tjlt %d\n",*nextlabel);
+                    fprintf(fp,"\tsub EDI, 100\n");
+                    fprintf(fp,"\tinc ESI\n");
+                    fprintf(fp,"\tjmp %d\n", *nextlabel + 1);
+                    fprintf(fp,"\tl%d:\n", *nextlabel);
+                    fprintf(fp,"\tcmp EDI, -100\n");
+                    fprintf(fp,"\tjgt %d\n", *nextlabel + 1);
+                    fprintf(fp,"\tadd EDI, 100\n");
+                    fprintf(fp,"\tdec ESI\n");
+                    fprintf(fp,"\tl%d:\n", *nextlabel + 1);
+                    *nextlabel += 2;
+
+                    fprintf(fp,"\tmov EDX, 0\n");
+                    fprintf(fp,"\tmov EAX, EBX\n");
+                    fprintf(fp,"\timul EAX, [%d]\n",intpart2);
+                    fprintf(fp,"\tidiv 100\n");
+                    fprintf(fp,"\tadd ESI, EAX\n");
+                    fprintf(fp,"\tadd EDI, EDX\n");
+                    fprintf(fp,"\tcmp EDI, 100\n");
+                    fprintf(fp,"\tjlt %d\n",*nextlabel);
+                    fprintf(fp,"\tsub EDI, 100\n");
+                    fprintf(fp,"\tinc ESI\n");
+                    fprintf(fp,"\tjmp %d\n", *nextlabel + 1);
+                    fprintf(fp,"\tl%d:\n", *nextlabel);
+                    fprintf(fp,"\tcmp EDI, -100\n");
+                    fprintf(fp,"\tjgt %d\n", *nextlabel + 1);
+                    fprintf(fp,"\tadd EDI, 100\n");
+                    fprintf(fp,"\tdec ESI\n");
+                    fprintf(fp,"\tl%d:\n", *nextlabel + 1);
+                    *nextlabel += 2;
+
+                    fprintf(fp,"\tmov EDX, 0\n");
+                    fprintf(fp,"\tmov EAX, EBX\n");
+                    fprintf(fp,"\timul EAX, [%d]\n", fracpart2);
+                    fprintf(fp,"\tidiv 100\n");
+                    fprintf(fp,"\tcmp EDX, 50\n");
+                    fprintf(fp,"\tjlt %d\n", *nextlabel);
+                    fprintf(fp,"\tinc EDI\n");
+                    fprintf(fp,"\tjmp %d\n", *nextlabel + 1);
+                    fprintf(fp,"\tl%d:\n", *nextlabel);
+                    fprintf(fp,"\tcmp EDX, -50\n");
+                    fprintf(fp,"\tjgt %d\n", *nextlabel + 1);
+                    fprintf(fp,"\tdec EDI\n");
+                    fprintf(fp,"\tl%d:\n", *nextlabel + 1);
+                    *nextlabel += 2;
+
+                    fprintf(fp,"\tmov EDX, 0\n");
+                    fprintf(fp,"\tidiv 100\n");
+                    fprintf(fp,"\tadd ESI, EAX\n");
+                    fprintf(fp,"\tadd EDI, EDX\n");
+                    fprintf(fp,"\tcmp EDI, 100\n");
+                    fprintf(fp,"\tjlt %d\n",*nextlabel);
+                    fprintf(fp,"\tsub EDI, 100\n");
+                    fprintf(fp,"\tinc ESI\n");
+                    fprintf(fp,"\tjmp %d\n", *nextlabel + 1);
+                    fprintf(fp,"\tl%d:\n", *nextlabel);
+                    fprintf(fp,"\tcmp EDI, -100\n");
+                    fprintf(fp,"\tjgt %d\n", *nextlabel + 1);
+                    fprintf(fp,"\tadd EDI, 100\n");
+                    fprintf(fp,"\tdec ESI\n");
+                    fprintf(fp,"\tl%d:\n", *nextlabel + 1);
+                    *nextlabel += 2;
+                    
+                    int offset2 = getOffset(qn->result,qn->opcode,currentScope,globalScope,rht,NULL);
+                    fprintf(fp,"\tmov [%d], ESI\n", offset2 );
+                    fprintf(fp,"\tmov [%d], EDI\n", offset2 + 4 );
+                    registers[ESI]->offsetIfPresent = offset2;
+                    registers[EDI]->offsetIfPresent = offset2 + 4;
+
+                }
+                break;
+            }
         
         }//end switch for opcode
 

@@ -1,6 +1,10 @@
 _main
 	
-	
+	record #marks
+		type real : maths; 
+		type real: physics; 
+		type real: chemistry;
+	endrecord;
 	type real : b5;
 	type real : c5;
 	type real : d5;

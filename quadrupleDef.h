@@ -6,6 +6,7 @@
 #define UNION_ID 3
 #define UNION_TEMPORARY 4
 #define UNION_LABEL 5
+#define UNION_OFFSET 6
 
 typedef parseTreeNode ASTNode;
 
@@ -15,6 +16,7 @@ typedef union operand{
     ASTNode *identifier;
     int temporary_identifier;
     int jump_label;
+    int offset;
 }operand;
 
 typedef struct typedUnion{

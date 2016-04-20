@@ -48,6 +48,9 @@ int getOffset(typedUnion *arg, int opcode, scopeHashTable *currentScope, scopeHa
 	if (arg == NULL || arg->type == UNION_INT || arg->type == UNION_REAL || arg->type == UNION_LABEL){
 		return -1;
 	}
+	if (arg->type == UNION_OFFSET){
+		return arg->data->offset;
+	}
 	if (arg->type == UNION_TEMPORARY){
 		int offset = globalScope->offset + currentScope->offset;
 		switch(opcode){

@@ -2471,10 +2471,8 @@ void dfsForSemanticAnalysis(ASTNode *head, recordsHashTable *rht, allFunctionsHa
     }
 }
 
-void makeCode(quadruple *q, scopeHashTable *currentScope, scopeHashTable *globalScope, recordsHashTable *rht, dynamicArray *usedLabels, reg **registers, int total_registers, int *nextlabel, FILE *fp){
-    int i;
-    for (i=0; i<q->index; i++){
-        quadrupleNode *qn = q->instructions[i];
+void makeCode(quadrupleNode *qn, scopeHashTable *currentScope, scopeHashTable *globalScope, recordsHashTable *rht, dynamicArray *usedLabels, reg **registers, int total_registers, int *nextlabel, FILE *fp){
+        
         switch(qn->opcode){
         case LABEL:
             {
@@ -4375,10 +4373,32 @@ void makeCode(quadruple *q, scopeHashTable *currentScope, scopeHashTable *global
         
         }//end switch for opcode
 
-    }//end for
 }
 
+int isNotRecordOpcode(int opcode){
+    switch(opcode){
+    case PLUS_RECORD:
+    case MINUS_RECORD:
+    case MULT_RECORD:
+    case DIV_RECORD:
+    case JLT_RECORD:
+    case JLE_RECORD:
+    case JGT_RECORD:
+    case JGE_RECORD:
+    case JEQ_RECORD:
+    case JNE_RECORD:
+    case ASSIGN_RECORD:
+    case WRITE_RECORD:
+        {
+            return 0;
+        }
+    default:
+        {
+            return 1;
+        }
+    }
 
+}
 
 void makeScopeTables(ASTNode *head, recordsHashTable *rht, allFunctionsHashTable *afht, scopeHashTable *globalScope, quadruple *q){
     int *offset = (int *)malloc(sizeof(int));
@@ -4403,8 +4423,32 @@ void makeScopeTables(ASTNode *head, recordsHashTable *rht, allFunctionsHashTable
     //making datastructure for registers
 
     scopeHashTable *currentScope = searchEntryAllFunctionsHashTable("_main",afht)->data->scope;
-    /*
-    //printing offsets for operands in quadruple
+
+    reg *rg[20];
+    rg[0] = createRegisterEntry(EAX,"EAX");
+    rg[1] = createRegisterEntry(EBX,"EBX");
+    rg[2] = createRegisterEntry(ECX,"ECX");
+    rg[3] = createRegisterEntry(EDX,"EDX");
+    rg[4] = createRegisterEntry(AX,"AX");
+    rg[5] = createRegisterEntry(BX,"BX");
+    rg[6] = createRegisterEntry(CX,"CX");
+    rg[7] = createRegisterEntry(DX,"DX");
+    rg[8] = createRegisterEntry(AH,"AH");
+    rg[9] = createRegisterEntry(AL,"AL");
+    rg[10] = createRegisterEntry(BH,"BH");
+    rg[11] = createRegisterEntry(BL,"BL");
+    rg[12] = createRegisterEntry(CH,"CH");
+    rg[13] = createRegisterEntry(CL,"CL");
+    rg[14] = createRegisterEntry(DH,"DH");
+    rg[15] = createRegisterEntry(DL,"DL");
+    rg[16] = createRegisterEntry(ESI,"ESI");
+    rg[17] = createRegisterEntry(EDI,"EDI");
+    rg[18] = createRegisterEntry(ESP,"ESP");
+    rg[19] = createRegisterEntry(EBP,"EBP");
+
+
+    FILE *fp = fopen("code.txt","w");
+    
     {
         int i;
         char *type = NULL;
@@ -4435,36 +4479,335 @@ void makeScopeTables(ASTNode *head, recordsHashTable *rht, allFunctionsHashTable
                     	type = shn->data->typeName;
                 }
             }
+            
+            if (isNotRecordOpcode(qn->opcode)){
+                makeCode(qn, currentScope, globalScope, rht, da, rg, 20, ptrAvailableLabels, fp);    
+            }
+            else {
+                recordHashNode *rhn = searchEntryRecordsHashTable(type,rht);
+                int offarg1, offarg2, offres;
+                offarg1 = getOffset(qn->arg1,qn->opcode,currentScope,globalScope,rht,type);
+                offarg2 = getOffset(qn->arg2,qn->opcode,currentScope,globalScope,rht,NULL);
+                offres = getOffset(qn->result,qn->opcode,currentScope,globalScope,rht,NULL);
+                typeNode *tn = rhn->data->type;
+                quadrupleNode *temp = (quadrupleNode *)malloc(sizeof(quadrupleNode));
+                temp->arg1 = (typedUnion *)malloc(sizeof(typedUnion));
+                temp->arg2 = (typedUnion *)malloc(sizeof(typedUnion));
+                temp->result = (typedUnion *)malloc(sizeof(typedUnion));
+                temp->arg1->data = (operand *)malloc(sizeof(operand));
+                temp->arg2->data = (operand *)malloc(sizeof(operand));
+                temp->result->data = (operand *)malloc(sizeof(operand));
+                
+                //temp->arg1->type = UNION_OFFSET;
+                //temp->arg2->type = UNION_OFFSET;
+                //temp->result->type = UNION_OFFSET;
 
-            printf("Arg1_Offset: %d ", getOffset(qn->arg1,qn->opcode,currentScope,globalScope,rht,NULL));
-            printf("Arg2_Offset: %d ", getOffset(qn->arg2,qn->opcode,currentScope,globalScope,rht,type));
-            printf("Res_Offset: %d\n", getOffset(qn->result,qn->opcode,currentScope,globalScope,rht,type));
+                switch (qn->opcode){
+                case ASSIGN_RECORD:
+                    {
+                        while (tn != NULL){
+                            temp->opcode = (tn->fieldtype == TK_INT) ? ASSIGN_INT : ASSIGN_REAL;
+                            temp->arg1->type = UNION_OFFSET;
+                            temp->result->type = UNION_OFFSET;
+                            temp->arg1->data->offset = offarg1;
+                            temp->result->data->offset = offres;
+                            makeCode(temp, currentScope, globalScope, rht, da, rg, 20, ptrAvailableLabels, fp);
+                            offres += ( (tn->fieldtype == TK_INT) ? INT_SIZE : REAL_SIZE );
+                            offarg1 += ( (tn->fieldtype == TK_INT) ? INT_SIZE : REAL_SIZE );
+                            tn = tn->next;
+                        }
+                        break;
+
+                    }
+
+                case PLUS_RECORD:
+                    {
+                        while (tn != NULL){
+                            temp->opcode = (tn->fieldtype == TK_INT) ? PLUS_INT : PLUS_REAL;
+                            temp->arg1->type = UNION_OFFSET;
+                            temp->arg2->type = UNION_OFFSET;
+                            temp->result->type = UNION_OFFSET;
+                            temp->arg1->data->offset = offarg1;
+                            temp->arg2->data->offset = offarg2;
+                            temp->result->data->offset = offres;
+                            makeCode(temp, currentScope, globalScope, rht, da, rg, 20, ptrAvailableLabels, fp);
+                            offres += ( (tn->fieldtype == TK_INT) ? INT_SIZE : REAL_SIZE );
+                            offarg1 += ( (tn->fieldtype == TK_INT) ? INT_SIZE : REAL_SIZE );
+                            offarg2 += ( (tn->fieldtype == TK_INT) ? INT_SIZE : REAL_SIZE );
+                            tn = tn->next;
+                        }
+                        break;
+
+                    }
+                
+                case MINUS_RECORD:
+                    {
+                        while (tn != NULL){
+                            temp->opcode = (tn->fieldtype == TK_INT) ? MINUS_INT : MINUS_REAL;
+                            temp->arg1->type = UNION_OFFSET;
+                            temp->arg2->type = UNION_OFFSET;
+                            temp->result->type = UNION_OFFSET;
+                            temp->arg1->data->offset = offarg1;
+                            temp->arg2->data->offset = offarg2;
+                            temp->result->data->offset = offres;
+                            makeCode(temp, currentScope, globalScope, rht, da, rg, 20, ptrAvailableLabels, fp);
+                            offres += ( (tn->fieldtype == TK_INT) ? INT_SIZE : REAL_SIZE );
+                            offarg1 += ( (tn->fieldtype == TK_INT) ? INT_SIZE : REAL_SIZE );
+                            offarg2 += ( (tn->fieldtype == TK_INT) ? INT_SIZE : REAL_SIZE );
+                            tn = tn->next;
+                        }
+                        break;
+
+                    }
+
+                case MULT_RECORD:
+                    {
+                        int flag = 2;
+                        if (qn->arg1->type == UNION_INT || qn->arg1->type == UNION_REAL  ){
+                            flag = 1;
+                        }
+                        else if (qn->arg1->type == UNION_ID){
+                            temp = qn->arg2->data->identifier;
+                            scopeHashNode *shn = searchEntryScopeHashTable(temp->lexemeCurrentNode,currentScope);
+                            if (shn == NULL){
+                                shn = searchEntryScopeHashTable(temp->lexemeCurrentNode,globalScope);
+                            }
+                            if (shn != NULL){
+                                if (strcmp(shn->data->typeName,"int") != 0 && strcmp(shn->data->typeName,"real") != 0 )
+                                    flag = 1;
+                            }
+                        }  
+                        
+                        while (tn != NULL){
+                            temp->opcode = (tn->fieldtype == TK_INT) ? MULT_INT : MULT_REAL;
+                            if (flag == 1){
+                                //make the condition proper
+
+
+
+
+
+                                temp->arg1->type = (tn->fieldtype == TK_INT) ? UNION_INT : UNION_REAL;
+                                if (temp->arg1->type == UNION_INT){
+                                    temp->arg1->data->int_val = (qn->arg1->type == UNION_INT) ? qn->arg1->data->int_val : (int) qn->arg1->data->real_val;
+                                }
+                                else {
+                                    temp->arg1->data->real_val = (qn->arg1->type == UNION_INT) ? (float)qn->arg1->data->int_val : qn->arg1->data->real_val;
+                                }
+                                temp->arg2->type = UNION_OFFSET;
+                                temp->arg2->data->offset = offarg2;
+                            }
+                            else {
+                                temp->arg2->type = (tn->fieldtype == TK_INT) ? UNION_INT : UNION_REAL;
+                                if (temp->arg2->type == UNION_INT){
+                                    temp->arg2->data->int_val = (qn->arg2->type == UNION_INT) ? qn->arg2->data->int_val : (int) qn->arg2->data->real_val;
+                                }
+                                else {
+                                    temp->arg2->data->real_val = (qn->arg2->type == UNION_INT) ? (float)qn->arg2->data->int_val : qn->arg2->data->real_val;
+                                }
+                                temp->arg1->type = UNION_OFFSET;
+                                temp->arg1->data->offset = offarg2;
+                            }
+                            temp->result->type = UNION_OFFSET;
+                            temp->result->data->offset = offres;
+                            makeCode(temp, currentScope, globalScope, rht, da, rg, 20, ptrAvailableLabels, fp);
+                            offres += ( (tn->fieldtype == TK_INT) ? INT_SIZE : REAL_SIZE );
+                            offarg1 += ( (tn->fieldtype == TK_INT) ? INT_SIZE : REAL_SIZE );
+                            offarg2 += ( (tn->fieldtype == TK_INT) ? INT_SIZE : REAL_SIZE );
+                            tn = tn->next;
+                        }
+                        break;
+
+                    }
+
+                case JEQ_RECORD:
+                    {
+
+                        int width = rhn->data->width;
+                        int j = 0;
+                        int reg1 = getEmptyRegister(rg);
+                        if (reg1 == -1){
+                            reg1 = EDI;
+                        }
+                        rg[reg1]->offsetIfPresent = -1;
+                        while (j < width-4 ){
+                            fprintf(fp,"\tmov %s, [%d]\n", rg[reg1]->regName ,offarg1 + j);
+                            fprintf(fp,"\tcmp %s, [%d]\n", rg[reg1]->regName ,offarg2 + j);
+                            fprintf(fp,"\tjne l%d\n", *ptrAvailableLabels);
+                            j += 4;
+                        }
+                        fprintf(fp,"\tmov %s, [%d]\n", rg[reg1]->regName ,offarg1 + j);
+                        fprintf(fp,"\tcmp %s, [%d]\n", rg[reg1]->regName ,offarg2 + j);
+                        fprintf(fp,"\tjeq l%d\n", qn->result->data->jump_label);
+                        fprintf(fp,"\tl%d:\n", *ptrAvailableLabels);
+                        *ptrAvailableLabels++;
+                        break; 
+                    }
+
+                case JNE_RECORD:
+                    {
+
+                        int width = rhn->data->width;
+                        int j = 0;
+                        int reg1 = getEmptyRegister(rg);
+                        if (reg1 == -1){
+                            reg1 = EDI;
+                        }
+                        rg[reg1]->offsetIfPresent = -1;
+                        while (j < width-4 ){
+                            fprintf(fp,"\tmov %s, [%d]\n", rg[reg1]->regName ,offarg1 + j);
+                            fprintf(fp,"\tcmp %s, [%d]\n", rg[reg1]->regName ,offarg2 + j);
+                            fprintf(fp,"\tjne l%d\n", qn->result->data->jump_label);
+                            j += 4;
+                        }
+                        fprintf(fp,"\tmov %s, [%d]\n", rg[reg1]->regName ,offarg1 + j);
+                        fprintf(fp,"\tcmp %s, [%d]\n", rg[reg1]->regName ,offarg2 + j);
+                        fprintf(fp,"\tjne l%d\n", qn->result->data->jump_label);
+                        break; 
+                    }
+                
+                case JLT_RECORD:
+                    {
+                        int lbl = *ptrAvailableLabels;
+                        *ptrAvailableLabels++;
+                        while (tn->next != NULL){
+                            temp->opcode = (tn->fieldtype == TK_INT) ? JLT_INT : JLT_REAL;
+                            temp->arg1->type = UNION_OFFSET;
+                            temp->arg2->type = UNION_OFFSET;
+                            temp->result->type = UNION_LABEL;
+                            temp->arg1->data->offset = offarg1;
+                            temp->arg2->data->offset = offarg2;
+                            temp->result->data->offset = qn->result->data->jump_label;
+                            makeCode(temp, currentScope, globalScope, rht, da, rg, 20, ptrAvailableLabels, fp);
+                            temp->opcode = (tn->fieldtype == TK_INT) ? JGT_INT : JGT_REAL;
+                            temp->result->data->offset = lbl;
+                            makeCode(temp, currentScope, globalScope, rht, da, rg, 20, ptrAvailableLabels, fp);
+                            offres += ( (tn->fieldtype == TK_INT) ? INT_SIZE : REAL_SIZE );
+                            offarg1 += ( (tn->fieldtype == TK_INT) ? INT_SIZE : REAL_SIZE );
+                            tn = tn->next;
+                        }
+                        temp->opcode = (tn->fieldtype == TK_INT) ? JLT_INT : JLT_REAL;
+                        temp->arg1->type = UNION_OFFSET;
+                        temp->arg2->type = UNION_OFFSET;
+                        temp->result->type = UNION_LABEL;
+                        temp->arg1->data->offset = offarg1;
+                        temp->arg2->data->offset = offarg2;
+                        temp->result->data->offset = qn->result->data->jump_label;
+                        makeCode(temp, currentScope, globalScope, rht, da, rg, 20, ptrAvailableLabels, fp);
+                        fprintf(fp,"\tl%d:\n", lbl);
+                        break;
+                    }
+
+                case JLE_RECORD:
+                    {
+                        int lbl = *ptrAvailableLabels;
+                        *ptrAvailableLabels++;
+                        while (tn->next != NULL){
+                            temp->opcode = (tn->fieldtype == TK_INT) ? JLT_INT : JLT_REAL;
+                            temp->arg1->type = UNION_OFFSET;
+                            temp->arg2->type = UNION_OFFSET;
+                            temp->result->type = UNION_LABEL;
+                            temp->arg1->data->offset = offarg1;
+                            temp->arg2->data->offset = offarg2;
+                            temp->result->data->offset = qn->result->data->jump_label;
+                            makeCode(temp, currentScope, globalScope, rht, da, rg, 20, ptrAvailableLabels, fp);
+                            temp->opcode = (tn->fieldtype == TK_INT) ? JGT_INT : JGT_REAL;
+                            temp->result->data->offset = lbl;
+                            makeCode(temp, currentScope, globalScope, rht, da, rg, 20, ptrAvailableLabels, fp);
+                            offres += ( (tn->fieldtype == TK_INT) ? INT_SIZE : REAL_SIZE );
+                            offarg1 += ( (tn->fieldtype == TK_INT) ? INT_SIZE : REAL_SIZE );
+                            tn = tn->next;
+                        }
+                        temp->opcode = (tn->fieldtype == TK_INT) ? JLE_INT : JLE_REAL;
+                        temp->arg1->type = UNION_OFFSET;
+                        temp->arg2->type = UNION_OFFSET;
+                        temp->result->type = UNION_LABEL;
+                        temp->arg1->data->offset = offarg1;
+                        temp->arg2->data->offset = offarg2;
+                        temp->result->data->offset = qn->result->data->jump_label;
+                        makeCode(temp, currentScope, globalScope, rht, da, rg, 20, ptrAvailableLabels, fp);
+                        fprintf(fp,"\tl%d:\n", lbl);
+                        break;
+                    }
+
+                case JGT_RECORD:
+                    {
+                        int lbl = *ptrAvailableLabels;
+                        *ptrAvailableLabels++;
+                        while (tn->next != NULL){
+                            temp->opcode = (tn->fieldtype == TK_INT) ? JGT_INT : JGT_REAL;
+                            temp->arg1->type = UNION_OFFSET;
+                            temp->arg2->type = UNION_OFFSET;
+                            temp->result->type = UNION_LABEL;
+                            temp->arg1->data->offset = offarg1;
+                            temp->arg2->data->offset = offarg2;
+                            temp->result->data->offset = qn->result->data->jump_label;
+                            makeCode(temp, currentScope, globalScope, rht, da, rg, 20, ptrAvailableLabels, fp);
+                            temp->opcode = (tn->fieldtype == TK_INT) ? JLT_INT : JLT_REAL;
+                            temp->result->data->offset = lbl;
+                            makeCode(temp, currentScope, globalScope, rht, da, rg, 20, ptrAvailableLabels, fp);
+                            offres += ( (tn->fieldtype == TK_INT) ? INT_SIZE : REAL_SIZE );
+                            offarg1 += ( (tn->fieldtype == TK_INT) ? INT_SIZE : REAL_SIZE );
+                            tn = tn->next;
+                        }
+                        temp->opcode = (tn->fieldtype == TK_INT) ? JGT_INT : JGT_REAL;
+                        temp->arg1->type = UNION_OFFSET;
+                        temp->arg2->type = UNION_OFFSET;
+                        temp->result->type = UNION_LABEL;
+                        temp->arg1->data->offset = offarg1;
+                        temp->arg2->data->offset = offarg2;
+                        temp->result->data->offset = qn->result->data->jump_label;
+                        makeCode(temp, currentScope, globalScope, rht, da, rg, 20, ptrAvailableLabels, fp);
+                        fprintf(fp,"\tl%d:\n", lbl);
+                        break;
+                    }
+                
+                case JGE_RECORD:
+                    {
+                        
+                        int lbl = *ptrAvailableLabels;
+                        *ptrAvailableLabels++;
+                        while (tn->next != NULL){
+                            temp->opcode = (tn->fieldtype == TK_INT) ? JGT_INT : JGT_REAL;
+                            temp->arg1->type = UNION_OFFSET;
+                            temp->arg2->type = UNION_OFFSET;
+                            temp->result->type = UNION_LABEL;
+                            temp->arg1->data->offset = offarg1;
+                            temp->arg2->data->offset = offarg2;
+                            temp->result->data->offset = qn->result->data->jump_label;
+                            makeCode(temp, currentScope, globalScope, rht, da, rg, 20, ptrAvailableLabels, fp);
+                            temp->opcode = (tn->fieldtype == TK_INT) ? JLT_INT : JLT_REAL;
+                            temp->result->data->offset = lbl;
+                            makeCode(temp, currentScope, globalScope, rht, da, rg, 20, ptrAvailableLabels, fp);
+                            offres += ( (tn->fieldtype == TK_INT) ? INT_SIZE : REAL_SIZE );
+                            offarg1 += ( (tn->fieldtype == TK_INT) ? INT_SIZE : REAL_SIZE );
+                            tn = tn->next;
+                        }
+                        temp->opcode = (tn->fieldtype == TK_INT) ? JGE_INT : JGE_REAL;
+                        temp->arg1->type = UNION_OFFSET;
+                        temp->arg2->type = UNION_OFFSET;
+                        temp->result->type = UNION_LABEL;
+                        temp->arg1->data->offset = offarg1;
+                        temp->arg2->data->offset = offarg2;
+                        temp->result->data->offset = qn->result->data->jump_label;
+                        makeCode(temp, currentScope, globalScope, rht, da, rg, 20, ptrAvailableLabels, fp);
+                        fprintf(fp,"\tl%d:\n", lbl);
+                        break;
+                    
+                    }
+
+                }//END SWITCH
+            
+            }//END ELSE
+            
+            //printf("Arg1_Offset: %d ", getOffset(qn->arg1,qn->opcode,currentScope,globalScope,rht,NULL));
+            //printf("Arg2_Offset: %d ", getOffset(qn->arg2,qn->opcode,currentScope,globalScope,rht,type));
+            //printf("Res_Offset: %d\n", getOffset(qn->result,qn->opcode,currentScope,globalScope,rht,type));
         }
     }
-    */
+    
 
-    reg *rg[20];
-    rg[0] = createRegisterEntry(EAX,"EAX");
-    rg[1] = createRegisterEntry(EBX,"EBX");
-    rg[2] = createRegisterEntry(ECX,"ECX");
-    rg[3] = createRegisterEntry(EDX,"EDX");
-    rg[4] = createRegisterEntry(AX,"AX");
-    rg[5] = createRegisterEntry(BX,"BX");
-    rg[6] = createRegisterEntry(CX,"CX");
-    rg[7] = createRegisterEntry(DX,"DX");
-    rg[8] = createRegisterEntry(AH,"AH");
-    rg[9] = createRegisterEntry(AL,"AL");
-    rg[10] = createRegisterEntry(BH,"BH");
-    rg[11] = createRegisterEntry(BL,"BL");
-    rg[12] = createRegisterEntry(CH,"CH");
-    rg[13] = createRegisterEntry(CL,"CL");
-    rg[14] = createRegisterEntry(DH,"DH");
-    rg[15] = createRegisterEntry(DL,"DL");
-    rg[16] = createRegisterEntry(ESI,"ESI");
-    rg[17] = createRegisterEntry(EDI,"EDI");
-    rg[18] = createRegisterEntry(ESP,"ESP");
-    rg[19] = createRegisterEntry(EBP,"EBP");
-
+    
     /*
     //printing registers
     int i;
@@ -4472,8 +4815,8 @@ void makeScopeTables(ASTNode *head, recordsHashTable *rht, allFunctionsHashTable
         printRegister(rg[i]);
     }
     */
-    FILE *fp = fopen("code.txt","w");
-    makeCode(q, currentScope, globalScope, rht, da, rg, 20, ptrAvailableLabels, fp);
+    
+    //makeCode(q, currentScope, globalScope, rht, da, rg, 20, ptrAvailableLabels, fp);
 
 }
 

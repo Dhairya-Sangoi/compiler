@@ -4563,57 +4563,110 @@ void makeScopeTables(ASTNode *head, recordsHashTable *rht, allFunctionsHashTable
                 case MULT_RECORD:
                     {
                         int flag = 2;
+                        int flagint = 0;
                         if (qn->arg1->type == UNION_INT || qn->arg1->type == UNION_REAL  ){
                             flag = 1;
                         }
                         else if (qn->arg1->type == UNION_ID){
-                            temp = qn->arg2->data->identifier;
-                            scopeHashNode *shn = searchEntryScopeHashTable(temp->lexemeCurrentNode,currentScope);
+                            ASTNode *temp2 = qn->arg1->data->identifier;
+                            scopeHashNode *shn = searchEntryScopeHashTable(temp2->lexemeCurrentNode,currentScope);
                             if (shn == NULL){
-                                shn = searchEntryScopeHashTable(temp->lexemeCurrentNode,globalScope);
+                                shn = searchEntryScopeHashTable(temp2->lexemeCurrentNode,globalScope);
                             }
                             if (shn != NULL){
-                                if (strcmp(shn->data->typeName,"int") != 0 && strcmp(shn->data->typeName,"real") != 0 )
+                                if (strcmp(shn->data->typeName,"int") == 0 || strcmp(shn->data->typeName,"real") == 0 ){
                                     flag = 1;
+                                    if (strcmp(shn->data->typeName,"int") == 0){
+                                        flagint = 1;
+                                    }
+                                }
                             }
                         }  
                         
+                        if (flag == 2){
+                            if (qn->arg2->type == UNION_ID){
+                                ASTNode *temp2 = qn->arg2->data->identifier;
+                                scopeHashNode *shn = searchEntryScopeHashTable(temp2->lexemeCurrentNode,currentScope);
+                                if (shn == NULL){
+                                    shn = searchEntryScopeHashTable(temp2->lexemeCurrentNode,globalScope);
+                                }
+                                if (shn != NULL){
+                                    if (strcmp(shn->data->typeName,"int") == 0 ){
+                                        flagint = 1;
+                                    }
+                                }
+                            }   
+                        }
+
                         while (tn != NULL){
                             temp->opcode = (tn->fieldtype == TK_INT) ? MULT_INT : MULT_REAL;
                             if (flag == 1){
-                                //make the condition proper
-
-
-
-
-
-                                temp->arg1->type = (tn->fieldtype == TK_INT) ? UNION_INT : UNION_REAL;
+                                //right code
+                                if (qn->arg1->type == UNION_ID){
+                                    temp->arg1->type = UNION_OFFSET;
+                                }
+                                else {
+                                    temp->arg1->type = (tn->fieldtype == TK_INT) ? UNION_INT : UNION_REAL;                                    
+                                }
                                 if (temp->arg1->type == UNION_INT){
                                     temp->arg1->data->int_val = (qn->arg1->type == UNION_INT) ? qn->arg1->data->int_val : (int) qn->arg1->data->real_val;
                                 }
-                                else {
+                                else if (temp->arg1->type == UNION_REAL){
                                     temp->arg1->data->real_val = (qn->arg1->type == UNION_INT) ? (float)qn->arg1->data->int_val : qn->arg1->data->real_val;
                                 }
+                                else {
+                                    temp->arg1->data->offset = offarg1;
+                                }
+
+                                //right code
                                 temp->arg2->type = UNION_OFFSET;
                                 temp->arg2->data->offset = offarg2;
                             }
                             else {
-                                temp->arg2->type = (tn->fieldtype == TK_INT) ? UNION_INT : UNION_REAL;
+                                if (qn->arg2->type == UNION_ID){
+                                    temp->arg2->type = UNION_OFFSET;
+                                }
+                                else {
+                                    temp->arg2->type = (tn->fieldtype == TK_INT) ? UNION_INT : UNION_REAL;                                    
+                                }
                                 if (temp->arg2->type == UNION_INT){
                                     temp->arg2->data->int_val = (qn->arg2->type == UNION_INT) ? qn->arg2->data->int_val : (int) qn->arg2->data->real_val;
                                 }
-                                else {
+                                else if (temp->arg2->type == UNION_REAL){
                                     temp->arg2->data->real_val = (qn->arg2->type == UNION_INT) ? (float)qn->arg2->data->int_val : qn->arg2->data->real_val;
                                 }
+                                else {
+                                    temp->arg2->data->offset = offarg2;
+                                }
+
+                                //right code
                                 temp->arg1->type = UNION_OFFSET;
-                                temp->arg1->data->offset = offarg2;
+                                temp->arg1->data->offset = offarg1;
+
                             }
                             temp->result->type = UNION_OFFSET;
                             temp->result->data->offset = offres;
+
+                            if (flagint == 1 && temp->opcode == MULT_REAL){
+                                int off = (flag == 1) ? offarg1 + 4 : offarg2 + 4;
+                                fprintf(fp,"\tmov ESP, [%d]\n", off);
+                                fprintf(fp,"\tmov [%d], 0\n", off);
+                            }
+
                             makeCode(temp, currentScope, globalScope, rht, da, rg, 20, ptrAvailableLabels, fp);
+
+                            if (flagint == 1 && temp->opcode == MULT_REAL){
+                                int off = (flag == 1) ? offarg1 + 4 : offarg2 + 4;
+                                fprintf(fp,"\tmov [%d], ESP\n", off);
+                            }
+
                             offres += ( (tn->fieldtype == TK_INT) ? INT_SIZE : REAL_SIZE );
-                            offarg1 += ( (tn->fieldtype == TK_INT) ? INT_SIZE : REAL_SIZE );
-                            offarg2 += ( (tn->fieldtype == TK_INT) ? INT_SIZE : REAL_SIZE );
+                            if (flag == 1){
+                                offarg2 += ( (tn->fieldtype == TK_INT) ? INT_SIZE : REAL_SIZE );    
+                            }
+                            else {
+                                offarg1 += ( (tn->fieldtype == TK_INT) ? INT_SIZE : REAL_SIZE );    
+                            }
                             tn = tn->next;
                         }
                         break;

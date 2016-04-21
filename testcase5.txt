@@ -5,15 +5,17 @@ _main
 		type real: physics; 
 		type real: chemistry;
 	endrecord;
-	type real : b5;
-	type real : c5;
-	type real : d5;
+	type record #marks : b5;
+	type record #marks : c5;
+	type record #marks : d5;
 	% b5 <--- 15 * b5 * d5 * 30;
-	type int : c4;
-	if ( (b5 < 3.01) &&& (d5 >= 50.91) )
-	then
-		c4<--- 22;
-	endif
+	b5 <--- c5  + c5 + d5;
+	b5 <--- c5  + c5 + d5 + d5;
+	%type int : c4;
+	%if ( (b5 < 3.01) &&& (d5 >= 50.91) )
+	%then
+	%	c4<--- 22;
+	%endif
 	
 	
 	return;

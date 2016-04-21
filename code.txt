@@ -1,18 +1,268 @@
-	mov EAX, [0]
-	mov EBX, [4]
-	cmp EAX, 3
-	jgt l1
-	jlt l4
-	cmp EBX, 1
-	jge l1
-l4:
-	mov ECX, [16]
-	mov EDX, [20]
-	cmp ECX, 50
-	jlt l1
-	jgt l0
-	cmp EDX, 91
-	jlt l1
-l0:
-	mov [24], 22
-l1:
+	mov EAX, [24]
+	mov EBX, [28]
+	add EAX, [24]
+	add EBX, [28]
+	cmp EBX, 100
+	jlt 3
+	sub EBX, 100
+	inc EAX
+	jmp 4
+	l3:
+	cmp EBX, -100
+	jgt 4
+	add EBX, 100
+	dec EAX
+	l4:
+	mov [72], EAX
+	mov [76], EBX
+	mov ECX, [32]
+	mov EDX, [36]
+	add ECX, [32]
+	add EDX, [36]
+	cmp EDX, 100
+	jlt 5
+	sub EDX, 100
+	inc ECX
+	jmp 6
+	l5:
+	cmp EDX, -100
+	jgt 6
+	add EDX, 100
+	dec ECX
+	l6:
+	mov [80], ECX
+	mov [84], EDX
+	mov ESI, [40]
+	mov EDI, [44]
+	add ESI, [40]
+	add EDI, [44]
+	cmp EDI, 100
+	jlt 7
+	sub EDI, 100
+	inc ESI
+	jmp 8
+	l7:
+	cmp EDI, -100
+	jgt 8
+	add EDI, 100
+	dec ESI
+	l8:
+	mov [88], ESI
+	mov [92], EDI
+	add EAX, [48]
+	add EBX, [52]
+	cmp EBX, 100
+	jlt 9
+	sub EBX, 100
+	inc EAX
+	jmp 10
+	l9:
+	cmp EBX, -100
+	jgt 10
+	add EBX, 100
+	dec EAX
+	l10:
+	mov [96], EAX
+	mov [100], EBX
+	add ECX, [56]
+	add EDX, [60]
+	cmp EDX, 100
+	jlt 11
+	sub EDX, 100
+	inc ECX
+	jmp 12
+	l11:
+	cmp EDX, -100
+	jgt 12
+	add EDX, 100
+	dec ECX
+	l12:
+	mov [104], ECX
+	mov [108], EDX
+	add ESI, [64]
+	add EDI, [68]
+	cmp EDI, 100
+	jlt 13
+	sub EDI, 100
+	inc ESI
+	jmp 14
+	l13:
+	cmp EDI, -100
+	jgt 14
+	add EDI, 100
+	dec ESI
+	l14:
+	mov [112], ESI
+	mov [116], EDI
+	mov [0], EAX
+	mov [4], EBX
+	mov [8], ECX
+	mov [12], EDX
+	mov [16], ESI
+	mov [20], EDI
+	mov EDI, [24]
+	mov ESI, [28]
+	add EDI, [24]
+	add ESI, [28]
+	cmp ESI, 100
+	jlt 15
+	sub ESI, 100
+	inc EDI
+	jmp 16
+	l15:
+	cmp ESI, -100
+	jgt 16
+	add ESI, 100
+	dec EDI
+	l16:
+	mov [72], EDI
+	mov [76], ESI
+	mov EDI, [32]
+	mov ESI, [36]
+	add EDI, [32]
+	add ESI, [36]
+	cmp ESI, 100
+	jlt 17
+	sub ESI, 100
+	inc EDI
+	jmp 18
+	l17:
+	cmp ESI, -100
+	jgt 18
+	add ESI, 100
+	dec EDI
+	l18:
+	mov [80], EDI
+	mov [84], ESI
+	mov EDI, [40]
+	mov ESI, [44]
+	add EDI, [40]
+	add ESI, [44]
+	cmp ESI, 100
+	jlt 19
+	sub ESI, 100
+	inc EDI
+	jmp 20
+	l19:
+	cmp ESI, -100
+	jgt 20
+	add ESI, 100
+	dec EDI
+	l20:
+	mov [88], EDI
+	mov [92], ESI
+	mov EDI, [72]
+	mov ESI, [76]
+	add EDI, [48]
+	add ESI, [52]
+	cmp ESI, 100
+	jlt 21
+	sub ESI, 100
+	inc EDI
+	jmp 22
+	l21:
+	cmp ESI, -100
+	jgt 22
+	add ESI, 100
+	dec EDI
+	l22:
+	mov [96], EDI
+	mov [100], ESI
+	mov EDI, [80]
+	mov ESI, [84]
+	add EDI, [56]
+	add ESI, [60]
+	cmp ESI, 100
+	jlt 23
+	sub ESI, 100
+	inc EDI
+	jmp 24
+	l23:
+	cmp ESI, -100
+	jgt 24
+	add ESI, 100
+	dec EDI
+	l24:
+	mov [104], EDI
+	mov [108], ESI
+	mov EDI, [88]
+	mov ESI, [92]
+	add EDI, [64]
+	add ESI, [68]
+	cmp ESI, 100
+	jlt 25
+	sub ESI, 100
+	inc EDI
+	jmp 26
+	l25:
+	cmp ESI, -100
+	jgt 26
+	add ESI, 100
+	dec EDI
+	l26:
+	mov [112], EDI
+	mov [116], ESI
+	mov EDI, [96]
+	mov ESI, [100]
+	add EDI, [48]
+	add ESI, [52]
+	cmp ESI, 100
+	jlt 27
+	sub ESI, 100
+	inc EDI
+	jmp 28
+	l27:
+	cmp ESI, -100
+	jgt 28
+	add ESI, 100
+	dec EDI
+	l28:
+	mov [120], EDI
+	mov [124], ESI
+	mov EDI, [104]
+	mov ESI, [108]
+	add EDI, [56]
+	add ESI, [60]
+	cmp ESI, 100
+	jlt 29
+	sub ESI, 100
+	inc EDI
+	jmp 30
+	l29:
+	cmp ESI, -100
+	jgt 30
+	add ESI, 100
+	dec EDI
+	l30:
+	mov [128], EDI
+	mov [132], ESI
+	mov EDI, [112]
+	mov ESI, [116]
+	add EDI, [64]
+	add ESI, [68]
+	cmp ESI, 100
+	jlt 31
+	sub ESI, 100
+	inc EDI
+	jmp 32
+	l31:
+	cmp ESI, -100
+	jgt 32
+	add ESI, 100
+	dec EDI
+	l32:
+	mov [136], EDI
+	mov [140], ESI
+	mov EDI, [120]
+	mov ESI, [124]
+	mov [0], EDI
+	mov [4], ESI
+	mov EDI, [128]
+	mov ESI, [132]
+	mov [8], EDI
+	mov [12], ESI
+	mov EDI, [136]
+	mov ESI, [140]
+	mov [16], EDI
+	mov [20], ESI
+l2:

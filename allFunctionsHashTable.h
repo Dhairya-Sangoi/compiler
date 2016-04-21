@@ -12,6 +12,6 @@ void printAllFunctionsDataNode(allFunctionsDataNode *afdn);
 void printAllFunctionsHashNode(allFunctionsHashNode *shn);
 void printAllFunctionsHashTable(allFunctionsHashTable *ht);
 allFunctionsHashNode *createAllFunctionsHashNode(char *key, scopeHashTable *scope);
-IONode *createIONode(char *param);
+IONode *createIONode(char *param, char *paramname);
 
 #endif // ALLFUNCTIONSHASHTABLE_H_INCLUDED

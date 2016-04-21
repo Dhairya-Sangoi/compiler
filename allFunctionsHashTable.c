@@ -166,9 +166,10 @@ allFunctionsHashNode *createAllFunctionsHashNode(char *key, scopeHashTable *scop
     return afhn;
 }
 
-IONode *createIONode(char *param){
+IONode *createIONode(char *param, char *paramname){
     IONode *in = (IONode *)malloc(sizeof(IONode));
     in->param = param;
+    in->paramname = paramname;
     in->next = NULL;
     return in;
 }

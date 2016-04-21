@@ -3,6 +3,7 @@
 
 typedef struct IONode{
     char *param;
+    char *paramname;
     struct IONode *next;
 }IONode;
 

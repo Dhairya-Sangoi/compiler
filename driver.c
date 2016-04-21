@@ -177,7 +177,8 @@ int main(int argc, char *argv[])
     globalScope = createScopeHashTable(5,7);
     quadruple *q = createQuadruple(20);
 
-    makeScopeTables(pt->head,rht,afht,globalScope,q);
+
+    makeScopeTables(pt->head,rht,afht,globalScope,q,0); //change the last parameter
     printQuadruple(q);
 //    return 0;
 

@@ -433,7 +433,7 @@ int canBeAdded(int index){
             || index == EPS);
 }
 
-void dfsForScopeTables(ASTNode *head, recordsHashTable *rht, allFunctionsHashTable *afht, scopeHashTable *currentScope, scopeHashTable *globalScope, typeNode **tn, int *recWidth, IONode **ion, scopeHashTable *recFields, char *fname, int *offset){
+void dfsForScopeTables(ASTNode *head, recordsHashTable *rht, allFunctionsHashTable *afht, scopeHashTable *currentScope, scopeHashTable *globalScope, typeNode **tn, int *recWidth, IONode **ion, scopeHashTable *recFields, char *fname, int *offset, FILE *fp, int *success){
     switch (head->index){
     case PROGRAM:
         {
@@ -443,7 +443,7 @@ void dfsForScopeTables(ASTNode *head, recordsHashTable *rht, allFunctionsHashTab
             ASTNode *child1 = head->child;
             ASTNode *child2 = child1->next;
             *offset = -1;
-            dfsForScopeTables(child1,rht,afht,NULL,globalScope,NULL,NULL,NULL,NULL,NULL,offset);
+            dfsForScopeTables(child1,rht,afht,NULL,globalScope,NULL,NULL,NULL,NULL,NULL,offset,fp,success);
 
             char *fn = (char *)malloc(sizeof(char)*6);
             strcpy(fn,"_main");
@@ -452,7 +452,7 @@ void dfsForScopeTables(ASTNode *head, recordsHashTable *rht, allFunctionsHashTab
             allFunctionsHashNode *temp = createAllFunctionsHashNode(fn,currentScope);
             insertAllFunctionsHashTable(temp,afht);
             *offset = -1; // change to 0 to work if only main function
-            dfsForScopeTables(child2,rht,afht,currentScope,globalScope,NULL,NULL,NULL,NULL,fn,offset);
+            dfsForScopeTables(child2,rht,afht,currentScope,globalScope,NULL,NULL,NULL,NULL,fn,offset,fp,success);
             *offset = -1;
             break;
         }
@@ -468,12 +468,13 @@ void dfsForScopeTables(ASTNode *head, recordsHashTable *rht, allFunctionsHashTab
             allFunctionsHashNode *temp = createAllFunctionsHashNode(child1->lexemeCurrentNode,currentScope);
             int inserted = insertAllFunctionsHashTable(temp,afht);
             if (inserted == 0){
-                printf("Error:9 Function overloading\n");
+                fprintf(fp,"Line <%d>: The funcion <%s> is redeclared.\n", child1->lineno, child1->lexemeCurrentNode);
+                *success = 0;
             }
             fname = child1->lexemeCurrentNode;
-            dfsForScopeTables(child2,rht,afht,currentScope,globalScope,NULL,NULL,&(temp->data->input_params),NULL,fname,offset);
-            dfsForScopeTables(child3,rht,afht,currentScope,globalScope,NULL,NULL,&(temp->data->output_params),NULL,fname, offset);
-            dfsForScopeTables(child4,rht,afht,currentScope,globalScope,NULL,NULL,NULL,NULL,fname, offset);
+            dfsForScopeTables(child2,rht,afht,currentScope,globalScope,NULL,NULL,&(temp->data->input_params),NULL,fname,offset,fp,success);
+            dfsForScopeTables(child3,rht,afht,currentScope,globalScope,NULL,NULL,&(temp->data->output_params),NULL,fname, offset,fp,success);
+            dfsForScopeTables(child4,rht,afht,currentScope,globalScope,NULL,NULL,NULL,NULL,fname, offset,fp,success);
             break;
         }
     case PARAMETER_LIST:
@@ -485,11 +486,12 @@ void dfsForScopeTables(ASTNode *head, recordsHashTable *rht, allFunctionsHashTab
             scopeHashNode *temp = createScopeHashNode(child2->lexemeCurrentNode,child1->lexemeCurrentNode,child2,offset);
             int inserted = insertScopeHashTable(temp,currentScope);
             if (inserted == 0){
-                printf("Error 1: Identifier Redeclaration\n");
+                fprintf(fp,"Line <%d>: The identifier <%s> is declared more than once.\n", child2->lineno, child2->lexemeCurrentNode);
+                *success = 0;
             }
             IONode **headptr = ion;
-            *ion = createIONode(child1->lexemeCurrentNode);
-            dfsForScopeTables(child3,rht,afht,currentScope,globalScope,NULL,NULL,&((*ion)->next),NULL,fname, offset);
+            *ion = createIONode(child1->lexemeCurrentNode, child2->lexemeCurrentNode);
+            dfsForScopeTables(child3,rht,afht,currentScope,globalScope,NULL,NULL,&((*ion)->next),NULL,fname, offset,fp,success);
             break;
         }
 
@@ -523,13 +525,16 @@ void dfsForScopeTables(ASTNode *head, recordsHashTable *rht, allFunctionsHashTab
             if (child3->index == EPS){
                 int inserted = insertScopeHashTable(temp,currentScope);
                 if (inserted == 0){
-                    printf("Error 1: Identifier Redeclaration\n");
+                    fprintf(fp,"Line <%d>: The identifier <%s> is declared more than once.\n", child2->lineno, child2->lexemeCurrentNode);
+                    *success = 0;
                 }
             }
             else {
                 int inserted = insertScopeHashTable(temp,globalScope);
                 if (inserted == 0){
-                    printf("Error 3: Global Identifier Redeclaration\n");
+                    fprintf(fp,"Line <%d>: The identifier <%s>, being a global identifier, cannot be declared more than once.\n", child2->lineno, child2->lexemeCurrentNode);
+                    *success = 0;
+                    //printf("Error 3: Global Identifier Redeclaration\n");
                 }
             }
             break;
@@ -541,7 +546,7 @@ void dfsForScopeTables(ASTNode *head, recordsHashTable *rht, allFunctionsHashTab
             ASTNode *child2 = child1->next;
             recordHashNode *temp = createRecordHashNode(child1->lexemeCurrentNode);
             insertRecordsHashTable(temp,rht);
-            dfsForScopeTables(child2,rht,afht,currentScope,globalScope,&(temp->data->type),&(temp->data->width),NULL,temp->data->fields,fname, offset);
+            dfsForScopeTables(child2,rht,afht,currentScope,globalScope,&(temp->data->type),&(temp->data->width),NULL,temp->data->fields,fname, offset,fp,success);
             //printf("%d %d \n",currentScope->elements, currentScope->f);
             break;
         }
@@ -567,7 +572,7 @@ void dfsForScopeTables(ASTNode *head, recordsHashTable *rht, allFunctionsHashTab
             *recWidth = *recWidth + ((child2->child->index == TK_INT) ? INT_SIZE : REAL_SIZE) ;
             recFields->offset = *recWidth;
             //printf("%d %d \n",currentScope->elements, currentScope->f);
-            dfsForScopeTables(child3,rht,afht,currentScope,globalScope,tn,recWidth,NULL,recFields,fname, offset);
+            dfsForScopeTables(child3,rht,afht,currentScope,globalScope,tn,recWidth,NULL,recFields,fname, offset,fp,success);
             break;
         }
 
@@ -583,7 +588,7 @@ void dfsForScopeTables(ASTNode *head, recordsHashTable *rht, allFunctionsHashTab
             *recWidth = *recWidth + ((child1->child->index == TK_INT) ? INT_SIZE : REAL_SIZE );
             recFields->offset = *recWidth;
             //printf("%d %d \n",currentScope->elements, currentScope->f);
-            dfsForScopeTables(child2,rht,afht,currentScope,globalScope,tn,recWidth,NULL,recFields,fname, offset);
+            dfsForScopeTables(child2,rht,afht,currentScope,globalScope,tn,recWidth,NULL,recFields,fname, offset,fp,success);
             break;
         }
     case FUNCALLSTMT:
@@ -592,11 +597,15 @@ void dfsForScopeTables(ASTNode *head, recordsHashTable *rht, allFunctionsHashTab
             ASTNode *child2 = child1->next;
             ASTNode *child3 = child2->next;
             if (strcmp(fname,child2->lexemeCurrentNode) == 0){
-                printf("Error:10 Function invoked recursively\n");
+                fprintf(fp,"Line <%d>: The funcion <%s> is invoked recursively.\n", child2->lineno, child2->lexemeCurrentNode);
+                *success = 0;
+                //printf("Error:10 Function invoked recursively\n");
             }
             allFunctionsHashNode *temp = searchEntryAllFunctionsHashTable(child2->lexemeCurrentNode,afht);
             if (temp == NULL){
-                printf("Error:14 Function definition must precede the use\n");
+                fprintf(fp,"Line <%d>: The funcion <%s> is undefined.\n", child2->lineno, child2->lexemeCurrentNode);
+                *success = 0;
+                //printf("Error:14 Function definition must precede the use\n");
             }
             //printf("%d %d \n",currentScope->elements, currentScope->f);
         }
@@ -605,7 +614,7 @@ void dfsForScopeTables(ASTNode *head, recordsHashTable *rht, allFunctionsHashTab
             ASTNode *curr = head->child;
             while (curr!=NULL){
                 //parseTreeNode *next = curr->next;
-                dfsForScopeTables(curr,rht,afht,currentScope,globalScope,tn,recWidth,ion,NULL,fname, offset);
+                dfsForScopeTables(curr,rht,afht,currentScope,globalScope,tn,recWidth,ion,NULL,fname, offset,fp,success);
                 //printf("%d %d \n",(currentScope != NULL ) ? (currentScope->elements, currentScope->f) : (0,0));
                 curr = curr->next;
             }
@@ -616,17 +625,17 @@ void dfsForScopeTables(ASTNode *head, recordsHashTable *rht, allFunctionsHashTab
 }
 ////////////////////////////////////////////////////
 
-void dfsForSemanticAnalysis(ASTNode *head, recordsHashTable *rht, allFunctionsHashTable *afht, scopeHashTable *currentScope, scopeHashTable *globalScope, char *fname, char **argtype, whileScopeList *headWhile, whileScopeList *tailWhile, int mylabel, int nextlabel, int grandnextlabel, int *ptrAvailableLabels, int *ptrAvailableTemporary, int jumpIfTrue, int jumpIfFalse, int shouldOutputLabel, int *success, quadruple *q, dynamicArray *da, int *maxoffset){
+void dfsForSemanticAnalysis(ASTNode *head, recordsHashTable *rht, allFunctionsHashTable *afht, scopeHashTable *currentScope, scopeHashTable *globalScope, char *fname, char **argtype, whileScopeList *headWhile, whileScopeList *tailWhile, int mylabel, int nextlabel, int grandnextlabel, int *ptrAvailableLabels, int *ptrAvailableTemporary, int jumpIfTrue, int jumpIfFalse, int shouldOutputLabel, int *success, quadruple *q, dynamicArray *da, int *maxoffset, FILE *fp){
     switch (head->index){
     case PROGRAM:
         {
             ASTNode *child1 = head->child;
             ASTNode *child2 = child1->next;
-            dfsForSemanticAnalysis(child1,rht,afht,NULL,globalScope,NULL,NULL,NULL,NULL, mylabel, nextlabel, grandnextlabel, ptrAvailableLabels, ptrAvailableTemporary, jumpIfTrue, jumpIfFalse, shouldOutputLabel, success, q, da, maxoffset);
+            dfsForSemanticAnalysis(child1,rht,afht,NULL,globalScope,NULL,NULL,NULL,NULL, mylabel, nextlabel, grandnextlabel, ptrAvailableLabels, ptrAvailableTemporary, jumpIfTrue, jumpIfFalse, shouldOutputLabel, success, q, da , maxoffset, fp);
             char *fn = (char *)malloc(sizeof(char)*6);
             strcpy(fn,"_main");
             currentScope = searchEntryAllFunctionsHashTable(fn,afht)->data->scope;
-            dfsForSemanticAnalysis(child2,rht,afht,currentScope,globalScope,fn,NULL,NULL,NULL, mylabel, nextlabel, grandnextlabel, ptrAvailableLabels, ptrAvailableTemporary, jumpIfTrue, jumpIfFalse, shouldOutputLabel, success, q, da, maxoffset);
+            dfsForSemanticAnalysis(child2,rht,afht,currentScope,globalScope,fn,NULL,NULL,NULL, mylabel, nextlabel, grandnextlabel, ptrAvailableLabels, ptrAvailableTemporary, jumpIfTrue, jumpIfFalse, shouldOutputLabel, success, q, da , maxoffset, fp);
             break;
         }
 
@@ -639,7 +648,7 @@ void dfsForSemanticAnalysis(ASTNode *head, recordsHashTable *rht, allFunctionsHa
             currentScope = searchEntryAllFunctionsHashTable(child1->lexemeCurrentNode,afht)->data->scope;
             fname = child1->lexemeCurrentNode;
             while (child1!=NULL){
-                dfsForSemanticAnalysis(child1,rht,afht,currentScope,globalScope,fname,NULL,NULL,NULL, mylabel, nextlabel, grandnextlabel, ptrAvailableLabels, ptrAvailableTemporary, jumpIfTrue, jumpIfFalse, shouldOutputLabel, success, q, da, maxoffset);
+                dfsForSemanticAnalysis(child1,rht,afht,currentScope,globalScope,fname,NULL,NULL,NULL, mylabel, nextlabel, grandnextlabel, ptrAvailableLabels, ptrAvailableTemporary, jumpIfTrue, jumpIfFalse, shouldOutputLabel, success, q, da , maxoffset, fp);
                 child1 = child1->next;
             }
             ASTNode *outparams = head->child->next->next;
@@ -647,7 +656,9 @@ void dfsForSemanticAnalysis(ASTNode *head, recordsHashTable *rht, allFunctionsHa
                 scopeHashNode *temp = searchEntryScopeHashTable(outparams->child->next->lexemeCurrentNode,currentScope);
                 if (temp != NULL){
                     if (temp->data->isChanged != 1){
-                        *success = 0; printf("Error 5:The parameters being returned by a function must be assigned a value\n");
+                        *success = 0; 
+                        fprintf(fp,"Line <%d>: The parameter <%s>, returned by the funcion must be assigned a value\n",outparams->child->next->lineno, outparams->child->next->lexemeCurrentNode );
+                        //fprintf(fp,"Error 5:The parameters being returned by a function must be assigned a value\n");
                         break;
                     }
                     else {
@@ -678,7 +689,9 @@ void dfsForSemanticAnalysis(ASTNode *head, recordsHashTable *rht, allFunctionsHa
             if (child1->index == TK_RECORDID){
                 recordHashNode *r = searchEntryRecordsHashTable(child1->lexemeCurrentNode,rht);
                 if (r==NULL){
-                    *success = 0; printf("Error 12: Record definition not found\n");
+                    *success = 0; 
+                    fprintf(fp,"Line <%d>: The record definition for <%s> was not found\n", child1->lineno, child1->lexemeCurrentNode);
+                    //printf("Error 12: Record definition not found\n");
                 }
                 else {
                     scopeHashNode *t = searchEntryScopeHashTable(child2->lexemeCurrentNode,currentScope);
@@ -696,7 +709,7 @@ void dfsForSemanticAnalysis(ASTNode *head, recordsHashTable *rht, allFunctionsHa
                 }
             }
             //dfsForScopeTables(child3,rht,afht,currentScope,globalScope,NULL,NULL,&((*ion)->next),NULL,fname, offset);
-            dfsForSemanticAnalysis(child3,rht,afht,currentScope,globalScope,fname,NULL,headWhile,tailWhile, mylabel, nextlabel, grandnextlabel, ptrAvailableLabels, ptrAvailableTemporary, jumpIfTrue, jumpIfFalse, shouldOutputLabel, success, q, da, maxoffset);
+            dfsForSemanticAnalysis(child3,rht,afht,currentScope,globalScope,fname,NULL,headWhile,tailWhile, mylabel, nextlabel, grandnextlabel, ptrAvailableLabels, ptrAvailableTemporary, jumpIfTrue, jumpIfFalse, shouldOutputLabel, success, q, da , maxoffset, fp);
             break;
         }
 
@@ -709,14 +722,18 @@ void dfsForSemanticAnalysis(ASTNode *head, recordsHashTable *rht, allFunctionsHa
             if (child3->index == EPS){
                 scopeHashNode *exists = searchEntryScopeHashTable(child2->lexemeCurrentNode,globalScope);
                 if (exists != NULL){
-                    *success = 0; printf("Error 3: Global Identifier Redeclaration. Trying to declare a local variable with global variable name.\n");
+                    *success = 0; 
+                    printf("Line <%d>: The identifier <%s>, being global, cannot be redeclared as local identifer.\n", child2->lineno, child2->lexemeCurrentNode);
+                    //printf("Error 3: Global Identifier Redeclaration. Trying to declare a local variable with global variable name.\n");
                 }
                 searchScope = currentScope;
             }
             if (child1->index == TK_RECORDID){
                 recordHashNode *r = searchEntryRecordsHashTable(child1->lexemeCurrentNode,rht);
                 if (r==NULL){
-                    *success = 0; printf("Error 12: Record definition not found\n");
+                    *success = 0; 
+                    fprintf(fp,"Line <%d>: The record definition for <%s> was not found\n", child1->lineno, child1->lexemeCurrentNode);
+                    //printf("Error 12: Record definition not found\n");
                 }
                 else {
                     scopeHashNode *t = searchEntryScopeHashTable(child2->lexemeCurrentNode,searchScope);
@@ -747,7 +764,9 @@ void dfsForSemanticAnalysis(ASTNode *head, recordsHashTable *rht, allFunctionsHa
                 if (exists == NULL){
                     exists = searchEntryScopeHashTable(head->lexemeCurrentNode,globalScope);
                     if (exists == NULL){
-                        *success = 0; printf("Error 2: Identifier must be declared before its use\n");
+                        *success = 0; 
+                        fprintf(fp,"Line <%d>: The identifier <%s> is undefined.\n", head->lineno, head->lexemeCurrentNode);
+                        //printf("Error 2: Identifier must be declared before its use\n");
                     }
                     else {
                         if (parent == SINGLEORRECID){
@@ -802,7 +821,9 @@ void dfsForSemanticAnalysis(ASTNode *head, recordsHashTable *rht, allFunctionsHa
             IONode *on = searchEntryAllFunctionsHashTable(child2->lexemeCurrentNode,afht)->data->output_params;
             if (on == NULL){
                 if (child1->index != EPS){
-                    *success = 0; printf("Error 6: The function that does not return any value, must be invoked appropriately.\n");
+                    *success = 0; 
+                    fprintf(fp,"Line <%d>: The function <%s> does not return any value. It must be invoked appropriately.\n",child2->lineno, child2->lexemeCurrentNode);
+                    //printf("Error 6: The function that does not return any value, must be invoked appropriately.\n");
                 }
             }
             else {
@@ -826,7 +847,10 @@ void dfsForSemanticAnalysis(ASTNode *head, recordsHashTable *rht, allFunctionsHa
                         }
 
                         if (strcmp(temp->data->typeName,on->param) != 0){
-                            *success = 0; printf("Error 4:output params type not matching\n");
+                            *success = 0; 
+                            fprintf(fp,"Line <%d>: The type <%s> of variable <%s> returned does not match with the type <%s> of the formal output parameter <%s>\n",child1->lineno, on->param, on->paramname, temp->data->typeName, child1->lexemeCurrentNode );
+                            //printf("Error 4:output params type not matching\n");
+                            //printf("Error 4:output params type not matching\n");
                             break;
                         }
                         else {
@@ -835,16 +859,22 @@ void dfsForSemanticAnalysis(ASTNode *head, recordsHashTable *rht, allFunctionsHa
                         }
                     }
                     else {
-                        *success = 0; printf("Error 4:output params not matching. no such identifier exists\n");
+                        *success = 0; 
+                        fprintf(fp,"Line <%d>: The identifier <%s> is undefined.\n", child1->lineno, child1->lexemeCurrentNode);
+                        //printf("Line <%d>: Error 4:output params not matching. no such identifier exists\n");
                         break;
                     }
 
                 }
                 if (on != NULL && child1 == NULL){
-                    *success = 0; printf("Error 4:output params not matching. actual list long\n");
+                    *success = 0; 
+                    fprintf(fp,"Line <%d>: The number of output parametrs at function call <%s> is incorrect.\n", child2->lineno, child2->lexemeCurrentNode);
+                    //printf("Error 4:output params not matching. actual list long\n");
                 }
                 if (child1 != NULL && on == NULL){
-                    *success = 0; printf("Error 4:output params not matching. used list long\n");
+                    *success = 0; 
+                    fprintf(fp,"Line <%d>: The number of output parametrs at function call <%s> is incorrect.\n", child2->lineno, child2->lexemeCurrentNode);
+                    //printf("Error 4:output params not matching. used list long\n");
                 }
             }
 
@@ -860,7 +890,9 @@ void dfsForSemanticAnalysis(ASTNode *head, recordsHashTable *rht, allFunctionsHa
                     }
                     if (temp != NULL){
                         if (strcmp(temp->data->typeName,on->param) != 0){
-                            *success = 0; printf("Error 4:input params type not matching\n");
+                            *success = 0; 
+                            fprintf(fp,"Line <%d>: The type <%s> of variable <%s> returned does not match with the type <%s> of the formal output parameter <%s>\n",child1->lineno, on->param, on->paramname, temp->data->typeName, child1->lexemeCurrentNode );
+                            //printf("Error 4:input params type not matching\n");
                             break;
                         }
                         else {
@@ -869,16 +901,22 @@ void dfsForSemanticAnalysis(ASTNode *head, recordsHashTable *rht, allFunctionsHa
                         }
                     }
                     else {
-                        *success = 0; printf("Error 4:input params not matching. no such identifier exists\n");
+                        *success = 0; 
+                        fprintf(fp,"Line <%d>: The identifier <%s> is undefined.\n",child1->lineno, child1->lexemeCurrentNode);
+                        //printf("Error 4:input params not matching. no such identifier exists\n");
                         break;
                     }
 
                 }
                 if (on != NULL && child1 == NULL){
-                    *success = 0; printf("Error 4:input params not matching. actual list long\n");
+                    *success = 0; 
+                    fprintf(fp,"Line <%d>: The number of input parametrs at function call <%s> is incorrect.\n", child2->lineno, child2->lexemeCurrentNode);
+                    //printf("Error 4:input params not matching. actual list long\n");
                 }
                 if (child1 != NULL && on == NULL){
-                    *success = 0; printf("Error 4:input params not matching. used list long\n");
+                    *success = 0; 
+                    fprintf(fp,"Line <%d>: The number of input parametrs at function call <%s> is incorrect.\n",child2->lineno, child2->lexemeCurrentNode);
+                    //printf("Error 4:input params not matching. used list long\n");
                 }
 
 
@@ -933,11 +971,11 @@ void dfsForSemanticAnalysis(ASTNode *head, recordsHashTable *rht, allFunctionsHa
             nxtlbl2 = -1;
             grndlbl2 = grandnextlabel;
 
-            dfsForSemanticAnalysis(child1,rht,afht,currentScope,globalScope,fname,NULL,headWhile,tailWhile, mylbl1, nxtlbl1, grndlbl1, ptrAvailableLabels, ptrAvailableTemporary, jumpIfTrue, jumpIfFalse, shouldOutputLabel, success, q, da, maxoffset);
+            dfsForSemanticAnalysis(child1,rht,afht,currentScope,globalScope,fname,NULL,headWhile,tailWhile, mylbl1, nxtlbl1, grndlbl1, ptrAvailableLabels, ptrAvailableTemporary, jumpIfTrue, jumpIfFalse, shouldOutputLabel, success, q, da , maxoffset, fp);
             if (child1->index == CONDITIONALSTMT || child1->index == ITERATIVESTMT){
                 shouldOutputLabel = 1;
             }
-            dfsForSemanticAnalysis(child2,rht,afht,currentScope,globalScope,fname,NULL,headWhile,tailWhile, mylbl2, nxtlbl2, grndlbl2, ptrAvailableLabels, ptrAvailableTemporary, jumpIfTrue, jumpIfFalse, shouldOutputLabel, success, q, da, maxoffset);
+            dfsForSemanticAnalysis(child2,rht,afht,currentScope,globalScope,fname,NULL,headWhile,tailWhile, mylbl2, nxtlbl2, grndlbl2, ptrAvailableLabels, ptrAvailableTemporary, jumpIfTrue, jumpIfFalse, shouldOutputLabel, success, q, da , maxoffset, fp);
             //add instruction for generating label if otherstmts's 2nd child goes to eps and grandnextlabel = -1
             if (head->index == OTHERSTMTS && child2->index == EPS && grandnextlabel == -1){
                 addEntryQuadruple(q,LABEL,-1,-1,-1,NULL,NULL,NULL,nxtlbl1);
@@ -966,6 +1004,7 @@ void dfsForSemanticAnalysis(ASTNode *head, recordsHashTable *rht, allFunctionsHa
                     t = searchEntryScopeHashTable(c1->lexemeCurrentNode,globalScope);
                     if (t == NULL){
                         strcpy(arg1,"error");
+                        fprintf(fp,"Line <%d>: The identifier <%s> is undefined.\n", c1->lineno, c1->lexemeCurrentNode);//new add
                     }
                     else {
                         whileScopeList *tt = headWhile;
@@ -990,6 +1029,7 @@ void dfsForSemanticAnalysis(ASTNode *head, recordsHashTable *rht, allFunctionsHa
                             recordHashNode *r = searchEntryRecordsHashTable(t->data->typeName,rht);
                             if (r == NULL){
                                 strcpy(arg1,"error");
+                                //fprintf(fp,"Line <%d>: The identifier <%s> is undefined.\n", c1->lineno, c1->lexemeCurrentNode);//new add
                             }
                             else {
                                 arg1 = t->data->typeName;
@@ -1121,7 +1161,7 @@ void dfsForSemanticAnalysis(ASTNode *head, recordsHashTable *rht, allFunctionsHa
                 }
             }
 
-            dfsForSemanticAnalysis(child1,rht,afht,currentScope,globalScope,fname,NULL,headWhile,tailWhile, mylabel, nextlabel, grandnextlabel, ptrAvailableLabels, ptrAvailableTemporary, jumpIfTrue, jumpIfFalse, shouldOutputLabel, success, q, da, maxoffset);
+            dfsForSemanticAnalysis(child1,rht,afht,currentScope,globalScope,fname,NULL,headWhile,tailWhile, mylabel, nextlabel, grandnextlabel, ptrAvailableLabels, ptrAvailableTemporary, jumpIfTrue, jumpIfFalse, shouldOutputLabel, success, q, da , maxoffset, fp);
             switch (child2->index){
             case ALLVAR:
                 {
@@ -1225,7 +1265,7 @@ void dfsForSemanticAnalysis(ASTNode *head, recordsHashTable *rht, allFunctionsHa
                             }
                         }
                     }
-                    dfsForSemanticAnalysis(child2,rht,afht,currentScope,globalScope,fname,NULL,headWhile,tailWhile, mylabel, nextlabel, grandnextlabel, ptrAvailableLabels, ptrAvailableTemporary, jumpIfTrue, jumpIfFalse, shouldOutputLabel, success, q, da, maxoffset);
+                    dfsForSemanticAnalysis(child2,rht,afht,currentScope,globalScope,fname,NULL,headWhile,tailWhile, mylabel, nextlabel, grandnextlabel, ptrAvailableLabels, ptrAvailableTemporary, jumpIfTrue, jumpIfFalse, shouldOutputLabel, success, q, da , maxoffset, fp);
                     break;
                 }
             case TK_NUM:
@@ -1240,7 +1280,7 @@ void dfsForSemanticAnalysis(ASTNode *head, recordsHashTable *rht, allFunctionsHa
                 }
             default:
                 {
-                    dfsForSemanticAnalysis(child2,rht,afht,currentScope,globalScope,fname,&arg2,headWhile,tailWhile, mylabel, nextlabel, grandnextlabel, ptrAvailableLabels, ptrAvailableTemporary, jumpIfTrue, jumpIfFalse, shouldOutputLabel, success, q, da, maxoffset); // mylabel changed to -1
+                    dfsForSemanticAnalysis(child2,rht,afht,currentScope,globalScope,fname,&arg2,headWhile,tailWhile, mylabel, nextlabel, grandnextlabel, ptrAvailableLabels, ptrAvailableTemporary, jumpIfTrue, jumpIfFalse, shouldOutputLabel, success, q, da , maxoffset, fp); // mylabel changed to -1
                     mylabel = -1;
                     break;
                 }
@@ -1248,7 +1288,9 @@ void dfsForSemanticAnalysis(ASTNode *head, recordsHashTable *rht, allFunctionsHa
 
             if (strcmp(arg1,arg2) == 0){
                 if (strcmp(arg1,"error") == 0){
-                    *success = 0; printf("Error 13: The right hand side expression of an assignment statement must be of the same type as that of the left hand side identifier.\n");
+                    *success = 0; 
+                    fprintf(fp,"Line <%d>: The rhs expression and the lhs identifier of assignment statement both are not valid.\n", c1->lineno);
+                    //printf("Error 13: The right hand side expression of an assignment statement must be of the same type as that of the left hand side identifier.\n");
                 }
                 /////////////////////////////////////////////////////////////////////////////////////////
                 void *res;
@@ -1301,7 +1343,9 @@ void dfsForSemanticAnalysis(ASTNode *head, recordsHashTable *rht, allFunctionsHa
 
             }
             else {
-                *success = 0; printf("Error 13: The right hand side expression of an assignment statement must be of the same type as that of the left hand side identifier.\n");
+                *success = 0; 
+                fprintf(fp,"Line <%d>: The lhs expression type <%s> of assignment statement is not same as that of the rhs identifier type <%s>.\n", c1->lineno,arg1, arg2);
+                //printf("Error 13: The right hand side expression of an assignment statement must be of the same type as that of the left hand side identifier.\n");
 
             }
             break;
@@ -1665,7 +1709,7 @@ void dfsForSemanticAnalysis(ASTNode *head, recordsHashTable *rht, allFunctionsHa
                             }
                         }
                     }
-                    dfsForSemanticAnalysis(child1,rht,afht,currentScope,globalScope,fname,NULL,headWhile,tailWhile, mylabel, nextlabel, grandnextlabel, ptrAvailableLabels, ptrAvailableTemporary, jumpIfTrue, jumpIfFalse, shouldOutputLabel, success, q, da, maxoffset);
+                    dfsForSemanticAnalysis(child1,rht,afht,currentScope,globalScope,fname,NULL,headWhile,tailWhile, mylabel, nextlabel, grandnextlabel, ptrAvailableLabels, ptrAvailableTemporary, jumpIfTrue, jumpIfFalse, shouldOutputLabel, success, q, da , maxoffset, fp);
                     break;
                 }
 
@@ -1735,7 +1779,7 @@ void dfsForSemanticAnalysis(ASTNode *head, recordsHashTable *rht, allFunctionsHa
             default:
                 {
 
-                    dfsForSemanticAnalysis(child1,rht,afht,currentScope,globalScope,fname,&arg1,headWhile,tailWhile, mylabel, nextlabel, grandnextlabel, ptrAvailableLabels, ptrAvailableTemporary, jumpIfTrue, jumpIfFalse, shouldOutputLabel, success, q, da, maxoffset);
+                    dfsForSemanticAnalysis(child1,rht,afht,currentScope,globalScope,fname,&arg1,headWhile,tailWhile, mylabel, nextlabel, grandnextlabel, ptrAvailableLabels, ptrAvailableTemporary, jumpIfTrue, jumpIfFalse, shouldOutputLabel, success, q, da , maxoffset, fp);
                     mylabel = -1;
                     op1 = (*ptrAvailableTemporary )- 1;
                     oper1 = &op1;
@@ -1925,7 +1969,7 @@ void dfsForSemanticAnalysis(ASTNode *head, recordsHashTable *rht, allFunctionsHa
                             }
                         }
                     }
-                    dfsForSemanticAnalysis(child2,rht,afht,currentScope,globalScope,fname,NULL,headWhile,tailWhile, mylabel, nextlabel, grandnextlabel, ptrAvailableLabels, ptrAvailableTemporary, jumpIfTrue, jumpIfFalse, shouldOutputLabel, success, q, da, maxoffset);
+                    dfsForSemanticAnalysis(child2,rht,afht,currentScope,globalScope,fname,NULL,headWhile,tailWhile, mylabel, nextlabel, grandnextlabel, ptrAvailableLabels, ptrAvailableTemporary, jumpIfTrue, jumpIfFalse, shouldOutputLabel, success, q, da , maxoffset, fp);
 
                     break;
                 }
@@ -1951,7 +1995,7 @@ void dfsForSemanticAnalysis(ASTNode *head, recordsHashTable *rht, allFunctionsHa
             default:
                 {
 
-                    dfsForSemanticAnalysis(child2,rht,afht,currentScope,globalScope,fname,&arg2,headWhile,tailWhile, mylabel, nextlabel, grandnextlabel, ptrAvailableLabels, ptrAvailableTemporary, jumpIfTrue, jumpIfFalse, shouldOutputLabel, success, q, da, maxoffset);
+                    dfsForSemanticAnalysis(child2,rht,afht,currentScope,globalScope,fname,&arg2,headWhile,tailWhile, mylabel, nextlabel, grandnextlabel, ptrAvailableLabels, ptrAvailableTemporary, jumpIfTrue, jumpIfFalse, shouldOutputLabel, success, q, da , maxoffset, fp);
                     mylabel = -1;
                     op2typ = UNION_TEMPORARY;
                     op2 = (*ptrAvailableTemporary) - 1;
@@ -2017,6 +2061,9 @@ void dfsForSemanticAnalysis(ASTNode *head, recordsHashTable *rht, allFunctionsHa
                 }
             }
 
+            /*if (strcmp(*argtype,"error") == 0 && child1->index == ALLVAR && child2->index == ALLVAR){
+                fprintf(fp,"Line <%d>: The lhs type <%s> of arithmetic statement is not same as the rhs type <%s>.\n",arg1, arg2);
+            }*/
 
 
             break;
@@ -2074,6 +2121,7 @@ void dfsForSemanticAnalysis(ASTNode *head, recordsHashTable *rht, allFunctionsHa
                     t = searchEntryScopeHashTable(child1->lexemeCurrentNode,globalScope);
                     if (t == NULL){
                         strcpy(arg1,"error");
+                        fprintf(fp,"Line <%d>: The identifier <%s> is undefined.\n", child1->lineno, child1->lexemeCurrentNode);
                     }
                     else {
                         arg1 = t->data->typeName;
@@ -2104,7 +2152,7 @@ void dfsForSemanticAnalysis(ASTNode *head, recordsHashTable *rht, allFunctionsHa
                         opcode = 3;
                     }
                 }
-                dfsForSemanticAnalysis(child1,rht,afht,currentScope,globalScope,fname,NULL,headWhile,tailWhile, mylabel, nextlabel, grandnextlabel, ptrAvailableLabels, ptrAvailableTemporary, jumpIfTrue, jumpIfFalse, shouldOutputLabel, success, q, da, maxoffset);
+                dfsForSemanticAnalysis(child1,rht,afht,currentScope,globalScope,fname,NULL,headWhile,tailWhile, mylabel, nextlabel, grandnextlabel, ptrAvailableLabels, ptrAvailableTemporary, jumpIfTrue, jumpIfFalse, shouldOutputLabel, success, q, da , maxoffset, fp);
             }
             if (child2->index == TK_NUM){
                 strcpy(arg2,"int");
@@ -2127,6 +2175,7 @@ void dfsForSemanticAnalysis(ASTNode *head, recordsHashTable *rht, allFunctionsHa
                     t = searchEntryScopeHashTable(child2->lexemeCurrentNode,globalScope);
                     if (t == NULL){
                         strcpy(arg2,"error");
+                        fprintf(fp,"Line <%d>: The identifier <%s> is undefined.\n", child2->lineno, child2->lexemeCurrentNode);
                     }
                     else {
                         arg2 = t->data->typeName;
@@ -2139,12 +2188,14 @@ void dfsForSemanticAnalysis(ASTNode *head, recordsHashTable *rht, allFunctionsHa
                     arg2type = UNION_ID;
                     a2 = child2;
                 }
-                dfsForSemanticAnalysis(child2,rht,afht,currentScope,globalScope,fname,NULL,headWhile,tailWhile, mylabel, nextlabel, grandnextlabel, ptrAvailableLabels, ptrAvailableTemporary, jumpIfTrue, jumpIfFalse, shouldOutputLabel, success, q, da, maxoffset);
+                dfsForSemanticAnalysis(child2,rht,afht,currentScope,globalScope,fname,NULL,headWhile,tailWhile, mylabel, nextlabel, grandnextlabel, ptrAvailableLabels, ptrAvailableTemporary, jumpIfTrue, jumpIfFalse, shouldOutputLabel, success, q, da , maxoffset, fp);
             }
             if (strcmp(arg1,arg2) == 0){
                 if (strcmp(arg1,"error") == 0){
                     strcpy(*argtype,"error");
-                    //*success = 0; printf("Error 8:An if statement must have the expression of boolean type\n");
+                    //*success = 0; 
+                    //fprintf(fp,"Line <%d>: The type <%s> of <%s> and <%s> of <%s> is not valid for comparison.\n", child1->lineno, arg1, child1->lexemeCurrentNode, arg2, child2->lexemeCurrentNode);
+                    //printf("Error 8:An if statement must have the expression of boolean type\n");
                 }
                 else {
                     strcpy(*argtype,"_boolean");
@@ -2157,7 +2208,9 @@ void dfsForSemanticAnalysis(ASTNode *head, recordsHashTable *rht, allFunctionsHa
             }
             else {
                 strcpy(*argtype,"error");
-                //*success = 0; printf("Error 8:An if statement must have the expression of boolean type\n");
+                //*success = 0; 
+                fprintf(fp,"Line <%d>: The type <%s> of <%s> and <%s> of <%s> is not valid for comparison.\n", child1->lineno, arg1, child1->lexemeCurrentNode, arg2, child2->lexemeCurrentNode);
+                //printf("Error 8:An if statement must have the expression of boolean type\n");
             }
             break;
         }
@@ -2195,8 +2248,8 @@ void dfsForSemanticAnalysis(ASTNode *head, recordsHashTable *rht, allFunctionsHa
 
             char *arg1 = (char *)malloc(sizeof(char) * 32);
             char *arg2 = (char *)malloc(sizeof(char) * 32);
-            dfsForSemanticAnalysis(child1,rht,afht,currentScope,globalScope,fname,&arg1,headWhile,tailWhile, mylabel, lbl, grandnextlabel, ptrAvailableLabels, ptrAvailableTemporary, b1t, b1f, shouldOutputLabel, success, q, da, maxoffset);
-            dfsForSemanticAnalysis(child2,rht,afht,currentScope,globalScope,fname,&arg2,headWhile,tailWhile, lbl, nextlabel, grandnextlabel, ptrAvailableLabels, ptrAvailableTemporary, b2t, b2f, shouldOutputLabel, success, q, da, maxoffset);
+            dfsForSemanticAnalysis(child1,rht,afht,currentScope,globalScope,fname,&arg1,headWhile,tailWhile, mylabel, lbl, grandnextlabel, ptrAvailableLabels, ptrAvailableTemporary, b1t, b1f, shouldOutputLabel, success, q, da , maxoffset, fp);
+            dfsForSemanticAnalysis(child2,rht,afht,currentScope,globalScope,fname,&arg2,headWhile,tailWhile, lbl, nextlabel, grandnextlabel, ptrAvailableLabels, ptrAvailableTemporary, b2t, b2f, shouldOutputLabel, success, q, da , maxoffset, fp);
             if (strcmp(arg1,arg2) == 0){
                 if (strcmp(arg1,"_boolean") == 0){
                     strcpy(*argtype,"_boolean");
@@ -2207,14 +2260,14 @@ void dfsForSemanticAnalysis(ASTNode *head, recordsHashTable *rht, allFunctionsHa
             }
             else {
                 strcpy(*argtype,"error");
-                dfsForSemanticAnalysis(child1,rht,afht,currentScope,globalScope,fname,argtype,headWhile,tailWhile, mylabel, nextlabel, grandnextlabel, ptrAvailableLabels, ptrAvailableTemporary, jumpIfTrue, jumpIfFalse, shouldOutputLabel, success, q, da, maxoffset); //previously uncommented. should be commented
+                dfsForSemanticAnalysis(child1,rht,afht,currentScope,globalScope,fname,argtype,headWhile,tailWhile, mylabel, nextlabel, grandnextlabel, ptrAvailableLabels, ptrAvailableTemporary, jumpIfTrue, jumpIfFalse, shouldOutputLabel, success, q, da , maxoffset, fp); //previously uncommented. should be commented
             }
             break;
         }
     case TK_NOT:
         {
             ASTNode *child1 = head->child;
-            dfsForSemanticAnalysis(child1,rht,afht,currentScope,globalScope,fname,argtype,headWhile,tailWhile, mylabel, nextlabel, grandnextlabel, ptrAvailableLabels, ptrAvailableTemporary, jumpIfFalse, jumpIfTrue, shouldOutputLabel, success, q, da, maxoffset); //new addition
+            dfsForSemanticAnalysis(child1,rht,afht,currentScope,globalScope,fname,argtype,headWhile,tailWhile, mylabel, nextlabel, grandnextlabel, ptrAvailableLabels, ptrAvailableTemporary, jumpIfFalse, jumpIfTrue, shouldOutputLabel, success, q, da , maxoffset, fp); //new addition
             break;
         }
 
@@ -2267,29 +2320,32 @@ void dfsForSemanticAnalysis(ASTNode *head, recordsHashTable *rht, allFunctionsHa
 
                 if (child1->index == TK_NOT){ //traversing boolean condition
                     char *arg = (char *)malloc(sizeof(char) * 32);
-                    dfsForSemanticAnalysis(child1->child,rht,afht,currentScope,globalScope,fname,&arg,headWhile,tailWhile, mylbl1, nxtlbl1, grandnextlabel, ptrAvailableLabels, ptrAvailableTemporary, jit, jif, shouldOutputLabel, success, q, da, maxoffset);
+                    dfsForSemanticAnalysis(child1->child,rht,afht,currentScope,globalScope,fname,&arg,headWhile,tailWhile, mylbl1, nxtlbl1, grandnextlabel, ptrAvailableLabels, ptrAvailableTemporary, jit, jif, shouldOutputLabel, success, q, da , maxoffset, fp);
                     if (strcmp(arg,"_boolean") != 0){
-                        *success = 0; printf("Error 8:An if statement must have the expression of boolean type\n");
+                        *success = 0; 
+                        //printf("Line <%d>: The boolean expression is not valid\n",);
+                        //printf("Error 8:An if statement must have the expression of boolean type\n");
                     }
                 }
                 else {
                     char *arg = (char *)malloc(sizeof(char) * 32);
-                    dfsForSemanticAnalysis(child1,rht,afht,currentScope,globalScope,fname,&arg,headWhile,tailWhile, mylbl1, nxtlbl1, grandnextlabel, ptrAvailableLabels, ptrAvailableTemporary, jit, jif, shouldOutputLabel, success, q, da, maxoffset);
+                    dfsForSemanticAnalysis(child1,rht,afht,currentScope,globalScope,fname,&arg,headWhile,tailWhile, mylbl1, nxtlbl1, grandnextlabel, ptrAvailableLabels, ptrAvailableTemporary, jit, jif, shouldOutputLabel, success, q, da , maxoffset, fp);
                     if (strcmp(arg,"_boolean") != 0){
-                        *success = 0; printf("Error 8:An if statement must have the expression of boolean type\n");
+                        *success = 0; 
+                        //printf("Error 8:An if statement must have the expression of boolean type\n");
                     }
                 }
-                dfsForSemanticAnalysis(child2,rht,afht,currentScope,globalScope,fname,argtype,headWhile,tailWhile, mylbl2, nxtlbl2, grndnxtlbl2, ptrAvailableLabels, ptrAvailableTemporary, jumpIfTrue, jumpIfFalse, shouldOutputLabel, success, q, da, maxoffset);
+                dfsForSemanticAnalysis(child2,rht,afht,currentScope,globalScope,fname,argtype,headWhile,tailWhile, mylbl2, nxtlbl2, grndnxtlbl2, ptrAvailableLabels, ptrAvailableTemporary, jumpIfTrue, jumpIfFalse, shouldOutputLabel, success, q, da , maxoffset, fp);
                 int shldoutlbl = 1;
                 if (child2->index == CONDITIONALSTMT || child2->index == ITERATIVESTMT){
                     shldoutlbl = 1;
                 }
-                dfsForSemanticAnalysis(child3,rht,afht,currentScope,globalScope,fname,argtype,headWhile,tailWhile, mylbl3, -1, grandnextlabel, ptrAvailableLabels, ptrAvailableTemporary, jumpIfTrue, jumpIfFalse, shldoutlbl, success, q, da, maxoffset);
+                dfsForSemanticAnalysis(child3,rht,afht,currentScope,globalScope,fname,argtype,headWhile,tailWhile, mylbl3, -1, grandnextlabel, ptrAvailableLabels, ptrAvailableTemporary, jumpIfTrue, jumpIfFalse, shldoutlbl, success, q, da , maxoffset, fp);
                 if (child4->index != EPS){
                     addEntryQuadruple(q,JUMP,UNION_LABEL,-1,-1,&nextlabel,NULL,NULL,-1);
                     addEntryDynamicArray(nextlabel,da);
                 }
-                dfsForSemanticAnalysis(child4,rht,afht,currentScope,globalScope,fname,argtype,headWhile,tailWhile, mylbl4, -1, grandnextlabel, ptrAvailableLabels, ptrAvailableTemporary, jumpIfTrue, jumpIfFalse, shouldOutputLabel, success, q, da, maxoffset);
+                dfsForSemanticAnalysis(child4,rht,afht,currentScope,globalScope,fname,argtype,headWhile,tailWhile, mylbl4, -1, grandnextlabel, ptrAvailableLabels, ptrAvailableTemporary, jumpIfTrue, jumpIfFalse, shouldOutputLabel, success, q, da , maxoffset, fp);
 
             }
             else {
@@ -2318,34 +2374,36 @@ void dfsForSemanticAnalysis(ASTNode *head, recordsHashTable *rht, allFunctionsHa
                 addEntryQuadruple(q,LABEL,-1,-1,-1,NULL,NULL,NULL,beglabel);
                 if (child1->index == TK_NOT){ //traversing boolean condition
                     char *arg = (char *)malloc(sizeof(char) * 32);
-                    dfsForSemanticAnalysis(child1->child,rht,afht,currentScope,globalScope,fname,&arg,headWhile,tailWhile, mylbl1, nxtlbl1, grandnextlabel, ptrAvailableLabels, ptrAvailableTemporary, jit, jif, shouldOutputLabel, success, q, da, maxoffset);
+                    dfsForSemanticAnalysis(child1->child,rht,afht,currentScope,globalScope,fname,&arg,headWhile,tailWhile, mylbl1, nxtlbl1, grandnextlabel, ptrAvailableLabels, ptrAvailableTemporary, jit, jif, shouldOutputLabel, success, q, da , maxoffset, fp);
                     if (strcmp(arg,"_boolean") != 0){
-                        *success = 0; printf("Error 8:A while statement must have the expression of boolean type\n");
+                        *success = 0; //printf("Error 8:A while statement must have the expression of boolean type\n");
                     }
                 }
                 else {
                     char *arg = (char *)malloc(sizeof(char) * 32);
-                    dfsForSemanticAnalysis(child1,rht,afht,currentScope,globalScope,fname,&arg,headWhile,tailWhile, mylbl1, nxtlbl1, grandnextlabel, ptrAvailableLabels, ptrAvailableTemporary, jit, jif, shouldOutputLabel, success, q, da, maxoffset);
+                    dfsForSemanticAnalysis(child1,rht,afht,currentScope,globalScope,fname,&arg,headWhile,tailWhile, mylbl1, nxtlbl1, grandnextlabel, ptrAvailableLabels, ptrAvailableTemporary, jit, jif, shouldOutputLabel, success, q, da , maxoffset, fp);
                     if (strcmp(arg,"_boolean") != 0){
-                        *success = 0; printf("Error 8:A while statement must have the expression of boolean type\n");
+                        *success = 0; //printf("Error 8:A while statement must have the expression of boolean type\n");
                     }
                 }
-                dfsForSemanticAnalysis(child2,rht,afht,currentScope,globalScope,fname,argtype,headWhile,tailWhile, mylbl2, nxtlbl2, grndnxt2, ptrAvailableLabels, ptrAvailableTemporary, jumpIfTrue, jumpIfFalse, shouldOutputLabel, success, q, da, maxoffset);
+                dfsForSemanticAnalysis(child2,rht,afht,currentScope,globalScope,fname,argtype,headWhile,tailWhile, mylbl2, nxtlbl2, grndnxt2, ptrAvailableLabels, ptrAvailableTemporary, jumpIfTrue, jumpIfFalse, shouldOutputLabel, success, q, da , maxoffset, fp);
                 int shldoutlbl = 1;
                 if (child2->index == CONDITIONALSTMT || child2->index == ITERATIVESTMT){
                     shldoutlbl = 1;
                 }
-                dfsForSemanticAnalysis(child3,rht,afht,currentScope,globalScope,fname,argtype,headWhile,tailWhile, mylbl3, -1, grndnxt3, ptrAvailableLabels, ptrAvailableTemporary, jumpIfTrue, jumpIfFalse, shldoutlbl, success, q, da, maxoffset);
+                dfsForSemanticAnalysis(child3,rht,afht,currentScope,globalScope,fname,argtype,headWhile,tailWhile, mylbl3, -1, grndnxt3, ptrAvailableLabels, ptrAvailableTemporary, jumpIfTrue, jumpIfFalse, shldoutlbl, success, q, da , maxoffset, fp);
                 addEntryQuadruple(q,JUMP,UNION_LABEL,-1,-1,&beglabel,NULL,NULL,mylbl4);
                 addEntryDynamicArray(beglabel,da);
                 if (tailWhile->isChanged == 0){
-                    *success = 0; printf("Error 15:A  while statement  must redefine the variable that participates in the iterations\n");
+                    *success = 0; 
+                    fprintf(fp,"Line <%d>: None of the variables participating in the iterations of the while loop gets updated.\n", head->lineno);
+                    //printf("Error 15:A  while statement  must redefine the variable that participates in the iterations\n");
                 }
             }
 
 //            child1 = child1->next;
 //            while (child1!= NULL){ //traversing other part
-//                dfsForSemanticAnalysis(child1,rht,afht,currentScope,globalScope,fname,argtype,headWhile,tailWhile, mylabel, nextlabel, grandnextlabel, ptrAvailableLabels, ptrAvailableTemporary, jumpIfTrue, jumpIfFalse, shouldOutputLabel, success, q, da, maxoffset);
+//                dfsForSemanticAnalysis(child1,rht,afht,currentScope,globalScope,fname,argtype,headWhile,tailWhile, mylabel, nextlabel, grandnextlabel, ptrAvailableLabels, ptrAvailableTemporary, jumpIfTrue, jumpIfFalse, shouldOutputLabel, success, q, da , maxoffset, fp);
 //                child1 = child1->next;
 //            }
 
@@ -2394,7 +2452,7 @@ void dfsForSemanticAnalysis(ASTNode *head, recordsHashTable *rht, allFunctionsHa
                 }
             }
             addEntryQuadruple(q,opcode,UNION_ID,-1,-1,arg,NULL,NULL,mylabel);
-            dfsForSemanticAnalysis(arg,rht,afht,currentScope,globalScope,fname,NULL,headWhile,tailWhile, mylabel, nextlabel, grandnextlabel, ptrAvailableLabels, ptrAvailableTemporary, jumpIfTrue, jumpIfFalse, shouldOutputLabel, success, q, da, maxoffset);
+            dfsForSemanticAnalysis(arg,rht,afht,currentScope,globalScope,fname,NULL,headWhile,tailWhile, mylabel, nextlabel, grandnextlabel, ptrAvailableLabels, ptrAvailableTemporary, jumpIfTrue, jumpIfFalse, shouldOutputLabel, success, q, da , maxoffset, fp);
             break;
         }
     case TK_WRITE:
@@ -2469,7 +2527,7 @@ void dfsForSemanticAnalysis(ASTNode *head, recordsHashTable *rht, allFunctionsHa
                     break;
                 }
             }
-            dfsForSemanticAnalysis(nxt,rht,afht,currentScope,globalScope,fname,NULL,headWhile,tailWhile, mylabel, nextlabel, grandnextlabel, ptrAvailableLabels, ptrAvailableTemporary, jumpIfTrue, jumpIfFalse, shouldOutputLabel, success, q, da, maxoffset);
+            dfsForSemanticAnalysis(nxt,rht,afht,currentScope,globalScope,fname,NULL,headWhile,tailWhile, mylabel, nextlabel, grandnextlabel, ptrAvailableLabels, ptrAvailableTemporary, jumpIfTrue, jumpIfFalse, shouldOutputLabel, success, q, da , maxoffset, fp);
             break;
         }
 
@@ -2477,7 +2535,7 @@ void dfsForSemanticAnalysis(ASTNode *head, recordsHashTable *rht, allFunctionsHa
         {
             ASTNode *curr = head->child;
             while (curr!=NULL){
-                dfsForSemanticAnalysis(curr,rht,afht,currentScope,globalScope,fname,NULL,headWhile,tailWhile, mylabel, nextlabel, grandnextlabel, ptrAvailableLabels, ptrAvailableTemporary, jumpIfTrue, jumpIfFalse, shouldOutputLabel, success, q, da, maxoffset);
+                dfsForSemanticAnalysis(curr,rht,afht,currentScope,globalScope,fname,NULL,headWhile,tailWhile, mylabel, nextlabel, grandnextlabel, ptrAvailableLabels, ptrAvailableTemporary, jumpIfTrue, jumpIfFalse, shouldOutputLabel, success, q, da , maxoffset, fp);
                 curr = curr->next;
             }
             break;
@@ -4414,22 +4472,25 @@ int isNotRecordOpcode(int opcode){
 
 }
 
-void makeScopeTables(ASTNode *head, recordsHashTable *rht, allFunctionsHashTable *afht, scopeHashTable *globalScope, quadruple *q){
+void makeScopeTables(ASTNode *head, recordsHashTable *rht, allFunctionsHashTable *afht, scopeHashTable *globalScope, quadruple *q, int fd){
     int *offset = (int *)malloc(sizeof(int));
     int *maxoffset = (int *)malloc(sizeof(int));
     *maxoffset = 0;
     *offset = -1;
-    dfsForScopeTables(head,rht,afht,NULL,globalScope,NULL,NULL,NULL,NULL,NULL,offset);
+    int *success = (int *)malloc(sizeof(int));
+    *success = 1;
+
+    FILE *fp2 = fdopen(fd,"w");
+    dfsForScopeTables(head,rht,afht,NULL,globalScope,NULL,NULL,NULL,NULL,NULL,offset,fp2,success);
     //printf("%d %d %d\n",rht->f,afht->f,globalScope->f);
     //printAllFunctionsHashTable(afht);
     int *ptrAvailableLabels = (int *)malloc(sizeof(int));
     int *ptrAvailableTemporary = (int *)malloc(sizeof(int));
     *ptrAvailableLabels = 1;
     *ptrAvailableTemporary = 1;
-    int *success = (int *)malloc(sizeof(int));
-    *success = 1;
+    
     dynamicArray *da = createDynamicArray(10);
-    dfsForSemanticAnalysis(head,rht,afht,NULL,globalScope,NULL,NULL,NULL,NULL,0,0,-1,ptrAvailableLabels,ptrAvailableTemporary,-1,-1,1,success,q,da,maxoffset);
+    dfsForSemanticAnalysis(head,rht,afht,NULL,globalScope,NULL,NULL,NULL,NULL,0,0,-1,ptrAvailableLabels,ptrAvailableTemporary,-1,-1,1,success,q,da,maxoffset,fp2);
     //printDynamicArray(da);
     sortDynamicArray(da);
     //printDynamicArray(da);

@@ -2538,13 +2538,13 @@ void makeCode(quadrupleNode *qn, scopeHashTable *currentScope, scopeHashTable *g
                     registers[reg2]->offsetIfPresent = getOffset(qn->arg2);
                     */
                     if (flag == 1){
-                        fprintf(fp,"\tmov %s, [%d]\n", registers[reg1]->regName ,registers[reg1]->offsetIfPresent);
+                        fprintf(fp,"\tmov %s, dword [programdata + %d]\n", registers[reg1]->regName ,registers[reg1]->offsetIfPresent);
                     }
                     if (qn->arg2->type != UNION_INT){
                         int offset2 = getOffset(qn->arg2,qn->opcode,currentScope,globalScope,rht,NULL);
                         int reg2 = searchRegister(registers,total_registers,offset2);
                         if (reg2 == -1){
-                            fprintf(fp,"\tcmp %s, [%d]\n", registers[reg1]->regName ,offset2);
+                            fprintf(fp,"\tcmp %s, dword [programdata + %d]\n", registers[reg1]->regName ,offset2);
                         }
                         else {
                             fprintf(fp,"\tcmp %s, %s\n", registers[reg1]->regName ,registers[reg2]->regName);
@@ -2557,7 +2557,7 @@ void makeCode(quadrupleNode *qn, scopeHashTable *currentScope, scopeHashTable *g
                     switch(qn->opcode){
                     case JLT_INT:
                         {
-                            fprintf(fp,"\tjlt l%d\n", qn->result->data->jump_label);
+                            fprintf(fp,"\tjl l%d\n", qn->result->data->jump_label);
                             break;
                         }
                     case JLE_INT:
@@ -2567,7 +2567,7 @@ void makeCode(quadrupleNode *qn, scopeHashTable *currentScope, scopeHashTable *g
                         }
                     case JGT_INT:
                         {
-                            fprintf(fp,"\tjgt l%d\n", qn->result->data->jump_label);
+                            fprintf(fp,"\tjg l%d\n", qn->result->data->jump_label);
                             break;
                         }
                     case JGE_INT:
@@ -2577,7 +2577,7 @@ void makeCode(quadrupleNode *qn, scopeHashTable *currentScope, scopeHashTable *g
                         }
                     case JEQ_INT:
                         {
-                            fprintf(fp,"\tjeq l%d\n", qn->result->data->jump_label);
+                            fprintf(fp,"\tje l%d\n", qn->result->data->jump_label);
                             break;
                         }
                     case JNE_INT:
@@ -2599,13 +2599,13 @@ void makeCode(quadrupleNode *qn, scopeHashTable *currentScope, scopeHashTable *g
                     }
                     registers[reg1]->offsetIfPresent = offset1;
                     if (flag == 1){
-                        fprintf(fp,"\tmov %s, [%d]\n", registers[reg1]->regName ,registers[reg1]->offsetIfPresent);
+                        fprintf(fp,"\tmov %s, dword [programdata + %d]\n", registers[reg1]->regName ,registers[reg1]->offsetIfPresent);
                     }
                     fprintf(fp,"\tcmp %s, %d\n", registers[reg1]->regName ,qn->arg1->data->int_val);
                     switch(qn->opcode){
                     case JLT_INT:
                         {
-                            fprintf(fp,"\tjgt l%d\n", qn->result->data->jump_label);
+                            fprintf(fp,"\tjg l%d\n", qn->result->data->jump_label);
                             break;
                         }
                     case JLE_INT:
@@ -2615,7 +2615,7 @@ void makeCode(quadrupleNode *qn, scopeHashTable *currentScope, scopeHashTable *g
                         }
                     case JGT_INT:
                         {
-                            fprintf(fp,"\tjlt l%d\n", qn->result->data->jump_label);
+                            fprintf(fp,"\tjl l%d\n", qn->result->data->jump_label);
                             break;
                         }
                     case JGE_INT:
@@ -2625,7 +2625,7 @@ void makeCode(quadrupleNode *qn, scopeHashTable *currentScope, scopeHashTable *g
                         }
                     case JEQ_INT:
                         {
-                            fprintf(fp,"\tjeq l%d\n", qn->result->data->jump_label);
+                            fprintf(fp,"\tje l%d\n", qn->result->data->jump_label);
                             break;
                         }
                     case JNE_INT:
@@ -2651,7 +2651,7 @@ void makeCode(quadrupleNode *qn, scopeHashTable *currentScope, scopeHashTable *g
                     fprintf(fp,"\tmov %s, %d\n", registers[reg1]->regName ,qn->arg1->data->int_val);
                     fprintf(fp,"\tadd %s, %d\n", registers[reg1]->regName, qn->arg2->data->int_val);
                     int offset2 = getOffset(qn->result,qn->opcode,currentScope,globalScope,rht,NULL);
-                    fprintf(fp,"\tmov [%d], %s\n", offset2, registers[reg1]->regName );
+                    fprintf(fp,"\tmov dword [programdata + %d], %s\n", offset2, registers[reg1]->regName );
                     registers[reg1]->offsetIfPresent = offset2;
 
                 }
@@ -2667,11 +2667,11 @@ void makeCode(quadrupleNode *qn, scopeHashTable *currentScope, scopeHashTable *g
                     }
                     registers[reg1]->offsetIfPresent = offset1;
                     if (flag == 1){
-                        fprintf(fp,"\tmov %s, [%d]\n", registers[reg1]->regName ,registers[reg1]->offsetIfPresent);
+                        fprintf(fp,"\tmov %s, dword [programdata + %d]\n", registers[reg1]->regName ,registers[reg1]->offsetIfPresent);
                     }
                     fprintf(fp,"\tadd %s, %d\n", registers[reg1]->regName, qn->arg2->data->int_val);
                     int offset2 = getOffset(qn->result,qn->opcode,currentScope,globalScope,rht,NULL);
-                    fprintf(fp,"\tmov [%d], %s\n", offset2, registers[reg1]->regName );
+                    fprintf(fp,"\tmov dword [programdata + %d], %s\n", offset2, registers[reg1]->regName );
                     registers[reg1]->offsetIfPresent = offset2; // adding changes the value of the register
                 }
                 else if (qn->arg1->type == UNION_INT && qn->arg2->type != UNION_INT){
@@ -2686,11 +2686,11 @@ void makeCode(quadrupleNode *qn, scopeHashTable *currentScope, scopeHashTable *g
                     }
                     registers[reg1]->offsetIfPresent = offset1;
                     if (flag == 1){
-                        fprintf(fp,"\tmov %s, [%d]\n", registers[reg1]->regName ,registers[reg1]->offsetIfPresent);
+                        fprintf(fp,"\tmov %s, dword [programdata + %d]\n", registers[reg1]->regName ,registers[reg1]->offsetIfPresent);
                     }
                     fprintf(fp,"\tadd %s, %d\n", registers[reg1]->regName, qn->arg1->data->int_val);
                     int offset2 = getOffset(qn->result,qn->opcode,currentScope,globalScope,rht,NULL);
-                    fprintf(fp,"\tmov [%d], %s\n", offset2, registers[reg1]->regName );
+                    fprintf(fp,"\tmov dword [programdata + %d], %s\n", offset2, registers[reg1]->regName );
                     registers[reg1]->offsetIfPresent = offset2; // adding changes the value of the register
                 }
                 else {
@@ -2705,11 +2705,11 @@ void makeCode(quadrupleNode *qn, scopeHashTable *currentScope, scopeHashTable *g
                     }
                     registers[reg1]->offsetIfPresent = offset1;
                     if (flag == 1){
-                        fprintf(fp,"\tmov %s, [%d]\n", registers[reg1]->regName ,registers[reg1]->offsetIfPresent);
+                        fprintf(fp,"\tmov %s, dword [programdata + %d]\n", registers[reg1]->regName ,registers[reg1]->offsetIfPresent);
                     }
-                    fprintf(fp,"\tadd %s, [%d]\n", registers[reg1]->regName, getOffset(qn->arg2,qn->opcode,currentScope,globalScope,rht,NULL) );
+                    fprintf(fp,"\tadd %s, dword [programdata + %d]\n", registers[reg1]->regName, getOffset(qn->arg2,qn->opcode,currentScope,globalScope,rht,NULL) );
                     int offset2 = getOffset(qn->result,qn->opcode,currentScope,globalScope,rht,NULL);
-                    fprintf(fp,"\tmov [%d], %s\n", offset2, registers[reg1]->regName );
+                    fprintf(fp,"\tmov dword [programdata + %d], %s\n", offset2, registers[reg1]->regName );
                     registers[reg1]->offsetIfPresent = offset2; // adding changes the value of the register
                 }
                 break;
@@ -2728,7 +2728,7 @@ void makeCode(quadrupleNode *qn, scopeHashTable *currentScope, scopeHashTable *g
                     fprintf(fp,"\tmov %s, %d\n", registers[reg1]->regName ,qn->arg1->data->int_val);
                     fprintf(fp,"\tsub %s, %d\n", registers[reg1]->regName, qn->arg2->data->int_val);
                     int offset2 = getOffset(qn->result,qn->opcode,currentScope,globalScope,rht,NULL);
-                    fprintf(fp,"\tmov [%d], %s\n", offset2, registers[reg1]->regName );
+                    fprintf(fp,"\tmov dword [programdata + %d], %s\n", offset2, registers[reg1]->regName );
                     registers[reg1]->offsetIfPresent = offset2;
 
                 }
@@ -2744,11 +2744,11 @@ void makeCode(quadrupleNode *qn, scopeHashTable *currentScope, scopeHashTable *g
                     }
                     registers[reg1]->offsetIfPresent = offset1;
                     if (flag == 1){
-                        fprintf(fp,"\tmov %s, [%d]\n", registers[reg1]->regName ,registers[reg1]->offsetIfPresent);
+                        fprintf(fp,"\tmov %s, dword [programdata + %d]\n", registers[reg1]->regName ,registers[reg1]->offsetIfPresent);
                     }
                     fprintf(fp,"\tsub %s, %d\n", registers[reg1]->regName, qn->arg2->data->int_val);
                     int offset2 = getOffset(qn->result,qn->opcode,currentScope,globalScope,rht,NULL);
-                    fprintf(fp,"\tmov [%d], %s\n", offset2, registers[reg1]->regName );
+                    fprintf(fp,"\tmov dword [programdata + %d], %s\n", offset2, registers[reg1]->regName );
                     registers[reg1]->offsetIfPresent = offset2; // adding changes the value of the register
                 }
                 else if (qn->arg1->type == UNION_INT && qn->arg2->type != UNION_INT){
@@ -2759,9 +2759,9 @@ void makeCode(quadrupleNode *qn, scopeHashTable *currentScope, scopeHashTable *g
                     }
                     registers[reg1]->offsetIfPresent = -1;
                     fprintf(fp,"\tmov %s, %d\n", registers[reg1]->regName, qn->arg1->data->int_val);
-                    fprintf(fp,"\tsub %s, [%d]\n", registers[reg1]->regName, getOffset(qn->arg2,qn->opcode,currentScope,globalScope,rht,NULL));
+                    fprintf(fp,"\tsub %s, dword [programdata + %d]\n", registers[reg1]->regName, getOffset(qn->arg2,qn->opcode,currentScope,globalScope,rht,NULL));
                     int offset2 = getOffset(qn->result,qn->opcode,currentScope,globalScope,rht,NULL);
-                    fprintf(fp,"\tmov [%d], %s\n", offset2, registers[reg1]->regName );
+                    fprintf(fp,"\tmov dword [programdata + %d], %s\n", offset2, registers[reg1]->regName );
                     registers[reg1]->offsetIfPresent = offset2;
                 }
                 else {
@@ -2776,11 +2776,11 @@ void makeCode(quadrupleNode *qn, scopeHashTable *currentScope, scopeHashTable *g
                     }
                     registers[reg1]->offsetIfPresent = offset1;
                     if (flag == 1){
-                        fprintf(fp,"\tmov %s, [%d]\n", registers[reg1]->regName ,registers[reg1]->offsetIfPresent);
+                        fprintf(fp,"\tmov %s, dword [programdata + %d]\n", registers[reg1]->regName ,registers[reg1]->offsetIfPresent);
                     }
-                    fprintf(fp,"\tsub %s, [%d]\n", registers[reg1]->regName, getOffset(qn->arg2,qn->opcode,currentScope,globalScope,rht,NULL) );
+                    fprintf(fp,"\tsub %s, dword [programdata + %d]\n", registers[reg1]->regName, getOffset(qn->arg2,qn->opcode,currentScope,globalScope,rht,NULL) );
                     int offset2 = getOffset(qn->result,qn->opcode,currentScope,globalScope,rht,NULL);
-                    fprintf(fp,"\tmov [%d], %s\n", offset2, registers[reg1]->regName );
+                    fprintf(fp,"\tmov dword [programdata + %d], %s\n", offset2, registers[reg1]->regName );
                     registers[reg1]->offsetIfPresent = offset2; // adding changes the value of the register
                 }
                 break;
@@ -2799,7 +2799,7 @@ void makeCode(quadrupleNode *qn, scopeHashTable *currentScope, scopeHashTable *g
                     fprintf(fp,"\tmov %s, %d\n", registers[reg1]->regName ,qn->arg1->data->int_val);
                     fprintf(fp,"\timul %s, %s, %d\n", registers[reg1]->regName, registers[reg1]->regName, qn->arg2->data->int_val);
                     int offset2 = getOffset(qn->result,qn->opcode,currentScope,globalScope,rht,NULL);
-                    fprintf(fp,"\tmov [%d], %s\n", offset2, registers[reg1]->regName );
+                    fprintf(fp,"\tmov dword [programdata + %d], %s\n", offset2, registers[reg1]->regName );
                     registers[reg1]->offsetIfPresent = offset2;
                 }
                 else if (qn->arg1->type != UNION_INT && qn->arg2->type == UNION_INT){
@@ -2813,13 +2813,13 @@ void makeCode(quadrupleNode *qn, scopeHashTable *currentScope, scopeHashTable *g
                         reg1 = EDI;
                     }
                     if (flag == 1){
-                        fprintf(fp,"\timul %s, [%d], %d\n", registers[reg1]->regName , offset1, qn->arg2->data->int_val);
+                        fprintf(fp,"\timul %s, dword [programdata + %d], %d\n", registers[reg1]->regName , offset1, qn->arg2->data->int_val);
                     }
                     else {
                         fprintf(fp,"\timul %s, %s, %d\n", registers[reg1]->regName , registers[reg1]->regName, qn->arg2->data->int_val);
                     }
                     int offset2 = getOffset(qn->result,qn->opcode,currentScope,globalScope,rht,NULL);
-                    fprintf(fp,"\tmov [%d], %s\n", offset2, registers[reg1]->regName );
+                    fprintf(fp,"\tmov dword [programdata + %d], %s\n", offset2, registers[reg1]->regName );
                     registers[reg1]->offsetIfPresent = offset2; // adding changes the value of the register
                 }
                 else if (qn->arg1->type == UNION_INT && qn->arg2->type != UNION_INT){
@@ -2833,13 +2833,13 @@ void makeCode(quadrupleNode *qn, scopeHashTable *currentScope, scopeHashTable *g
                         reg1 = EDI;
                     }
                     if (flag == 1){
-                        fprintf(fp,"\timul %s, [%d], %d\n", registers[reg1]->regName , offset1, qn->arg1->data->int_val);
+                        fprintf(fp,"\timul %s, dword [programdata + %d], %d\n", registers[reg1]->regName , offset1, qn->arg1->data->int_val);
                     }
                     else {
                         fprintf(fp,"\timul %s, %s, %d\n", registers[reg1]->regName , registers[reg1]->regName, qn->arg1->data->int_val);
                     }
                     int offset2 = getOffset(qn->result,qn->opcode,currentScope,globalScope,rht,NULL);
-                    fprintf(fp,"\tmov [%d], %s\n", offset2, registers[reg1]->regName );
+                    fprintf(fp,"\tmov dword [programdata + %d], %s\n", offset2, registers[reg1]->regName );
                     registers[reg1]->offsetIfPresent = offset2;
                 }
                 else {
@@ -2854,11 +2854,11 @@ void makeCode(quadrupleNode *qn, scopeHashTable *currentScope, scopeHashTable *g
                     }
                     registers[reg1]->offsetIfPresent = offset1;
                     if (flag == 1){
-                        fprintf(fp,"\tmov %s, [%d]\n", registers[reg1]->regName ,registers[reg1]->offsetIfPresent);
+                        fprintf(fp,"\tmov %s, dword [programdata + %d]\n", registers[reg1]->regName ,registers[reg1]->offsetIfPresent);
                     }
-                    fprintf(fp,"\timul %s, [%d]\n", registers[reg1]->regName,  getOffset(qn->arg2,qn->opcode,currentScope,globalScope,rht,NULL));
+                    fprintf(fp,"\timul %s, dword [programdata + %d]\n", registers[reg1]->regName,  getOffset(qn->arg2,qn->opcode,currentScope,globalScope,rht,NULL));
                     int offset2 = getOffset(qn->result,qn->opcode,currentScope,globalScope,rht,NULL);
-                    fprintf(fp,"\tmov [%d], %s\n", offset2, registers[reg1]->regName );
+                    fprintf(fp,"\tmov dword [programdata + %d], %s\n", offset2, registers[reg1]->regName );
                     registers[reg1]->offsetIfPresent = offset2; // adding changes the value of the register
                 }
                 break;
@@ -2882,7 +2882,7 @@ void makeCode(quadrupleNode *qn, scopeHashTable *currentScope, scopeHashTable *g
                     registers[reg1]->offsetIfPresent = -1;
                     fprintf(fp,"\tidiv %s\n", registers[reg1]->regName);
                     int offset2 = getOffset(qn->result,qn->opcode,currentScope,globalScope,rht,NULL);
-                    fprintf(fp,"\tmov [%d], EAX\n", offset2 );
+                    fprintf(fp,"\tmov dword [programdata + %d], EAX\n", offset2 );
                     registers[EAX]->offsetIfPresent = offset2;
                 }
                 else if (qn->arg1->type != UNION_INT && qn->arg2->type == UNION_INT){
@@ -2890,7 +2890,7 @@ void makeCode(quadrupleNode *qn, scopeHashTable *currentScope, scopeHashTable *g
                     int offset1 = getOffset(qn->arg1,qn->opcode,currentScope,globalScope,rht,NULL);
                     int reg1 = searchRegister(registers,total_registers,offset1);
                     if (reg1 == -1){
-                        fprintf(fp,"\tmov EAX, [%d]\n", offset1);
+                        fprintf(fp,"\tmov EAX, dword [programdata + %d]\n", offset1);
                         registers[EAX]->offsetIfPresent = offset1;
                     }
                     else {
@@ -2903,7 +2903,7 @@ void makeCode(quadrupleNode *qn, scopeHashTable *currentScope, scopeHashTable *g
                     registers[reg2]->offsetIfPresent = -1;
                     fprintf(fp,"\tidiv %s\n", registers[reg2]->regName);
                     int offset2 = getOffset(qn->result,qn->opcode,currentScope,globalScope,rht,NULL);
-                    fprintf(fp,"\tmov [%d], EAX\n", offset2);
+                    fprintf(fp,"\tmov dword [programdata + %d], EAX\n", offset2);
                     registers[EAX]->offsetIfPresent = offset2;
                 }
                 else if (qn->arg1->type == UNION_INT && qn->arg2->type != UNION_INT){
@@ -2912,13 +2912,13 @@ void makeCode(quadrupleNode *qn, scopeHashTable *currentScope, scopeHashTable *g
                     int offset1 = getOffset(qn->arg2,qn->opcode,currentScope,globalScope,rht,NULL);
                     int reg1 = searchRegister(registers,total_registers,offset1);
                     if (reg1 == -1){
-                        fprintf(fp,"\tidiv DWORD PTR [%d]\n", offset1);
+                        fprintf(fp,"\tidiv   dword [programdata + %d]\n", offset1);
                     }
                     else {
                         fprintf(fp,"\tidiv %s\n", registers[reg1]->regName);
                     }
                     int offset2 = getOffset(qn->result,qn->opcode,currentScope,globalScope,rht,NULL);
-                    fprintf(fp,"\tmov [%d], EAX\n", offset2);
+                    fprintf(fp,"\tmov dword [programdata + %d], EAX\n", offset2);
                     registers[EAX]->offsetIfPresent = offset2;
                 }
                 else {
@@ -2926,15 +2926,15 @@ void makeCode(quadrupleNode *qn, scopeHashTable *currentScope, scopeHashTable *g
                     int offset1 = getOffset(qn->arg1,qn->opcode,currentScope,globalScope,rht,NULL);
                     int reg1 = searchRegister(registers,total_registers,offset1);
                     if (reg1 == -1){
-                        fprintf(fp,"\tmov EAX, [%d]\n", offset1);
+                        fprintf(fp,"\tmov EAX, dword [programdata + %d]\n", offset1);
                         registers[EAX]->offsetIfPresent = offset1;
                     }
                     else {
                         fprintf(fp,"\tmov EAX, %s\n", registers[reg1]->regName);
                     }
-                    fprintf(fp,"\tidiv DWORD PTR [%d]\n", getOffset(qn->arg2,qn->opcode,currentScope,globalScope,rht,NULL));
+                    fprintf(fp,"\tidiv   dword [programdata + %d]\n", getOffset(qn->arg2,qn->opcode,currentScope,globalScope,rht,NULL));
                     int offset2 = getOffset(qn->result,qn->opcode,currentScope,globalScope,rht,NULL);
-                    fprintf(fp,"\tmov [%d], EAX\n", offset2 );
+                    fprintf(fp,"\tmov dword [programdata + %d], EAX\n", offset2 );
                     registers[EAX]->offsetIfPresent = offset2; // adding changes the value of the register
                 }
                 break;
@@ -2945,7 +2945,7 @@ void makeCode(quadrupleNode *qn, scopeHashTable *currentScope, scopeHashTable *g
                     fprintf(fp,"l%d:\n",qn->label);
                 }
                 if (qn->arg1->type == UNION_INT){
-                    fprintf(fp,"\tmov [%d], %d\n", getOffset(qn->result,qn->opcode,currentScope,globalScope,rht,NULL), qn->arg1->data->int_val);
+                    fprintf(fp,"\tmov dword [programdata + %d], %d\n", getOffset(qn->result,qn->opcode,currentScope,globalScope,rht,NULL), qn->arg1->data->int_val);
                 }
                 else {
                     int offset1 = getOffset(qn->arg1,qn->opcode,currentScope,globalScope,rht,NULL);
@@ -2959,10 +2959,10 @@ void makeCode(quadrupleNode *qn, scopeHashTable *currentScope, scopeHashTable *g
                     }
                     registers[reg1]->offsetIfPresent = offset1;
                     if (flag == 1){
-                        fprintf(fp,"\tmov %s, [%d]\n", registers[reg1]->regName ,registers[reg1]->offsetIfPresent);
+                        fprintf(fp,"\tmov %s, dword [programdata + %d]\n", registers[reg1]->regName ,registers[reg1]->offsetIfPresent);
                     }
                     int offset2 = getOffset(qn->result,qn->opcode,currentScope,globalScope,rht,NULL);
-                    fprintf(fp,"\tmov [%d], %s\n", offset2, registers[reg1]->regName );
+                    fprintf(fp,"\tmov dword [programdata + %d], %s\n", offset2, registers[reg1]->regName );
                     registers[reg1]->offsetIfPresent = offset2;
                 }
                 break;
@@ -2997,7 +2997,7 @@ void makeCode(quadrupleNode *qn, scopeHashTable *currentScope, scopeHashTable *g
                     fprintf(fp,"\tcmp %s, %d\n", registers[reg1]->regName, intpart2);
                     fprintf(fp,"\tjne l%d\n", *nextlabel);
                     fprintf(fp,"\tcmp %s, %d\n", registers[reg2]->regName, fracpart2);
-                    fprintf(fp,"\tjeq l%d\n", qn->result->data->jump_label);
+                    fprintf(fp,"\tje l%d\n", qn->result->data->jump_label);
                     fprintf(fp,"l%d:\n",*nextlabel);
                     *nextlabel++;
                 }
@@ -3013,7 +3013,7 @@ void makeCode(quadrupleNode *qn, scopeHashTable *currentScope, scopeHashTable *g
                     }
                     registers[reg1]->offsetIfPresent = offset1;
                     if (flag1 == 1){
-                        fprintf(fp,"\tmov %s, [%d]\n", registers[reg1]->regName ,registers[reg1]->offsetIfPresent);
+                        fprintf(fp,"\tmov %s, dword [programdata + %d]\n", registers[reg1]->regName ,registers[reg1]->offsetIfPresent);
                     }
                     int offset2 = offset1 + 4;
                     int reg2 = searchRegister(registers,total_registers,offset2);
@@ -3026,13 +3026,13 @@ void makeCode(quadrupleNode *qn, scopeHashTable *currentScope, scopeHashTable *g
                     }
                     registers[reg2]->offsetIfPresent = offset2;
                     if (flag2 == 1){
-                        fprintf(fp,"\tmov %s, [%d]\n", registers[reg2]->regName ,registers[reg2]->offsetIfPresent);
+                        fprintf(fp,"\tmov %s, dword [programdata + %d]\n", registers[reg2]->regName ,registers[reg2]->offsetIfPresent);
                     }
                     int offset3 = getOffset(qn->arg2,qn->opcode,currentScope,globalScope,rht,NULL);
-                    fprintf(fp,"\tcmp %s, [%d]\n", registers[reg1]->regName, offset3);
+                    fprintf(fp,"\tcmp %s, dword [programdata + %d]\n", registers[reg1]->regName, offset3);
                     fprintf(fp,"\tjne l%d\n", *nextlabel);
-                    fprintf(fp,"\tcmp %s, [%d]\n", registers[reg2]->regName, offset3 + 4);
-                    fprintf(fp,"\tjeq l%d\n", qn->result->data->jump_label);
+                    fprintf(fp,"\tcmp %s, dword [programdata + %d]\n", registers[reg2]->regName, offset3 + 4);
+                    fprintf(fp,"\tje l%d\n", qn->result->data->jump_label);
                     fprintf(fp,"l%d:\n",*nextlabel);
                     *nextlabel++;
                 }
@@ -3064,7 +3064,7 @@ void makeCode(quadrupleNode *qn, scopeHashTable *currentScope, scopeHashTable *g
                     }
                     registers[reg1]->offsetIfPresent = offset1;
                     if (flag1 == 1){
-                        fprintf(fp,"\tmov %s, [%d]\n", registers[reg1]->regName ,registers[reg1]->offsetIfPresent);
+                        fprintf(fp,"\tmov %s, dword [programdata + %d]\n", registers[reg1]->regName ,registers[reg1]->offsetIfPresent);
                     }
                     int offset2 = offset1 + 4;
                     int reg2 = searchRegister(registers,total_registers,offset2);
@@ -3077,12 +3077,12 @@ void makeCode(quadrupleNode *qn, scopeHashTable *currentScope, scopeHashTable *g
                     }
                     registers[reg2]->offsetIfPresent = offset2;
                     if (flag2 == 1){
-                        fprintf(fp,"\tmov %s, [%d]\n", registers[reg2]->regName ,registers[reg2]->offsetIfPresent);
+                        fprintf(fp,"\tmov %s, dword [programdata + %d]\n", registers[reg2]->regName ,registers[reg2]->offsetIfPresent);
                     }
                     fprintf(fp,"\tcmp %s, %d\n", registers[reg1]->regName, intpart2);
                     fprintf(fp,"\tjne l%d\n", *nextlabel);
                     fprintf(fp,"\tcmp %s, %d\n", registers[reg2]->regName, fracpart2);
-                    fprintf(fp,"\tjeq l%d\n", qn->result->data->jump_label);
+                    fprintf(fp,"\tje l%d\n", qn->result->data->jump_label);
                     fprintf(fp,"l%d:\n",*nextlabel);
                     *nextlabel++;
                 }
@@ -3132,7 +3132,7 @@ void makeCode(quadrupleNode *qn, scopeHashTable *currentScope, scopeHashTable *g
                     }
                     registers[reg1]->offsetIfPresent = offset1;
                     if (flag1 == 1){
-                        fprintf(fp,"\tmov %s, [%d]\n", registers[reg1]->regName ,registers[reg1]->offsetIfPresent);
+                        fprintf(fp,"\tmov %s, dword [programdata + %d]\n", registers[reg1]->regName ,registers[reg1]->offsetIfPresent);
                     }
                     int offset2 = offset1 + 4;
                     int reg2 = searchRegister(registers,total_registers,offset2);
@@ -3145,12 +3145,12 @@ void makeCode(quadrupleNode *qn, scopeHashTable *currentScope, scopeHashTable *g
                     }
                     registers[reg2]->offsetIfPresent = offset2;
                     if (flag2 == 1){
-                        fprintf(fp,"\tmov %s, [%d]\n", registers[reg2]->regName ,registers[reg2]->offsetIfPresent);
+                        fprintf(fp,"\tmov %s, dword [programdata + %d]\n", registers[reg2]->regName ,registers[reg2]->offsetIfPresent);
                     }
                     int offset3 = getOffset(qn->arg2,qn->opcode,currentScope,globalScope,rht,NULL);
-                    fprintf(fp,"\tcmp %s, [%d]\n", registers[reg1]->regName, offset3);
+                    fprintf(fp,"\tcmp %s, dword [programdata + %d]\n", registers[reg1]->regName, offset3);
                     fprintf(fp,"\tjne l%d\n", qn->result->data->jump_label);
-                    fprintf(fp,"\tcmp %s, [%d]\n", registers[reg2]->regName, offset3 + 4);
+                    fprintf(fp,"\tcmp %s, dword [programdata + %d]\n", registers[reg2]->regName, offset3 + 4);
                     fprintf(fp,"\tjne l%d\n", qn->result->data->jump_label);
                 }
                 else {
@@ -3181,7 +3181,7 @@ void makeCode(quadrupleNode *qn, scopeHashTable *currentScope, scopeHashTable *g
                     }
                     registers[reg1]->offsetIfPresent = offset1;
                     if (flag1 == 1){
-                        fprintf(fp,"\tmov %s, [%d]\n", registers[reg1]->regName ,registers[reg1]->offsetIfPresent);
+                        fprintf(fp,"\tmov %s, dword [programdata + %d]\n", registers[reg1]->regName ,registers[reg1]->offsetIfPresent);
                     }
                     int offset2 = offset1 + 4;
                     int reg2 = searchRegister(registers,total_registers,offset2);
@@ -3194,7 +3194,7 @@ void makeCode(quadrupleNode *qn, scopeHashTable *currentScope, scopeHashTable *g
                     }
                     registers[reg2]->offsetIfPresent = offset2;
                     if (flag2 == 1){
-                        fprintf(fp,"\tmov %s, [%d]\n", registers[reg2]->regName ,registers[reg2]->offsetIfPresent);
+                        fprintf(fp,"\tmov %s, dword [programdata + %d]\n", registers[reg2]->regName ,registers[reg2]->offsetIfPresent);
                     }
                     fprintf(fp,"\tcmp %s, %d\n", registers[reg1]->regName, intpart2);
                     fprintf(fp,"\tjne l%d\n", qn->result->data->jump_label);
@@ -3231,10 +3231,10 @@ void makeCode(quadrupleNode *qn, scopeHashTable *currentScope, scopeHashTable *g
                     fprintf(fp,"\tmov %s, %d\n", registers[reg1]->regName, intpart1);
                     fprintf(fp,"\tmov %s, %d\n", registers[reg2]->regName, fracpart1);
                     fprintf(fp,"\tcmp %s, %d\n", registers[reg1]->regName, intpart2);
-                    fprintf(fp,"\tjlt l%d\n", qn->result->data->jump_label);
-                    fprintf(fp,"\tjgt l%d\n", *nextlabel);
+                    fprintf(fp,"\tjl l%d\n", qn->result->data->jump_label);
+                    fprintf(fp,"\tjg l%d\n", *nextlabel);
                     fprintf(fp,"\tcmp %s, %d\n", registers[reg2]->regName, fracpart2);
-                    fprintf(fp,"\tjlt l%d\n", qn->result->data->jump_label);
+                    fprintf(fp,"\tjl l%d\n", qn->result->data->jump_label);
                     fprintf(fp,"l%d:\n",*nextlabel);
                     *nextlabel++;
                 }
@@ -3250,7 +3250,7 @@ void makeCode(quadrupleNode *qn, scopeHashTable *currentScope, scopeHashTable *g
                     }
                     registers[reg1]->offsetIfPresent = offset1;
                     if (flag1 == 1){
-                        fprintf(fp,"\tmov %s, [%d]\n", registers[reg1]->regName ,registers[reg1]->offsetIfPresent);
+                        fprintf(fp,"\tmov %s, dword [programdata + %d]\n", registers[reg1]->regName ,registers[reg1]->offsetIfPresent);
                     }
                     int offset2 = offset1 + 4;
                     int reg2 = searchRegister(registers,total_registers,offset2);
@@ -3263,14 +3263,14 @@ void makeCode(quadrupleNode *qn, scopeHashTable *currentScope, scopeHashTable *g
                     }
                     registers[reg2]->offsetIfPresent = offset2;
                     if (flag2 == 1){
-                        fprintf(fp,"\tmov %s, [%d]\n", registers[reg2]->regName ,registers[reg2]->offsetIfPresent);
+                        fprintf(fp,"\tmov %s, dword [programdata + %d]\n", registers[reg2]->regName ,registers[reg2]->offsetIfPresent);
                     }
                     int offset3 = getOffset(qn->arg2,qn->opcode,currentScope,globalScope,rht,NULL);
-                    fprintf(fp,"\tcmp %s, [%d]\n", registers[reg1]->regName, offset3);
-                    fprintf(fp,"\tjlt l%d\n", qn->result->data->jump_label);
-                    fprintf(fp,"\tjgt l%d\n", *nextlabel);
-                    fprintf(fp,"\tcmp %s, [%d]\n", registers[reg2]->regName, offset3 + 4);
-                    fprintf(fp,"\tjlt l%d\n", qn->result->data->jump_label);
+                    fprintf(fp,"\tcmp %s, dword [programdata + %d]\n", registers[reg1]->regName, offset3);
+                    fprintf(fp,"\tjl l%d\n", qn->result->data->jump_label);
+                    fprintf(fp,"\tjg l%d\n", *nextlabel);
+                    fprintf(fp,"\tcmp %s, dword [programdata + %d]\n", registers[reg2]->regName, offset3 + 4);
+                    fprintf(fp,"\tjl l%d\n", qn->result->data->jump_label);
                     fprintf(fp,"l%d:\n",*nextlabel);
                     *nextlabel++;
                 }
@@ -3302,7 +3302,7 @@ void makeCode(quadrupleNode *qn, scopeHashTable *currentScope, scopeHashTable *g
                     }
                     registers[reg1]->offsetIfPresent = offset1;
                     if (flag1 == 1){
-                        fprintf(fp,"\tmov %s, [%d]\n", registers[reg1]->regName ,registers[reg1]->offsetIfPresent);
+                        fprintf(fp,"\tmov %s, dword [programdata + %d]\n", registers[reg1]->regName ,registers[reg1]->offsetIfPresent);
                     }
                     int offset2 = offset1 + 4;
                     int reg2 = searchRegister(registers,total_registers,offset2);
@@ -3315,13 +3315,13 @@ void makeCode(quadrupleNode *qn, scopeHashTable *currentScope, scopeHashTable *g
                     }
                     registers[reg2]->offsetIfPresent = offset2;
                     if (flag2 == 1){
-                        fprintf(fp,"\tmov %s, [%d]\n", registers[reg2]->regName ,registers[reg2]->offsetIfPresent);
+                        fprintf(fp,"\tmov %s, dword [programdata + %d]\n", registers[reg2]->regName ,registers[reg2]->offsetIfPresent);
                     }
                     fprintf(fp,"\tcmp %s, %d\n", registers[reg1]->regName, intpart2);
-                    fprintf(fp,"\tjlt l%d\n", qn->result->data->jump_label);
-                    fprintf(fp,"\tjgt l%d\n", *nextlabel);
+                    fprintf(fp,"\tjl l%d\n", qn->result->data->jump_label);
+                    fprintf(fp,"\tjg l%d\n", *nextlabel);
                     fprintf(fp,"\tcmp %s, %d\n", registers[reg2]->regName, fracpart2);
-                    fprintf(fp,"\tjlt l%d\n", qn->result->data->jump_label);
+                    fprintf(fp,"\tjl l%d\n", qn->result->data->jump_label);
                     fprintf(fp,"l%d:\n",*nextlabel);
                     *nextlabel++;
                 }
@@ -3355,8 +3355,8 @@ void makeCode(quadrupleNode *qn, scopeHashTable *currentScope, scopeHashTable *g
                     fprintf(fp,"\tmov %s, %d\n", registers[reg1]->regName, intpart1);
                     fprintf(fp,"\tmov %s, %d\n", registers[reg2]->regName, fracpart1);
                     fprintf(fp,"\tcmp %s, %d\n", registers[reg1]->regName, intpart2);
-                    fprintf(fp,"\tjlt l%d\n", qn->result->data->jump_label);
-                    fprintf(fp,"\tjgt l%d\n", *nextlabel);
+                    fprintf(fp,"\tjl l%d\n", qn->result->data->jump_label);
+                    fprintf(fp,"\tjg l%d\n", *nextlabel);
                     fprintf(fp,"\tcmp %s, %d\n", registers[reg2]->regName, fracpart2);
                     fprintf(fp,"\tjle l%d\n", qn->result->data->jump_label);
                     fprintf(fp,"l%d:\n",*nextlabel);
@@ -3374,7 +3374,7 @@ void makeCode(quadrupleNode *qn, scopeHashTable *currentScope, scopeHashTable *g
                     }
                     registers[reg1]->offsetIfPresent = offset1;
                     if (flag1 == 1){
-                        fprintf(fp,"\tmov %s, [%d]\n", registers[reg1]->regName ,registers[reg1]->offsetIfPresent);
+                        fprintf(fp,"\tmov %s, dword [programdata + %d]\n", registers[reg1]->regName ,registers[reg1]->offsetIfPresent);
                     }
                     int offset2 = offset1 + 4;
                     int reg2 = searchRegister(registers,total_registers,offset2);
@@ -3387,13 +3387,13 @@ void makeCode(quadrupleNode *qn, scopeHashTable *currentScope, scopeHashTable *g
                     }
                     registers[reg2]->offsetIfPresent = offset2;
                     if (flag2 == 1){
-                        fprintf(fp,"\tmov %s, [%d]\n", registers[reg2]->regName ,registers[reg2]->offsetIfPresent);
+                        fprintf(fp,"\tmov %s, dword [programdata + %d]\n", registers[reg2]->regName ,registers[reg2]->offsetIfPresent);
                     }
                     int offset3 = getOffset(qn->arg2,qn->opcode,currentScope,globalScope,rht,NULL)  ;
-                    fprintf(fp,"\tcmp %s, [%d]\n", registers[reg1]->regName, offset3);
-                    fprintf(fp,"\tjlt l%d\n", qn->result->data->jump_label);
-                    fprintf(fp,"\tjgt l%d\n", *nextlabel);
-                    fprintf(fp,"\tcmp %s, [%d]\n", registers[reg2]->regName, offset3);
+                    fprintf(fp,"\tcmp %s, dword [programdata + %d]\n", registers[reg1]->regName, offset3);
+                    fprintf(fp,"\tjl l%d\n", qn->result->data->jump_label);
+                    fprintf(fp,"\tjg l%d\n", *nextlabel);
+                    fprintf(fp,"\tcmp %s, dword [programdata + %d]\n", registers[reg2]->regName, offset3);
                     fprintf(fp,"\tjle l%d\n", qn->result->data->jump_label);
                     fprintf(fp,"l%d:\n",*nextlabel);
                     *nextlabel++;
@@ -3426,7 +3426,7 @@ void makeCode(quadrupleNode *qn, scopeHashTable *currentScope, scopeHashTable *g
                     }
                     registers[reg1]->offsetIfPresent = offset1;
                     if (flag1 == 1){
-                        fprintf(fp,"\tmov %s, [%d]\n", registers[reg1]->regName ,registers[reg1]->offsetIfPresent);
+                        fprintf(fp,"\tmov %s, dword [programdata + %d]\n", registers[reg1]->regName ,registers[reg1]->offsetIfPresent);
                     }
                     int offset2 = offset1 + 4;
                     int reg2 = searchRegister(registers,total_registers,offset2);
@@ -3439,11 +3439,11 @@ void makeCode(quadrupleNode *qn, scopeHashTable *currentScope, scopeHashTable *g
                     }
                     registers[reg2]->offsetIfPresent = offset2;
                     if (flag2 == 1){
-                        fprintf(fp,"\tmov %s, [%d]\n", registers[reg2]->regName ,registers[reg2]->offsetIfPresent);
+                        fprintf(fp,"\tmov %s, dword [programdata + %d]\n", registers[reg2]->regName ,registers[reg2]->offsetIfPresent);
                     }
                     fprintf(fp,"\tcmp %s, %d\n", registers[reg1]->regName, intpart2);
-                    fprintf(fp,"\tjlt l%d\n", qn->result->data->jump_label);
-                    fprintf(fp,"\tjgt l%d\n", *nextlabel);
+                    fprintf(fp,"\tjl l%d\n", qn->result->data->jump_label);
+                    fprintf(fp,"\tjg l%d\n", *nextlabel);
                     fprintf(fp,"\tcmp %s, %d\n", registers[reg2]->regName, fracpart2);
                     fprintf(fp,"\tjle l%d\n", qn->result->data->jump_label);
                     fprintf(fp,"l%d:\n",*nextlabel);
@@ -3479,10 +3479,10 @@ void makeCode(quadrupleNode *qn, scopeHashTable *currentScope, scopeHashTable *g
                     fprintf(fp,"\tmov %s, %d\n", registers[reg1]->regName, intpart1);
                     fprintf(fp,"\tmov %s, %d\n", registers[reg2]->regName, fracpart1);
                     fprintf(fp,"\tcmp %s, %d\n", registers[reg1]->regName, intpart2);
-                    fprintf(fp,"\tjgt l%d\n", qn->result->data->jump_label);
-                    fprintf(fp,"\tjlt l%d\n", *nextlabel);
+                    fprintf(fp,"\tjg l%d\n", qn->result->data->jump_label);
+                    fprintf(fp,"\tjl l%d\n", *nextlabel);
                     fprintf(fp,"\tcmp %s, %d\n", registers[reg2]->regName, fracpart2);
-                    fprintf(fp,"\tjgt l%d\n", qn->result->data->jump_label);
+                    fprintf(fp,"\tjg l%d\n", qn->result->data->jump_label);
                     fprintf(fp,"l%d:\n",*nextlabel);
                     *nextlabel++;
                 }
@@ -3498,7 +3498,7 @@ void makeCode(quadrupleNode *qn, scopeHashTable *currentScope, scopeHashTable *g
                     }
                     registers[reg1]->offsetIfPresent = offset1;
                     if (flag1 == 1){
-                        fprintf(fp,"\tmov %s, [%d]\n", registers[reg1]->regName ,registers[reg1]->offsetIfPresent);
+                        fprintf(fp,"\tmov %s, dword [programdata + %d]\n", registers[reg1]->regName ,registers[reg1]->offsetIfPresent);
                     }
                     int offset2 = offset1 + 4;
                     int reg2 = searchRegister(registers,total_registers,offset2);
@@ -3511,14 +3511,14 @@ void makeCode(quadrupleNode *qn, scopeHashTable *currentScope, scopeHashTable *g
                     }
                     registers[reg2]->offsetIfPresent = offset2;
                     if (flag2 == 1){
-                        fprintf(fp,"\tmov %s, [%d]\n", registers[reg2]->regName ,registers[reg2]->offsetIfPresent);
+                        fprintf(fp,"\tmov %s, dword [programdata + %d]\n", registers[reg2]->regName ,registers[reg2]->offsetIfPresent);
                     }
                     int offset3 = getOffset(qn->arg2,qn->opcode,currentScope,globalScope,rht,NULL)   ;
-                    fprintf(fp,"\tcmp %s, [%d]\n", registers[reg1]->regName, offset3);
-                    fprintf(fp,"\tjgt l%d\n", qn->result->data->jump_label);
-                    fprintf(fp,"\tjlt l%d\n", *nextlabel);
-                    fprintf(fp,"\tcmp %s, [%d]\n", registers[reg2]->regName, offset3 + 4);
-                    fprintf(fp,"\tjgt l%d\n", qn->result->data->jump_label);
+                    fprintf(fp,"\tcmp %s, dword [programdata + %d]\n", registers[reg1]->regName, offset3);
+                    fprintf(fp,"\tjg l%d\n", qn->result->data->jump_label);
+                    fprintf(fp,"\tjl l%d\n", *nextlabel);
+                    fprintf(fp,"\tcmp %s, dword [programdata + %d]\n", registers[reg2]->regName, offset3 + 4);
+                    fprintf(fp,"\tjg l%d\n", qn->result->data->jump_label);
                     fprintf(fp,"l%d:\n",*nextlabel);
                     *nextlabel++;
                 }
@@ -3550,7 +3550,7 @@ void makeCode(quadrupleNode *qn, scopeHashTable *currentScope, scopeHashTable *g
                     }
                     registers[reg1]->offsetIfPresent = offset1;
                     if (flag1 == 1){
-                        fprintf(fp,"\tmov %s, [%d]\n", registers[reg1]->regName ,registers[reg1]->offsetIfPresent);
+                        fprintf(fp,"\tmov %s, dword [programdata + %d]\n", registers[reg1]->regName ,registers[reg1]->offsetIfPresent);
                     }
                     int offset2 = offset1 + 4;
                     int reg2 = searchRegister(registers,total_registers,offset2);
@@ -3563,13 +3563,13 @@ void makeCode(quadrupleNode *qn, scopeHashTable *currentScope, scopeHashTable *g
                     }
                     registers[reg2]->offsetIfPresent = offset2;
                     if (flag2 == 1){
-                        fprintf(fp,"\tmov %s, [%d]\n", registers[reg2]->regName ,registers[reg2]->offsetIfPresent);
+                        fprintf(fp,"\tmov %s, dword [programdata + %d]\n", registers[reg2]->regName ,registers[reg2]->offsetIfPresent);
                     }
                     fprintf(fp,"\tcmp %s, %d\n", registers[reg1]->regName, intpart2);
-                    fprintf(fp,"\tjgt l%d\n", qn->result->data->jump_label);
-                    fprintf(fp,"\tjlt l%d\n", *nextlabel);
+                    fprintf(fp,"\tjg l%d\n", qn->result->data->jump_label);
+                    fprintf(fp,"\tjl l%d\n", *nextlabel);
                     fprintf(fp,"\tcmp %s, %d\n", registers[reg2]->regName, fracpart2);
-                    fprintf(fp,"\tjgt l%d\n", qn->result->data->jump_label);
+                    fprintf(fp,"\tjg l%d\n", qn->result->data->jump_label);
                     fprintf(fp,"l%d:\n",*nextlabel);
                     *nextlabel++;
                 }
@@ -3603,8 +3603,8 @@ void makeCode(quadrupleNode *qn, scopeHashTable *currentScope, scopeHashTable *g
                     fprintf(fp,"\tmov %s, %d\n", registers[reg1]->regName, intpart1);
                     fprintf(fp,"\tmov %s, %d\n", registers[reg2]->regName, fracpart1);
                     fprintf(fp,"\tcmp %s, %d\n", registers[reg1]->regName, intpart2);
-                    fprintf(fp,"\tjgt l%d\n", qn->result->data->jump_label);
-                    fprintf(fp,"\tjlt l%d\n", *nextlabel);
+                    fprintf(fp,"\tjg l%d\n", qn->result->data->jump_label);
+                    fprintf(fp,"\tjl l%d\n", *nextlabel);
                     fprintf(fp,"\tcmp %s, %d\n", registers[reg2]->regName, fracpart2);
                     fprintf(fp,"\tjge l%d\n", qn->result->data->jump_label);
                     fprintf(fp,"l%d:\n",*nextlabel);
@@ -3622,7 +3622,7 @@ void makeCode(quadrupleNode *qn, scopeHashTable *currentScope, scopeHashTable *g
                     }
                     registers[reg1]->offsetIfPresent = offset1;
                     if (flag1 == 1){
-                        fprintf(fp,"\tmov %s, [%d]\n", registers[reg1]->regName ,registers[reg1]->offsetIfPresent);
+                        fprintf(fp,"\tmov %s, dword [programdata + %d]\n", registers[reg1]->regName ,registers[reg1]->offsetIfPresent);
                     }
                     int offset2 = offset1 + 4;
                     int reg2 = searchRegister(registers,total_registers,offset2);
@@ -3635,13 +3635,13 @@ void makeCode(quadrupleNode *qn, scopeHashTable *currentScope, scopeHashTable *g
                     }
                     registers[reg2]->offsetIfPresent = offset2;
                     if (flag2 == 1){
-                        fprintf(fp,"\tmov %s, [%d]\n", registers[reg2]->regName ,registers[reg2]->offsetIfPresent);
+                        fprintf(fp,"\tmov %s, dword [programdata + %d]\n", registers[reg2]->regName ,registers[reg2]->offsetIfPresent);
                     }
                     int offset3 = getOffset(qn->arg2,qn->opcode,currentScope,globalScope,rht,NULL)  ;
-                    fprintf(fp,"\tcmp %s, [%d]\n", registers[reg1]->regName, offset3);
-                    fprintf(fp,"\tjgt l%d\n", qn->result->data->jump_label);
-                    fprintf(fp,"\tjlt l%d\n", *nextlabel);
-                    fprintf(fp,"\tcmp %s, [%d]\n", registers[reg2]->regName, offset3 + 4);
+                    fprintf(fp,"\tcmp %s, dword [programdata + %d]\n", registers[reg1]->regName, offset3);
+                    fprintf(fp,"\tjg l%d\n", qn->result->data->jump_label);
+                    fprintf(fp,"\tjl l%d\n", *nextlabel);
+                    fprintf(fp,"\tcmp %s, dword [programdata + %d]\n", registers[reg2]->regName, offset3 + 4);
                     fprintf(fp,"\tjge l%d\n", qn->result->data->jump_label);
                     fprintf(fp,"l%d:\n",*nextlabel);
                     *nextlabel++;
@@ -3674,7 +3674,7 @@ void makeCode(quadrupleNode *qn, scopeHashTable *currentScope, scopeHashTable *g
                     }
                     registers[reg1]->offsetIfPresent = offset1;
                     if (flag1 == 1){
-                        fprintf(fp,"\tmov %s, [%d]\n", registers[reg1]->regName ,registers[reg1]->offsetIfPresent);
+                        fprintf(fp,"\tmov %s, dword [programdata + %d]\n", registers[reg1]->regName ,registers[reg1]->offsetIfPresent);
                     }
                     int offset2 = offset1 + 4;
                     int reg2 = searchRegister(registers,total_registers,offset2);
@@ -3687,11 +3687,11 @@ void makeCode(quadrupleNode *qn, scopeHashTable *currentScope, scopeHashTable *g
                     }
                     registers[reg2]->offsetIfPresent = offset2;
                     if (flag2 == 1){
-                        fprintf(fp,"\tmov %s, [%d]\n", registers[reg2]->regName ,registers[reg2]->offsetIfPresent);
+                        fprintf(fp,"\tmov %s, dword [programdata + %d]\n", registers[reg2]->regName ,registers[reg2]->offsetIfPresent);
                     }
                     fprintf(fp,"\tcmp %s, %d\n", registers[reg1]->regName, intpart2);
-                    fprintf(fp,"\tjgt l%d\n", qn->result->data->jump_label);
-                    fprintf(fp,"\tjlt l%d\n", *nextlabel);
+                    fprintf(fp,"\tjg l%d\n", qn->result->data->jump_label);
+                    fprintf(fp,"\tjl l%d\n", *nextlabel);
                     fprintf(fp,"\tcmp %s, %d\n", registers[reg2]->regName, fracpart2);
                     fprintf(fp,"\tjge l%d\n", qn->result->data->jump_label);
                     fprintf(fp,"l%d:\n",*nextlabel);
@@ -3710,8 +3710,8 @@ void makeCode(quadrupleNode *qn, scopeHashTable *currentScope, scopeHashTable *g
                     intpart1 = (int)data1;
                     fracpart1 = ((int)(data1*100))%100;
                     int offset1 = getOffset(qn->result,qn->opcode,currentScope,globalScope,rht,NULL);
-                    fprintf(fp,"\tmov [%d], %d\n", offset1, intpart1);
-                    fprintf(fp,"\tmov [%d], %d\n", offset1 + 4, fracpart1);
+                    fprintf(fp,"\tmov dword [programdata + %d], %d\n", offset1, intpart1);
+                    fprintf(fp,"\tmov dword [programdata + %d], %d\n", offset1 + 4, fracpart1);
                 }
                 else {
                     int offset1 = getOffset(qn->arg1,qn->opcode,currentScope,globalScope,rht,NULL);
@@ -3725,7 +3725,7 @@ void makeCode(quadrupleNode *qn, scopeHashTable *currentScope, scopeHashTable *g
                     }
                     registers[reg1]->offsetIfPresent = offset1;
                     if (flag1 == 1){
-                        fprintf(fp,"\tmov %s, [%d]\n", registers[reg1]->regName ,registers[reg1]->offsetIfPresent);
+                        fprintf(fp,"\tmov %s, dword [programdata + %d]\n", registers[reg1]->regName ,registers[reg1]->offsetIfPresent);
                     }
                     int offset2 = offset1 + 4;
                     int reg2 = searchRegister(registers,total_registers,offset2);
@@ -3738,12 +3738,12 @@ void makeCode(quadrupleNode *qn, scopeHashTable *currentScope, scopeHashTable *g
                     }
                     registers[reg2]->offsetIfPresent = offset2;
                     if (flag2 == 1){
-                        fprintf(fp,"\tmov %s, [%d]\n", registers[reg2]->regName ,registers[reg2]->offsetIfPresent);
+                        fprintf(fp,"\tmov %s, dword [programdata + %d]\n", registers[reg2]->regName ,registers[reg2]->offsetIfPresent);
                     }
                     int offset3 = getOffset(qn->result,qn->opcode,currentScope,globalScope,rht,NULL);
-                    fprintf(fp,"\tmov [%d], %s\n", offset3, registers[reg1]->regName );
+                    fprintf(fp,"\tmov dword [programdata + %d], %s\n", offset3, registers[reg1]->regName );
                     registers[reg1]->offsetIfPresent = offset3;
-                    fprintf(fp,"\tmov [%d], %s\n", offset3 + 4, registers[reg2]->regName );
+                    fprintf(fp,"\tmov dword [programdata + %d], %s\n", offset3 + 4, registers[reg2]->regName );
                     registers[reg2]->offsetIfPresent = offset3 + 4;
                 }
                 break;
@@ -3778,20 +3778,20 @@ void makeCode(quadrupleNode *qn, scopeHashTable *currentScope, scopeHashTable *g
                     fprintf(fp,"\tadd %s, %d\n", registers[reg1]->regName, intpart2);
                     fprintf(fp,"\tadd %s, %d\n", registers[reg2]->regName, fracpart2);
                     fprintf(fp,"\tcmp %s, 100\n", registers[reg2]->regName);
-                    fprintf(fp,"\tjlt %d\n", *nextlabel);
+                    fprintf(fp,"\tjl %d\n", *nextlabel);
                     fprintf(fp,"\tsub %s, 100\n", registers[reg2]->regName);
                     fprintf(fp,"\tinc %s\n", registers[reg1]->regName);
                     fprintf(fp,"\tjmp %d\n", *nextlabel + 1);
                     fprintf(fp,"\tl%d:\n", *nextlabel);
                     fprintf(fp,"\tcmp %s, -100\n", registers[reg2]->regName);
-                    fprintf(fp,"\tjgt %d\n", *nextlabel + 1);
+                    fprintf(fp,"\tjg %d\n", *nextlabel + 1);
                     fprintf(fp,"\tadd %s, 100\n", registers[reg2]->regName);
                     fprintf(fp,"\tdec %s\n", registers[reg1]->regName);
                     fprintf(fp,"\tl%d:\n", *nextlabel + 1);
                     *nextlabel += 2;
                     int offset2 = getOffset(qn->result,qn->opcode,currentScope,globalScope,rht,NULL);
-                    fprintf(fp,"\tmov [%d], %s\n", offset2, registers[reg1]->regName );
-                    fprintf(fp,"\tmov [%d], %s\n", offset2 + 4, registers[reg2]->regName );
+                    fprintf(fp,"\tmov dword [programdata + %d], %s\n", offset2, registers[reg1]->regName );
+                    fprintf(fp,"\tmov dword [programdata + %d], %s\n", offset2 + 4, registers[reg2]->regName );
                     registers[reg1]->offsetIfPresent = offset2;
                     registers[reg2]->offsetIfPresent = offset2 + 4;
 
@@ -3808,7 +3808,7 @@ void makeCode(quadrupleNode *qn, scopeHashTable *currentScope, scopeHashTable *g
                     }
                     registers[reg1]->offsetIfPresent = offset1;
                     if (flag1 == 1){
-                        fprintf(fp,"\tmov %s, [%d]\n", registers[reg1]->regName ,registers[reg1]->offsetIfPresent);
+                        fprintf(fp,"\tmov %s, dword [programdata + %d]\n", registers[reg1]->regName ,registers[reg1]->offsetIfPresent);
                     }
 
                     int offset2 = offset1 + 4;
@@ -3822,7 +3822,7 @@ void makeCode(quadrupleNode *qn, scopeHashTable *currentScope, scopeHashTable *g
                     }
                     registers[reg2]->offsetIfPresent = offset2;
                     if (flag2 == 1){
-                        fprintf(fp,"\tmov %s, [%d]\n", registers[reg2]->regName ,registers[reg2]->offsetIfPresent);
+                        fprintf(fp,"\tmov %s, dword [programdata + %d]\n", registers[reg2]->regName ,registers[reg2]->offsetIfPresent);
                     }
 
                     float data2 = qn->arg2->data->real_val;
@@ -3833,21 +3833,21 @@ void makeCode(quadrupleNode *qn, scopeHashTable *currentScope, scopeHashTable *g
                     fprintf(fp,"\tadd %s, %d\n", registers[reg1]->regName, intpart2);
                     fprintf(fp,"\tadd %s, %d\n", registers[reg2]->regName, fracpart2);
                     fprintf(fp,"\tcmp %s, 100\n", registers[reg2]->regName);
-                    fprintf(fp,"\tjlt %d\n", *nextlabel);
+                    fprintf(fp,"\tjl %d\n", *nextlabel);
                     fprintf(fp,"\tsub %s, 100\n", registers[reg2]->regName);
                     fprintf(fp,"\tinc %s\n", registers[reg1]->regName);
                     fprintf(fp,"\tjmp %d\n", *nextlabel + 1);
                     fprintf(fp,"\tl%d:\n", *nextlabel);
                     fprintf(fp,"\tcmp %s, -100\n", registers[reg2]->regName);
-                    fprintf(fp,"\tjgt %d\n", *nextlabel + 1);
+                    fprintf(fp,"\tjg %d\n", *nextlabel + 1);
                     fprintf(fp,"\tadd %s, 100\n", registers[reg2]->regName);
                     fprintf(fp,"\tdec %s\n", registers[reg1]->regName);
                     fprintf(fp,"\tl%d:\n", *nextlabel + 1);
                     *nextlabel += 2;
 
                     int offset3 = getOffset(qn->result,qn->opcode,currentScope,globalScope,rht,NULL);
-                    fprintf(fp,"\tmov [%d], %s\n", offset3, registers[reg1]->regName );
-                    fprintf(fp,"\tmov [%d], %s\n", offset3 + 4, registers[reg2]->regName );
+                    fprintf(fp,"\tmov dword [programdata + %d], %s\n", offset3, registers[reg1]->regName );
+                    fprintf(fp,"\tmov dword [programdata + %d], %s\n", offset3 + 4, registers[reg2]->regName );
                     registers[reg1]->offsetIfPresent = offset3;
                     registers[reg2]->offsetIfPresent = offset3 + 4;
                 }
@@ -3863,7 +3863,7 @@ void makeCode(quadrupleNode *qn, scopeHashTable *currentScope, scopeHashTable *g
                     }
                     registers[reg1]->offsetIfPresent = offset1;
                     if (flag == 1){
-                        fprintf(fp,"\tmov %s, [%d]\n", registers[reg1]->regName ,registers[reg1]->offsetIfPresent);
+                        fprintf(fp,"\tmov %s, dword [programdata + %d]\n", registers[reg1]->regName ,registers[reg1]->offsetIfPresent);
                     }
 
                     int offset2 = offset1 + 4;
@@ -3877,7 +3877,7 @@ void makeCode(quadrupleNode *qn, scopeHashTable *currentScope, scopeHashTable *g
                     }
                     registers[reg2]->offsetIfPresent = offset2;
                     if (flag2 == 1){
-                        fprintf(fp,"\tmov %s, [%d]\n", registers[reg2]->regName ,registers[reg2]->offsetIfPresent);
+                        fprintf(fp,"\tmov %s, dword [programdata + %d]\n", registers[reg2]->regName ,registers[reg2]->offsetIfPresent);
                     }
 
                     float data1 = qn->arg1->data->real_val;
@@ -3888,21 +3888,21 @@ void makeCode(quadrupleNode *qn, scopeHashTable *currentScope, scopeHashTable *g
                     fprintf(fp,"\tadd %s, %d\n", registers[reg1]->regName, intpart1);
                     fprintf(fp,"\tadd %s, %d\n", registers[reg2]->regName, fracpart1);
                     fprintf(fp,"\tcmp %s, 100\n", registers[reg2]->regName);
-                    fprintf(fp,"\tjlt %d\n", *nextlabel);
+                    fprintf(fp,"\tjl %d\n", *nextlabel);
                     fprintf(fp,"\tsub %s, 100\n", registers[reg2]->regName);
                     fprintf(fp,"\tinc %s\n", registers[reg1]->regName);
                     fprintf(fp,"\tjmp %d\n", *nextlabel + 1);
                     fprintf(fp,"\tl%d:\n", *nextlabel);
                     fprintf(fp,"\tcmp %s, -100\n", registers[reg2]->regName);
-                    fprintf(fp,"\tjgt %d\n", *nextlabel + 1);
+                    fprintf(fp,"\tjg %d\n", *nextlabel + 1);
                     fprintf(fp,"\tadd %s, 100\n", registers[reg2]->regName);
                     fprintf(fp,"\tdec %s\n", registers[reg1]->regName);
                     fprintf(fp,"\tl%d:\n", *nextlabel + 1);
                     *nextlabel += 2;
 
                     int offset3 = getOffset(qn->result,qn->opcode,currentScope,globalScope,rht,NULL);
-                    fprintf(fp,"\tmov [%d], %s\n", offset3, registers[reg1]->regName );
-                    fprintf(fp,"\tmov [%d], %s\n", offset3 + 4, registers[reg2]->regName );
+                    fprintf(fp,"\tmov dword [programdata + %d], %s\n", offset3, registers[reg1]->regName );
+                    fprintf(fp,"\tmov dword [programdata + %d], %s\n", offset3 + 4, registers[reg2]->regName );
                     registers[reg1]->offsetIfPresent = offset3;
                     registers[reg2]->offsetIfPresent = offset3 + 4;
 
@@ -3919,7 +3919,7 @@ void makeCode(quadrupleNode *qn, scopeHashTable *currentScope, scopeHashTable *g
                     }
                     registers[reg1]->offsetIfPresent = offset1;
                     if (flag == 1){
-                        fprintf(fp,"\tmov %s, [%d]\n", registers[reg1]->regName ,registers[reg1]->offsetIfPresent);
+                        fprintf(fp,"\tmov %s, dword [programdata + %d]\n", registers[reg1]->regName ,registers[reg1]->offsetIfPresent);
                     }
 
                     int offset2 = offset1 + 4;
@@ -3933,28 +3933,28 @@ void makeCode(quadrupleNode *qn, scopeHashTable *currentScope, scopeHashTable *g
                     }
                     registers[reg2]->offsetIfPresent = offset2;
                     if (flag2 == 1){
-                        fprintf(fp,"\tmov %s, [%d]\n", registers[reg2]->regName ,registers[reg2]->offsetIfPresent);
+                        fprintf(fp,"\tmov %s, dword [programdata + %d]\n", registers[reg2]->regName ,registers[reg2]->offsetIfPresent);
                     }
 
                     int offset3 = getOffset(qn->arg2,qn->opcode,currentScope,globalScope,rht,NULL);
-                    fprintf(fp,"\tadd %s, [%d]\n", registers[reg1]->regName, offset3 );
-                    fprintf(fp,"\tadd %s, [%d]\n", registers[reg2]->regName, offset3 + 4 );
+                    fprintf(fp,"\tadd %s, dword [programdata + %d]\n", registers[reg1]->regName, offset3 );
+                    fprintf(fp,"\tadd %s, dword [programdata + %d]\n", registers[reg2]->regName, offset3 + 4 );
                     fprintf(fp,"\tcmp %s, 100\n", registers[reg2]->regName);
-                    fprintf(fp,"\tjlt %d\n", *nextlabel);
+                    fprintf(fp,"\tjl %d\n", *nextlabel);
                     fprintf(fp,"\tsub %s, 100\n", registers[reg2]->regName);
                     fprintf(fp,"\tinc %s\n", registers[reg1]->regName);
                     fprintf(fp,"\tjmp %d\n", *nextlabel + 1);
                     fprintf(fp,"\tl%d:\n", *nextlabel);
                     fprintf(fp,"\tcmp %s, -100\n", registers[reg2]->regName);
-                    fprintf(fp,"\tjgt %d\n", *nextlabel + 1);
+                    fprintf(fp,"\tjg %d\n", *nextlabel + 1);
                     fprintf(fp,"\tadd %s, 100\n", registers[reg2]->regName);
                     fprintf(fp,"\tdec %s\n", registers[reg1]->regName);
                     fprintf(fp,"\tl%d:\n", *nextlabel + 1);
                     *nextlabel += 2;
 
                     int offset4 = getOffset(qn->result,qn->opcode,currentScope,globalScope,rht,NULL);
-                    fprintf(fp,"\tmov [%d], %s\n", offset4, registers[reg1]->regName );
-                    fprintf(fp,"\tmov [%d], %s\n", offset4 + 4, registers[reg2]->regName );
+                    fprintf(fp,"\tmov dword [programdata + %d], %s\n", offset4, registers[reg1]->regName );
+                    fprintf(fp,"\tmov dword [programdata + %d], %s\n", offset4 + 4, registers[reg2]->regName );
                     registers[reg1]->offsetIfPresent = offset4;
                     registers[reg2]->offsetIfPresent = offset4 + 4;
                 }
@@ -3990,20 +3990,20 @@ void makeCode(quadrupleNode *qn, scopeHashTable *currentScope, scopeHashTable *g
                     fprintf(fp,"\tsub %s, %d\n", registers[reg1]->regName, intpart2);
                     fprintf(fp,"\tsub %s, %d\n", registers[reg2]->regName, fracpart2);
                     fprintf(fp,"\tcmp %s, 100\n", registers[reg2]->regName);
-                    fprintf(fp,"\tjlt %d\n", *nextlabel);
+                    fprintf(fp,"\tjl %d\n", *nextlabel);
                     fprintf(fp,"\tsub %s, 100\n", registers[reg2]->regName);
                     fprintf(fp,"\tinc %s\n", registers[reg1]->regName);
                     fprintf(fp,"\tjmp %d\n", *nextlabel + 1);
                     fprintf(fp,"\tl%d:\n", *nextlabel);
                     fprintf(fp,"\tcmp %s, -100\n", registers[reg2]->regName);
-                    fprintf(fp,"\tjgt %d\n", *nextlabel + 1);
+                    fprintf(fp,"\tjg %d\n", *nextlabel + 1);
                     fprintf(fp,"\tadd %s, 100\n", registers[reg2]->regName);
                     fprintf(fp,"\tdec %s\n", registers[reg1]->regName);
                     fprintf(fp,"\tl%d:\n", *nextlabel + 1);
                     *nextlabel += 2;
                     int offset2 = getOffset(qn->result,qn->opcode,currentScope,globalScope,rht,NULL);
-                    fprintf(fp,"\tmov [%d], %s\n", offset2, registers[reg1]->regName );
-                    fprintf(fp,"\tmov [%d], %s\n", offset2 + 4, registers[reg2]->regName );
+                    fprintf(fp,"\tmov dword [programdata + %d], %s\n", offset2, registers[reg1]->regName );
+                    fprintf(fp,"\tmov dword [programdata + %d], %s\n", offset2 + 4, registers[reg2]->regName );
                     registers[reg1]->offsetIfPresent = offset2;
                     registers[reg2]->offsetIfPresent = offset2 + 4;
 
@@ -4020,7 +4020,7 @@ void makeCode(quadrupleNode *qn, scopeHashTable *currentScope, scopeHashTable *g
                     }
                     registers[reg1]->offsetIfPresent = offset1;
                     if (flag1 == 1){
-                        fprintf(fp,"\tmov %s, [%d]\n", registers[reg1]->regName ,registers[reg1]->offsetIfPresent);
+                        fprintf(fp,"\tmov %s, dword [programdata + %d]\n", registers[reg1]->regName ,registers[reg1]->offsetIfPresent);
                     }
 
                     int offset2 = offset1 + 4;
@@ -4034,7 +4034,7 @@ void makeCode(quadrupleNode *qn, scopeHashTable *currentScope, scopeHashTable *g
                     }
                     registers[reg2]->offsetIfPresent = offset2;
                     if (flag2 == 1){
-                        fprintf(fp,"\tmov %s, [%d]\n", registers[reg2]->regName ,registers[reg2]->offsetIfPresent);
+                        fprintf(fp,"\tmov %s, dword [programdata + %d]\n", registers[reg2]->regName ,registers[reg2]->offsetIfPresent);
                     }
 
                     float data2 = qn->arg2->data->real_val;
@@ -4045,21 +4045,21 @@ void makeCode(quadrupleNode *qn, scopeHashTable *currentScope, scopeHashTable *g
                     fprintf(fp,"\tsub %s, %d\n", registers[reg1]->regName, intpart2);
                     fprintf(fp,"\tsub %s, %d\n", registers[reg2]->regName, fracpart2);
                     fprintf(fp,"\tcmp %s, 100\n", registers[reg2]->regName);
-                    fprintf(fp,"\tjlt %d\n", *nextlabel);
+                    fprintf(fp,"\tjl %d\n", *nextlabel);
                     fprintf(fp,"\tsub %s, 100\n", registers[reg2]->regName);
                     fprintf(fp,"\tinc %s\n", registers[reg1]->regName);
                     fprintf(fp,"\tjmp %d\n", *nextlabel + 1);
                     fprintf(fp,"\tl%d:\n", *nextlabel);
                     fprintf(fp,"\tcmp %s, -100\n", registers[reg2]->regName);
-                    fprintf(fp,"\tjgt %d\n", *nextlabel + 1);
+                    fprintf(fp,"\tjg %d\n", *nextlabel + 1);
                     fprintf(fp,"\tadd %s, 100\n", registers[reg2]->regName);
                     fprintf(fp,"\tdec %s\n", registers[reg1]->regName);
                     fprintf(fp,"\tl%d:\n", *nextlabel + 1);
                     *nextlabel += 2;
 
                     int offset3 = getOffset(qn->result,qn->opcode,currentScope,globalScope,rht,NULL);
-                    fprintf(fp,"\tmov [%d], %s\n", offset3, registers[reg1]->regName );
-                    fprintf(fp,"\tmov [%d], %s\n", offset3 + 4, registers[reg2]->regName );
+                    fprintf(fp,"\tmov dword [programdata + %d], %s\n", offset3, registers[reg1]->regName );
+                    fprintf(fp,"\tmov dword [programdata + %d], %s\n", offset3 + 4, registers[reg2]->regName );
                     registers[reg1]->offsetIfPresent = offset3;
                     registers[reg2]->offsetIfPresent = offset3 + 4;
                 }
@@ -4085,24 +4085,24 @@ void makeCode(quadrupleNode *qn, scopeHashTable *currentScope, scopeHashTable *g
                     fprintf(fp,"\tmov %s, %d\n", registers[reg2]->regName ,fracpart1);
 
                     int offset3 = getOffset(qn->arg2,qn->opcode,currentScope,globalScope,rht,NULL);
-                    fprintf(fp,"\tsub %s, [%d]\n", registers[reg1]->regName, offset3 );
-                    fprintf(fp,"\tsub %s, [%d]\n", registers[reg2]->regName, offset3 + 4 );
+                    fprintf(fp,"\tsub %s, dword [programdata + %d]\n", registers[reg1]->regName, offset3 );
+                    fprintf(fp,"\tsub %s, dword [programdata + %d]\n", registers[reg2]->regName, offset3 + 4 );
                     fprintf(fp,"\tcmp %s, 100\n", registers[reg2]->regName);
-                    fprintf(fp,"\tjlt %d\n", *nextlabel);
+                    fprintf(fp,"\tjl %d\n", *nextlabel);
                     fprintf(fp,"\tsub %s, 100\n", registers[reg2]->regName);
                     fprintf(fp,"\tinc %s\n", registers[reg1]->regName);
                     fprintf(fp,"\tjmp %d\n", *nextlabel + 1);
                     fprintf(fp,"\tl%d:\n", *nextlabel);
                     fprintf(fp,"\tcmp %s, -100\n", registers[reg2]->regName);
-                    fprintf(fp,"\tjgt %d\n", *nextlabel + 1);
+                    fprintf(fp,"\tjg %d\n", *nextlabel + 1);
                     fprintf(fp,"\tadd %s, 100\n", registers[reg2]->regName);
                     fprintf(fp,"\tdec %s\n", registers[reg1]->regName);
                     fprintf(fp,"\tl%d:\n", *nextlabel + 1);
                     *nextlabel += 2;
 
                     int offset4 = getOffset(qn->result,qn->opcode,currentScope,globalScope,rht,NULL);
-                    fprintf(fp,"\tmov [%d], %s\n", offset4, registers[reg1]->regName );
-                    fprintf(fp,"\tmov [%d], %s\n", offset4 + 4, registers[reg2]->regName );
+                    fprintf(fp,"\tmov dword [programdata + %d], %s\n", offset4, registers[reg1]->regName );
+                    fprintf(fp,"\tmov dword [programdata + %d], %s\n", offset4 + 4, registers[reg2]->regName );
                     registers[reg1]->offsetIfPresent = offset4;
                     registers[reg2]->offsetIfPresent = offset4 + 4;
                 }
@@ -4118,7 +4118,7 @@ void makeCode(quadrupleNode *qn, scopeHashTable *currentScope, scopeHashTable *g
                     }
                     registers[reg1]->offsetIfPresent = offset1;
                     if (flag == 1){
-                        fprintf(fp,"\tmov %s, [%d]\n", registers[reg1]->regName ,registers[reg1]->offsetIfPresent);
+                        fprintf(fp,"\tmov %s, dword [programdata + %d]\n", registers[reg1]->regName ,registers[reg1]->offsetIfPresent);
                     }
 
                     int offset2 = offset1 + 4;
@@ -4132,28 +4132,28 @@ void makeCode(quadrupleNode *qn, scopeHashTable *currentScope, scopeHashTable *g
                     }
                     registers[reg2]->offsetIfPresent = offset2;
                     if (flag2 == 1){
-                        fprintf(fp,"\tmov %s, [%d]\n", registers[reg2]->regName ,registers[reg2]->offsetIfPresent);
+                        fprintf(fp,"\tmov %s, dword [programdata + %d]\n", registers[reg2]->regName ,registers[reg2]->offsetIfPresent);
                     }
 
                     int offset3 = getOffset(qn->arg2,qn->opcode,currentScope,globalScope,rht,NULL);
-                    fprintf(fp,"\tsub %s, [%d]\n", registers[reg1]->regName, offset3 );
-                    fprintf(fp,"\tsub %s, [%d]\n", registers[reg2]->regName, offset3 + 4 );
+                    fprintf(fp,"\tsub %s, dword [programdata + %d]\n", registers[reg1]->regName, offset3 );
+                    fprintf(fp,"\tsub %s, dword [programdata + %d]\n", registers[reg2]->regName, offset3 + 4 );
                     fprintf(fp,"\tcmp %s, 100\n", registers[reg2]->regName);
-                    fprintf(fp,"\tjlt %d\n", *nextlabel);
+                    fprintf(fp,"\tjl %d\n", *nextlabel);
                     fprintf(fp,"\tsub %s, 100\n", registers[reg2]->regName);
                     fprintf(fp,"\tinc %s\n", registers[reg1]->regName);
                     fprintf(fp,"\tjmp %d\n", *nextlabel + 1);
                     fprintf(fp,"\tl%d:\n", *nextlabel);
                     fprintf(fp,"\tcmp %s, -100\n", registers[reg2]->regName);
-                    fprintf(fp,"\tjgt %d\n", *nextlabel + 1);
+                    fprintf(fp,"\tjg %d\n", *nextlabel + 1);
                     fprintf(fp,"\tadd %s, 100\n", registers[reg2]->regName);
                     fprintf(fp,"\tdec %s\n", registers[reg1]->regName);
                     fprintf(fp,"\tl%d:\n", *nextlabel + 1);
                     *nextlabel += 2;
 
                     int offset4 = getOffset(qn->result,qn->opcode,currentScope,globalScope,rht,NULL);
-                    fprintf(fp,"\tmov [%d], %s\n", offset4, registers[reg1]->regName );
-                    fprintf(fp,"\tmov [%d], %s\n", offset4 + 4, registers[reg2]->regName );
+                    fprintf(fp,"\tmov dword [programdata + %d], %s\n", offset4, registers[reg1]->regName );
+                    fprintf(fp,"\tmov dword [programdata + %d], %s\n", offset4 + 4, registers[reg2]->regName );
                     registers[reg1]->offsetIfPresent = offset4;
                     registers[reg2]->offsetIfPresent = offset4 + 4;
                 }
@@ -4183,8 +4183,8 @@ void makeCode(quadrupleNode *qn, scopeHashTable *currentScope, scopeHashTable *g
                         int offset1 = getOffset(qn->arg1,qn->opcode,currentScope,globalScope,rht,NULL);
                         registers[ECX]->offsetIfPresent = offset1;
                         registers[EBX]->offsetIfPresent = offset1 + 4;
-                        fprintf(fp,"\tmov ECX, [%d]\n", offset1);
-                        fprintf(fp,"\tmov EBX, [%d]\n", offset1 + 4);
+                        fprintf(fp,"\tmov ECX, dword [programdata + %d]\n", offset1);
+                        fprintf(fp,"\tmov EBX, dword [programdata + %d]\n", offset1 + 4);
                         data2 = qn->arg2->data->real_val;
                         intpart2 = (int)data2;
                         fracpart2 = ((int)(data2*100))%100;
@@ -4193,8 +4193,8 @@ void makeCode(quadrupleNode *qn, scopeHashTable *currentScope, scopeHashTable *g
                         int offset2 = getOffset(qn->arg2,qn->opcode,currentScope,globalScope,rht,NULL);
                         registers[ECX]->offsetIfPresent = offset2;
                         registers[EBX]->offsetIfPresent = offset2 + 4;
-                        fprintf(fp,"\tmov ECX, [%d]\n", offset2);
-                        fprintf(fp,"\tmov EBX, [%d]\n", offset2 + 4);
+                        fprintf(fp,"\tmov ECX, dword [programdata + %d]\n", offset2);
+                        fprintf(fp,"\tmov EBX, dword [programdata + %d]\n", offset2 + 4);
                         data2 = qn->arg1->data->real_val;
                         intpart2 = (int)data2;
                         fracpart2 = ((int)(data2*100))%100;
@@ -4217,13 +4217,13 @@ void makeCode(quadrupleNode *qn, scopeHashTable *currentScope, scopeHashTable *g
                     fprintf(fp,"\tadd ESI, EAX\n");
                     fprintf(fp,"\tadd EDI, EDX\n");
                     fprintf(fp,"\tcmp EDI, 100\n");
-                    fprintf(fp,"\tjlt %d\n",*nextlabel);
+                    fprintf(fp,"\tjl %d\n",*nextlabel);
                     fprintf(fp,"\tsub EDI, 100\n");
                     fprintf(fp,"\tinc ESI\n");
                     fprintf(fp,"\tjmp %d\n", *nextlabel + 1);
                     fprintf(fp,"\tl%d:\n", *nextlabel);
                     fprintf(fp,"\tcmp EDI, -100\n");
-                    fprintf(fp,"\tjgt %d\n", *nextlabel + 1);
+                    fprintf(fp,"\tjg %d\n", *nextlabel + 1);
                     fprintf(fp,"\tadd EDI, 100\n");
                     fprintf(fp,"\tdec ESI\n");
                     fprintf(fp,"\tl%d:\n", *nextlabel + 1);
@@ -4236,13 +4236,13 @@ void makeCode(quadrupleNode *qn, scopeHashTable *currentScope, scopeHashTable *g
                     fprintf(fp,"\tadd ESI, EAX\n");
                     fprintf(fp,"\tadd EDI, EDX\n");
                     fprintf(fp,"\tcmp EDI, 100\n");
-                    fprintf(fp,"\tjlt %d\n",*nextlabel);
+                    fprintf(fp,"\tjl %d\n",*nextlabel);
                     fprintf(fp,"\tsub EDI, 100\n");
                     fprintf(fp,"\tinc ESI\n");
                     fprintf(fp,"\tjmp %d\n", *nextlabel + 1);
                     fprintf(fp,"\tl%d:\n", *nextlabel);
                     fprintf(fp,"\tcmp EDI, -100\n");
-                    fprintf(fp,"\tjgt %d\n", *nextlabel + 1);
+                    fprintf(fp,"\tjg %d\n", *nextlabel + 1);
                     fprintf(fp,"\tadd EDI, 100\n");
                     fprintf(fp,"\tdec ESI\n");
                     fprintf(fp,"\tl%d:\n", *nextlabel + 1);
@@ -4253,12 +4253,12 @@ void makeCode(quadrupleNode *qn, scopeHashTable *currentScope, scopeHashTable *g
                     fprintf(fp,"\timul EAX, EAX, %d\n", fracpart2);
                     fprintf(fp,"\tidiv 100\n");
                     fprintf(fp,"\tcmp EDX, 50\n");
-                    fprintf(fp,"\tjlt %d\n", *nextlabel);
+                    fprintf(fp,"\tjl %d\n", *nextlabel);
                     fprintf(fp,"\tinc EDI\n");
                     fprintf(fp,"\tjmp %d\n", *nextlabel + 1);
                     fprintf(fp,"\tl%d:\n", *nextlabel);
                     fprintf(fp,"\tcmp EDX, -50\n");
-                    fprintf(fp,"\tjgt %d\n", *nextlabel + 1);
+                    fprintf(fp,"\tjg %d\n", *nextlabel + 1);
                     fprintf(fp,"\tdec EDI\n");
                     fprintf(fp,"\tl%d:\n", *nextlabel + 1);
                     *nextlabel += 2;
@@ -4268,21 +4268,21 @@ void makeCode(quadrupleNode *qn, scopeHashTable *currentScope, scopeHashTable *g
                     fprintf(fp,"\tadd ESI, EAX\n");
                     fprintf(fp,"\tadd EDI, EDX\n");
                     fprintf(fp,"\tcmp EDI, 100\n");
-                    fprintf(fp,"\tjlt %d\n",*nextlabel);
+                    fprintf(fp,"\tjl %d\n",*nextlabel);
                     fprintf(fp,"\tsub EDI, 100\n");
                     fprintf(fp,"\tinc ESI\n");
                     fprintf(fp,"\tjmp %d\n", *nextlabel + 1);
                     fprintf(fp,"\tl%d:\n", *nextlabel);
                     fprintf(fp,"\tcmp EDI, -100\n");
-                    fprintf(fp,"\tjgt %d\n", *nextlabel + 1);
+                    fprintf(fp,"\tjg %d\n", *nextlabel + 1);
                     fprintf(fp,"\tadd EDI, 100\n");
                     fprintf(fp,"\tdec ESI\n");
                     fprintf(fp,"\tl%d:\n", *nextlabel + 1);
                     *nextlabel += 2;
                     
                     int offset2 = getOffset(qn->result,qn->opcode,currentScope,globalScope,rht,NULL);
-                    fprintf(fp,"\tmov [%d], ESI\n", offset2 );
-                    fprintf(fp,"\tmov [%d], EDI\n", offset2 + 4 );
+                    fprintf(fp,"\tmov dword [programdata + %d], ESI\n", offset2 );
+                    fprintf(fp,"\tmov dword [programdata + %d], EDI\n", offset2 + 4 );
                     registers[ESI]->offsetIfPresent = offset2;
                     registers[EDI]->offsetIfPresent = offset2 + 4;
 
@@ -4291,8 +4291,8 @@ void makeCode(quadrupleNode *qn, scopeHashTable *currentScope, scopeHashTable *g
                     int offset1 = getOffset(qn->arg1,qn->opcode,currentScope,globalScope,rht,NULL);
                     registers[ECX]->offsetIfPresent = offset1;
                     registers[EBX]->offsetIfPresent = offset1 + 4;
-                    fprintf(fp,"\tmov ECX, [%d]\n", offset1);
-                    fprintf(fp,"\tmov EBX, [%d]\n", offset1 + 4);
+                    fprintf(fp,"\tmov ECX, dword [programdata + %d]\n", offset1);
+                    fprintf(fp,"\tmov EBX, dword [programdata + %d]\n", offset1 + 4);
 
                     int intpart2 = getOffset(qn->arg2,qn->opcode,currentScope,globalScope,rht,NULL);
                     int fracpart2 = intpart2 + 4;
@@ -4302,23 +4302,23 @@ void makeCode(quadrupleNode *qn, scopeHashTable *currentScope, scopeHashTable *g
 
                     fprintf(fp,"\tmov EDX, 0\n");
                     fprintf(fp,"\tmov EAX, ECX\n");
-                    fprintf(fp,"\timul EAX, [%d]\n",intpart2);
+                    fprintf(fp,"\timul EAX, dword [programdata + %d]\n",intpart2);
                     fprintf(fp,"\tadd ESI, EAX\n");
 
                     fprintf(fp,"\tmov EDX, 0\n");
                     fprintf(fp,"\tmov EAX, ECX\n");
-                    fprintf(fp,"\timul EAX, [%d]\n", fracpart2);
+                    fprintf(fp,"\timul EAX, dword [programdata + %d]\n", fracpart2);
                     fprintf(fp,"\tidiv 100\n");
                     fprintf(fp,"\tadd ESI, EAX\n");
                     fprintf(fp,"\tadd EDI, EDX\n");
                     fprintf(fp,"\tcmp EDI, 100\n");
-                    fprintf(fp,"\tjlt %d\n",*nextlabel);
+                    fprintf(fp,"\tjl %d\n",*nextlabel);
                     fprintf(fp,"\tsub EDI, 100\n");
                     fprintf(fp,"\tinc ESI\n");
                     fprintf(fp,"\tjmp %d\n", *nextlabel + 1);
                     fprintf(fp,"\tl%d:\n", *nextlabel);
                     fprintf(fp,"\tcmp EDI, -100\n");
-                    fprintf(fp,"\tjgt %d\n", *nextlabel + 1);
+                    fprintf(fp,"\tjg %d\n", *nextlabel + 1);
                     fprintf(fp,"\tadd EDI, 100\n");
                     fprintf(fp,"\tdec ESI\n");
                     fprintf(fp,"\tl%d:\n", *nextlabel + 1);
@@ -4326,18 +4326,18 @@ void makeCode(quadrupleNode *qn, scopeHashTable *currentScope, scopeHashTable *g
 
                     fprintf(fp,"\tmov EDX, 0\n");
                     fprintf(fp,"\tmov EAX, EBX\n");
-                    fprintf(fp,"\timul EAX, [%d]\n",intpart2);
+                    fprintf(fp,"\timul EAX, dword [programdata + %d]\n",intpart2);
                     fprintf(fp,"\tidiv 100\n");
                     fprintf(fp,"\tadd ESI, EAX\n");
                     fprintf(fp,"\tadd EDI, EDX\n");
                     fprintf(fp,"\tcmp EDI, 100\n");
-                    fprintf(fp,"\tjlt %d\n",*nextlabel);
+                    fprintf(fp,"\tjl %d\n",*nextlabel);
                     fprintf(fp,"\tsub EDI, 100\n");
                     fprintf(fp,"\tinc ESI\n");
                     fprintf(fp,"\tjmp %d\n", *nextlabel + 1);
                     fprintf(fp,"\tl%d:\n", *nextlabel);
                     fprintf(fp,"\tcmp EDI, -100\n");
-                    fprintf(fp,"\tjgt %d\n", *nextlabel + 1);
+                    fprintf(fp,"\tjg %d\n", *nextlabel + 1);
                     fprintf(fp,"\tadd EDI, 100\n");
                     fprintf(fp,"\tdec ESI\n");
                     fprintf(fp,"\tl%d:\n", *nextlabel + 1);
@@ -4345,15 +4345,15 @@ void makeCode(quadrupleNode *qn, scopeHashTable *currentScope, scopeHashTable *g
 
                     fprintf(fp,"\tmov EDX, 0\n");
                     fprintf(fp,"\tmov EAX, EBX\n");
-                    fprintf(fp,"\timul EAX, [%d]\n", fracpart2);
+                    fprintf(fp,"\timul EAX, dword [programdata + %d]\n", fracpart2);
                     fprintf(fp,"\tidiv 100\n");
                     fprintf(fp,"\tcmp EDX, 50\n");
-                    fprintf(fp,"\tjlt %d\n", *nextlabel);
+                    fprintf(fp,"\tjl %d\n", *nextlabel);
                     fprintf(fp,"\tinc EDI\n");
                     fprintf(fp,"\tjmp %d\n", *nextlabel + 1);
                     fprintf(fp,"\tl%d:\n", *nextlabel);
                     fprintf(fp,"\tcmp EDX, -50\n");
-                    fprintf(fp,"\tjgt %d\n", *nextlabel + 1);
+                    fprintf(fp,"\tjg %d\n", *nextlabel + 1);
                     fprintf(fp,"\tdec EDI\n");
                     fprintf(fp,"\tl%d:\n", *nextlabel + 1);
                     *nextlabel += 2;
@@ -4363,21 +4363,21 @@ void makeCode(quadrupleNode *qn, scopeHashTable *currentScope, scopeHashTable *g
                     fprintf(fp,"\tadd ESI, EAX\n");
                     fprintf(fp,"\tadd EDI, EDX\n");
                     fprintf(fp,"\tcmp EDI, 100\n");
-                    fprintf(fp,"\tjlt %d\n",*nextlabel);
+                    fprintf(fp,"\tjl %d\n",*nextlabel);
                     fprintf(fp,"\tsub EDI, 100\n");
                     fprintf(fp,"\tinc ESI\n");
                     fprintf(fp,"\tjmp %d\n", *nextlabel + 1);
                     fprintf(fp,"\tl%d:\n", *nextlabel);
                     fprintf(fp,"\tcmp EDI, -100\n");
-                    fprintf(fp,"\tjgt %d\n", *nextlabel + 1);
+                    fprintf(fp,"\tjg %d\n", *nextlabel + 1);
                     fprintf(fp,"\tadd EDI, 100\n");
                     fprintf(fp,"\tdec ESI\n");
                     fprintf(fp,"\tl%d:\n", *nextlabel + 1);
                     *nextlabel += 2;
                     
                     int offset2 = getOffset(qn->result,qn->opcode,currentScope,globalScope,rht,NULL);
-                    fprintf(fp,"\tmov [%d], ESI\n", offset2 );
-                    fprintf(fp,"\tmov [%d], EDI\n", offset2 + 4 );
+                    fprintf(fp,"\tmov dword [programdata + %d], ESI\n", offset2 );
+                    fprintf(fp,"\tmov dword [programdata + %d], EDI\n", offset2 + 4 );
                     registers[ESI]->offsetIfPresent = offset2;
                     registers[EDI]->offsetIfPresent = offset2 + 4;
 
@@ -4439,10 +4439,14 @@ void makeScopeTables(ASTNode *head, recordsHashTable *rht, allFunctionsHashTable
     //making datastructure for registers
 
 
-    printf("\n\nmaxoffset: %d\n\n", *maxoffset);
-
+    
 
     scopeHashTable *currentScope = searchEntryAllFunctionsHashTable("_main",afht)->data->scope;
+
+    printf("\n\nmaxoffset: %d\n\n", *maxoffset);
+    *maxoffset += globalScope->offset;
+    *maxoffset += currentScope->offset;
+    printf("\n\nmaxoffset: %d\n\n", *maxoffset);
 
     reg *rg[20];
     rg[0] = createRegisterEntry(EAX,"EAX");
@@ -4467,9 +4471,19 @@ void makeScopeTables(ASTNode *head, recordsHashTable *rht, allFunctionsHashTable
     rg[19] = createRegisterEntry(EBP,"EBP");
 
 
-    FILE *fp = fopen("code.txt","w");
+    FILE *fp = fopen("code.asm","w");
     
     {
+        fprintf(fp,"\tSECTION .data\n");
+        fprintf(fp,"\tSECTION .bss\n");
+        fprintf(fp,"programdata\tresd\t%d\n", *maxoffset);
+        fprintf(fp,"\tSECTION .text\n");
+        fprintf(fp,"\t\t\tglobal main\n");
+        fprintf(fp,"main:\n");
+        //fprintf(fp,"\tlea EBP, programdata\n");
+        
+        
+
         int i;
         char *type = NULL;
         for (i=0; i<q->index; i++){
@@ -4669,15 +4683,15 @@ void makeScopeTables(ASTNode *head, recordsHashTable *rht, allFunctionsHashTable
 
                             if (flagint == 1 && temp->opcode == MULT_REAL){
                                 int off = (flag == 1) ? offarg1 + 4 : offarg2 + 4;
-                                fprintf(fp,"\tmov ESP, [%d]\n", off);
-                                fprintf(fp,"\tmov [%d], 0\n", off);
+                                fprintf(fp,"\tmov ESP, dword [programdata + %d]\n", off);
+                                fprintf(fp,"\tmov dword [programdata + %d], 0\n", off);
                             }
 
                             makeCode(temp, currentScope, globalScope, rht, da, rg, 20, ptrAvailableLabels, fp);
 
                             if (flagint == 1 && temp->opcode == MULT_REAL){
                                 int off = (flag == 1) ? offarg1 + 4 : offarg2 + 4;
-                                fprintf(fp,"\tmov [%d], ESP\n", off);
+                                fprintf(fp,"\tmov dword [programdata + %d], ESP\n", off);
                             }
 
                             offres += ( (tn->fieldtype == TK_INT) ? INT_SIZE : REAL_SIZE );
@@ -4704,14 +4718,14 @@ void makeScopeTables(ASTNode *head, recordsHashTable *rht, allFunctionsHashTable
                         }
                         rg[reg1]->offsetIfPresent = -1;
                         while (j < width-4 ){
-                            fprintf(fp,"\tmov %s, [%d]\n", rg[reg1]->regName ,offarg1 + j);
-                            fprintf(fp,"\tcmp %s, [%d]\n", rg[reg1]->regName ,offarg2 + j);
+                            fprintf(fp,"\tmov %s, dword [programdata + %d]\n", rg[reg1]->regName ,offarg1 + j);
+                            fprintf(fp,"\tcmp %s, dword [programdata + %d]\n", rg[reg1]->regName ,offarg2 + j);
                             fprintf(fp,"\tjne l%d\n", *ptrAvailableLabels);
                             j += 4;
                         }
-                        fprintf(fp,"\tmov %s, [%d]\n", rg[reg1]->regName ,offarg1 + j);
-                        fprintf(fp,"\tcmp %s, [%d]\n", rg[reg1]->regName ,offarg2 + j);
-                        fprintf(fp,"\tjeq l%d\n", qn->result->data->jump_label);
+                        fprintf(fp,"\tmov %s, dword [programdata + %d]\n", rg[reg1]->regName ,offarg1 + j);
+                        fprintf(fp,"\tcmp %s, dword [programdata + %d]\n", rg[reg1]->regName ,offarg2 + j);
+                        fprintf(fp,"\tje l%d\n", qn->result->data->jump_label);
                         fprintf(fp,"\tl%d:\n", *ptrAvailableLabels);
                         *ptrAvailableLabels++;
                         break; 
@@ -4728,13 +4742,13 @@ void makeScopeTables(ASTNode *head, recordsHashTable *rht, allFunctionsHashTable
                         }
                         rg[reg1]->offsetIfPresent = -1;
                         while (j < width-4 ){
-                            fprintf(fp,"\tmov %s, [%d]\n", rg[reg1]->regName ,offarg1 + j);
-                            fprintf(fp,"\tcmp %s, [%d]\n", rg[reg1]->regName ,offarg2 + j);
+                            fprintf(fp,"\tmov %s, dword [programdata + %d]\n", rg[reg1]->regName ,offarg1 + j);
+                            fprintf(fp,"\tcmp %s, dword [programdata + %d]\n", rg[reg1]->regName ,offarg2 + j);
                             fprintf(fp,"\tjne l%d\n", qn->result->data->jump_label);
                             j += 4;
                         }
-                        fprintf(fp,"\tmov %s, [%d]\n", rg[reg1]->regName ,offarg1 + j);
-                        fprintf(fp,"\tcmp %s, [%d]\n", rg[reg1]->regName ,offarg2 + j);
+                        fprintf(fp,"\tmov %s, dword [programdata + %d]\n", rg[reg1]->regName ,offarg1 + j);
+                        fprintf(fp,"\tcmp %s, dword [programdata + %d]\n", rg[reg1]->regName ,offarg2 + j);
                         fprintf(fp,"\tjne l%d\n", qn->result->data->jump_label);
                         break; 
                     }
@@ -4877,6 +4891,10 @@ void makeScopeTables(ASTNode *head, recordsHashTable *rht, allFunctionsHashTable
             //printf("Arg2_Offset: %d ", getOffset(qn->arg2,qn->opcode,currentScope,globalScope,rht,type));
             //printf("Res_Offset: %d\n", getOffset(qn->result,qn->opcode,currentScope,globalScope,rht,type));
         }
+
+        fprintf(fp,"\tmov EBX, 0\n");
+        fprintf(fp,"\tmov EAX, 1\n");
+        fprintf(fp,"\tint 0x80\n");
     }
     
 

@@ -20,4 +20,7 @@ void printParseTreeNode(parseTreeNode *ptn, FILE *fp);
 //dfs on parse tree
 void dfsParseTree(parseTreeNode *ptn, FILE *fp);
 
+void dfsp(parseTreeNode *ptn, int *cnt);
+
+
 #endif // PARSETREE_H_INCLUDED

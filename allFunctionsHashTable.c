@@ -13,6 +13,7 @@
 #include "stack.h"
 #include "helper.h"
 #include "scopeHashTableDef.h"
+#include "recordsHashTableDef.h"
 #include "scopeHashTable.h"
 #include "allFunctionsHashTableDef.h"
 #include "allFunctionsHashTable.h" //should be commented
@@ -184,35 +185,35 @@ void printIONode(IONode *ion){
     printIONode(ion->next);
 }
 
-void printAllFunctionsDataNode(allFunctionsDataNode *afdn){
-    printf("\nscopeHashTable: \n");
-    printScopeHashTable(afdn->scope);
-    printf("inputparam: ");
-    printIONode(afdn->input_params);
-    printf("\n");
-    printf("outputparam: ");
-    printIONode(afdn->output_params);
+void printAllFunctionsDataNode(allFunctionsDataNode *afdn, char *fname, recordsHashTable *rht){
+    //printf("\nscopeHashTable: \n");
+    printScopeHashTable(afdn->scope, fname, rht);
+    //printf("inputparam: ");
+    //printIONode(afdn->input_params);
+    //printf("\n");
+    //printf("outputparam: ");
+    //printIONode(afdn->output_params);
 }
 
-void printAllFunctionsHashNode(allFunctionsHashNode *shn){
-    printf("key: %s data: ",shn->key);
-    printAllFunctionsDataNode(shn->data);
-    printf("\n");
+void printAllFunctionsHashNode(allFunctionsHashNode *shn, recordsHashTable *rht){
+    //printf("key: %s data: ",shn->key);
+    printAllFunctionsDataNode(shn->data, shn->key, rht);
+    //printf("\n");
 }
 
-void printAllFunctionsHashTable(allFunctionsHashTable *ht){
+void printAllFunctionsHashTable(allFunctionsHashTable *ht, recordsHashTable *rht){
     if (ht == NULL){
         return;
     }
     int i;
     //printf("\nprinting table\n");
     for (i=0;i<ht->tableSize;i++){
-        printf("Entry %-3d:  ",i+1);
+        //printf("Entry %-3d:  ",i+1);
         if (ht->arr[i] == NULL || ht->arr[i] == ht->specialValue){
-            printf("NULL\n");
+            //printf("NULL\n");
         }
         else {
-            printAllFunctionsHashNode(ht->arr[i]);
+            printAllFunctionsHashNode(ht->arr[i], rht);
         }
     }
     return;

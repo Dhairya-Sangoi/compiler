@@ -26,10 +26,11 @@
 #include "quadruple.h"
 
 #include "scopeHashTableDef.h"
-#include "scopeHashTable.h"
+#include "recordsHashTableDef.h"
 #include "allFunctionsHashTableDef.h"
 #include "allFunctionsHashTable.h"
-#include "recordsHashTableDef.h"
+
+#include "scopeHashTable.h"
 #include "recordsHashTable.h"
 #include "registerDef.h"
 #include "semanticAnalyzerDef.h"
@@ -39,9 +40,7 @@ int main(int argc, char *argv[])
 {
 
 	if (argc != 3){
-		printf("Usage: %s <testCase.txt> <parseTreeOutFile.txt>\n",argv[0]);
-		//argv[1] = "testcase5.txt";
-        //argv[2] = "parsedoutput.txt";
+		printf("Usage: %s <testCase.txt> <code.asm>\n",argv[0]);
         exit(0);
 	}
 
@@ -74,101 +73,6 @@ int main(int argc, char *argv[])
 
     parseTree *pt;
 
-    int p[2];
-    //pipe(p);
-    p[1] = 1;
-    p[0] = 0;
-    int success = parseInputSourceCode(&pt, terminals, nonterminals, allTokens, allRules, term, nonterm, parseTable,tklist, firstSetterminals,followSet,p[1]);
-    if (success == 0){
-        printf("compilation error\n");
-        return 0;
-    }
-//actual code
-//    close(p[1]);
-//    char *compilationmessage = (char *)malloc(sizeof(char)*100000);
-//    char *temp = compilationmessage;
-//    int len;
-//    while ( (len = read(p[0], temp, 1) ) > 0){
-//        temp+=len;
-//    }
-//    *temp = '\0';
-//    close(p[0]);
-//actual code end
-
-
-
-
-
-
-//    FILE *fp = fopen("rule.txt","r");
-//    FILE *out = fopen("output.txt","w");
-//    ruleq *temp;
-//    ruleNode *t;
-//    char c;
-//    int i = 0;
-//    fputs("Rule: ",out);
-//    while (!feof(fp)){
-//        c = fgetc(fp);
-//        if (c == '\n' || c == '\0'){
-//            fputc(c,out);
-//            fputs("Semantic: ",out);
-//            temp = newRules[i];
-//            //fputc('<',out);
-//            fputs(allTokens[temp->nontermindex]->name,out);
-//            fputs(".node",out);
-//            t = temp->head;
-//            if (newRules[i]->index != 1){
-//                fputs(" = createNode( ",out);
-//
-//                while (t != NULL && t->next!=NULL){
-//                    fputs(allTokens[t->val]->name,out);
-//                    fputs(".node, ",out);
-//                    t = t->next;
-//                }
-//                if (t!=NULL){
-//                    fputs(allTokens[t->val]->name,out);
-//                    fputs(".node )\n",out);
-//                    fputs("Rule: ",out);
-//                    i++;
-//                }
-//                else {
-//                    i++;
-//                    fputs("Rule: ",out);
-//                }
-//
-//            }
-//            else {
-//                fputs(" = ",out);
-//                fputs(allTokens[t->val]->name,out);
-//                fputs(".node\n",out);
-//                fputs("Rule: ",out);
-//                i++;
-//            }
-//
-//
-//        }
-//        else {
-//            fputc(c,out);
-//        }
-//    }
-//
-//    fclose(fp);
-//    fclose(out);
-//
-//
-//
-//
-//    return 0;
-
-
-
-
-
-
-
-    makeAST(pt->head,newRules,NULL);
-
-
     recordsHashTable *rht;
     allFunctionsHashTable *afht;
     scopeHashTable *globalScope;
@@ -177,13 +81,61 @@ int main(int argc, char *argv[])
     globalScope = createScopeHashTable(5,7);
     quadruple *q = createQuadruple(20);
 
+    int parsenodecount, astnodecount, sizenode;
+    float compression = 0;
+    parsenodecount = 0;
+    astnodecount = 0;
+    sizenode = sizeof(parseTreeNode);
 
-    makeScopeTables(pt->head,rht,afht,globalScope,q,0); //change the last parameter
-    printQuadruple(q);
-//    return 0;
+    int p[2];
+    pipe(p);
+    int success = parseInputSourceCode(&pt, terminals, nonterminals, allTokens, allRules, term, nonterm, parseTable,tklist, firstSetterminals,followSet,p[1]);
+    close(p[1]);
+    char *compilationmessage = (char *)malloc(sizeof(char)*1000000);
+    char *temp = compilationmessage;
+    int len;
+    while ( (len = read(p[0], temp, 1) ) > 0){
+        temp+=len;
+    }
+    *temp = '\0';
+    close(p[0]);
+    
+    int p1[2];
+    pipe(p1);
+    int success2 = 0;
+    char *semanticmessage = NULL;
+    FILE *fp1 ;
+    char *parsetree;
+    parsetree = (char *)malloc(sizeof(char) * 100);
+
+    FILE *asmfile;
+    
+    if (success == 1){
+        fp1 = fopen("parsetree.txt","w+");
+        dfsParseTree(pt->head,fp1);
+        dfsp(pt->head, &parsenodecount);
+        makeAST(pt->head,newRules,NULL);
+        dfsp(pt->head, &astnodecount);
+        asmfile = fopen(argv[2],"w");
+        success2 = makeScopeTables(pt->head,rht,afht,globalScope,q,p1[1],asmfile); //change the last parameter
+        close(p1[1]);
+        semanticmessage = (char *)malloc(sizeof(char)*100000);
+        char *temp2 = semanticmessage;
+        int len2;
+        while ( (len2 = read(p1[0], temp2, 1) ) > 0){
+            temp2+=len2;
+        }
+        *temp2 = '\0';
+        close(p1[0]);
+        compression =( ((float)(parsenodecount * sizenode) - (astnodecount * sizenode))/(parsenodecount * sizenode) ) * 100;
+    }
+    
+    
+    //return 0;
 
 
 
+/*
 
     printf("\nRecord Hash Table:\n");
     printRecordHashTable(rht);
@@ -193,40 +145,31 @@ int main(int argc, char *argv[])
     printScopeHashTable(globalScope);
     printf("\n\n");
     return 0;
-//
-//    quadruple *q = createQuadruple(1);
-//    int z = 1, x = 2, c = 3;
-//    float a = 1.1, s = 2.2, d = 3.3;
-//    int qq = 3, w = 4, e = 5;
-//    addEntryQuadruple(q,1,UNION_INT,UNION_INT,UNION_REAL,&qq, &w, &a, 1);
-//    addEntryQuadruple(q,5,UNION_INT,UNION_REAL,UNION_REAL,&qq, &a, &s, 2);
-//    addEntryQuadruple(q,4,UNION_REAL,UNION_TEMPORARY,UNION_REAL,&d, &w, &a, 3);
-//    addEntryQuadruple(q,3,UNION_INT,UNION_ID,UNION_REAL,&c, pt->head, &d, 4);
-//    addEntryQuadruple(q,2,UNION_TEMPORARY,UNION_REAL,UNION_REAL,&qq, &a, &s, 5);
-//
-//    printQuadruple(q);
-//    return 0;
-
-
-
-    //return 0;
-
-
+    int count = 0;
     if (success){
         FILE *parsingtree = fopen(argv[2],"w");
-        dfsParseTree(pt->head,parsingtree);
+        dfsParseTree(pt->head,parsingtree, &count);
         fclose(parsingtree);
     }
-
+*/
 
     printf("(a) FIRST and FOLLOW set automated.\n(b) Both lexical and syntax analysis modules implemented.\n(c) Modules working for all test cases.\n");
+
+    
+    
+
+
+
 
     while (1){
         printf("\n**************************************************************************\n");
         printf("\nPress option for the defined task:\n");
-        printf("1: For removal of comments\n");
-        printf("2: For printing the token list\n");
-        printf("3: For parsing to verify the syntactic correctness of the input source code\n");
+        printf("1: For printing the token list\n");
+        printf("2: For parsing to verify the syntactic correctness of the input source code\n");
+        printf("3: For printing the abstract syntax tree\n");
+        printf("3: For printing the abstract syntax tree\n");
+        printf("3: For printing the abstract syntax tree\n");
+        printf("3: For printing the abstract syntax tree\n");
         printf("4: For creating the parse tree and printing it appropriately\n");
         printf("   Any other to exit the program\n\nChoice: ");
         char choice;
@@ -234,24 +177,70 @@ int main(int argc, char *argv[])
         printf("\n**************************************************************************\n");
         switch(choice){
             case '1':
-                printCommentFreeCode(tklist);
-                break;
-            case '2':
                 printTokenList(tklist,allTokens);
                 break;
+            case '2':
+                if (success){
+                    fseek(fp1,0,SEEK_SET);
+                    while(fgets(parsetree,100,fp1)!=NULL){
+                        fputs(parsetree,stdout);
+                    }
+                    //printf("%s",parsetree);
+                }
+                else {
+                    printf("Didn't generate parse tree since compilation failed\n");
+                }
+                break;
             case '3':
-                //printf("%s",compilationmessage);
+                if (success){
+                    dfsParseTree(pt->head,stdout);
+                }
+                else {
+                    printf("Didn't generate abstract syntax tree since compilation failed\n");
+                }
                 break;
             case '4':
                 if (success){
-                	dfsParseTree(pt->head,stdout);
+                    printf("Parse tree\tNumber of nodes = %d\tAllocated Memory =  %d Bytes\n", parsenodecount, sizenode*(parsenodecount));
+                    printf("AST\tNumber of nodes = %d\tAllocated Memory =  %d Bytes\n", astnodecount, sizenode*(astnodecount));
+                    printf("Compression Peercentage =  %f%%", compression);
                 }
                 else {
-                	printf("Didn't generate parse tree since compilation failed\n");
+                    printf("Didn't generate parse tree and abstract syntax tree since compilation failed\n");
                 }
+                break;
+
+            case '5':
+                if (success == 1 && success2 == 1){
+                    printf("Symbol Table Entries: \n");
+                    printAllFunctionsHashTable(afht,rht);
+                }
+                else {
+                    printf("The code being not correct (syntactically or semantically), couldn't print symbol table.\n");
+                }
+                break;
+
+            case '6':
+                if (success == 0){
+                    printf("Syntactical Errors:\n");
+                    printf("%s\n",compilationmessage);
+                }
+                else {
+                    if (success2 == 0){
+                        printf("Semantic Errors:\n");
+                        printf("%s\n",semanticmessage);
+                    }
+                }
+                
+                break;
+
+            case '7':
+                printf("Generated <%s> file.\n", argv[2]);
                 break;
             default:
                 printf("Exiting Compiler Project. It was a nice learning experience :)\n");
+                
+                //delete parsetree.txt
                 return 0;
         }
 

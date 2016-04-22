@@ -10,9 +10,9 @@ int insertScopeHashTable(scopeHashNode *temp, scopeHashTable *ht);
 int insertEntryScopeHashTable(scopeHashNode *temp, scopeHashTable *ht);
 scopeHashNode *searchEntryScopeHashTable(char *key, scopeHashTable *ht);
 int deleteEntryScopeHashTable(char *key, scopeHashTable *ht);
-void printScopeDataNode(scopeDataNode *sdn);
-void printScopeHashNode(scopeHashNode *shn);
-void printScopeHashTable(scopeHashTable *ht);
+void printScopeDataNode(scopeDataNode *sdn, char *fname, recordsHashTable *rht);
+void printScopeHashNode(scopeHashNode *shn, char *fname, recordsHashTable *rht);
+void printScopeHashTable(scopeHashTable *ht, char *fname, recordsHashTable *rht);
 scopeHashNode *createScopeHashNode(char *key, char *typeName, parseTreeNode *head, int *offset);
 
 #endif // SCOPEHASHTABLE_H_INCLUDED

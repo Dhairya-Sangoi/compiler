@@ -4,10 +4,17 @@
 
 #include "parseTreeDef.h"
 #include "registerDef.h"
+
+
+
 #include "scopeHashTableDef.h"
-#include "scopeHashTable.h"
+
+
 #include "recordsHashTableDef.h"
+
+#include "scopeHashTable.h"
 #include "recordsHashTable.h"
+
 #include "quadrupleDef.h"
 
 #include "enum.h"

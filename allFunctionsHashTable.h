@@ -8,9 +8,9 @@ int insertEntryAllFunctionsHashTable(allFunctionsHashNode *temp, allFunctionsHas
 allFunctionsHashNode *searchEntryAllFunctionsHashTable(char *key, allFunctionsHashTable *ht);
 int deleteEntryAllFunctionsHashTable(char *key, allFunctionsHashTable *ht);
 void printIONode(IONode *ion);
-void printAllFunctionsDataNode(allFunctionsDataNode *afdn);
-void printAllFunctionsHashNode(allFunctionsHashNode *shn);
-void printAllFunctionsHashTable(allFunctionsHashTable *ht);
+void printAllFunctionsDataNode(allFunctionsDataNode *afdn, char *fname, recordsHashTable *rht);
+void printAllFunctionsHashNode(allFunctionsHashNode *shn, recordsHashTable *rht);
+void printAllFunctionsHashTable(allFunctionsHashTable *ht, recordsHashTable *rht);
 allFunctionsHashNode *createAllFunctionsHashNode(char *key, scopeHashTable *scope);
 IONode *createIONode(char *param, char *paramname);
 

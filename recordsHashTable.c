@@ -13,8 +13,9 @@
 #include "stack.h"
 #include "helper.h"
 #include "scopeHashTableDef.h"
-#include "scopeHashTable.h"
 #include "recordsHashTableDef.h"
+#include "scopeHashTable.h"
+
 #include "recordsHashTable.h" //should be commented
 
 recordsHashTable *createRecordsHashTable(int size, int multiplier){
@@ -183,7 +184,7 @@ void printTypeNode(typeNode *tn){
 
 void printRecordDataNode(recordDataNode *rdn){
     printf("\nrecords fields:\n");
-    printScopeHashTable(rdn->fields);
+    //printScopeHashTable(rdn->fields);
     printf("\n");
     printf("width: %d type: ",rdn->width);
     printTypeNode(rdn->type);

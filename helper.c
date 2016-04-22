@@ -22,10 +22,11 @@
 #include "quadrupleDef.h"
 #include "quadruple.h"
 #include "scopeHashTableDef.h"
+#include "recordsHashTableDef.h"
 #include "scopeHashTable.h"
 #include "allFunctionsHashTableDef.h"
 #include "allFunctionsHashTable.h"
-#include "recordsHashTableDef.h"
+
 #include "recordsHashTable.h"
 
 #include "registerDef.h"

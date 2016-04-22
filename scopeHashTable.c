@@ -13,7 +13,12 @@
 #include "stack.h"
 #include "helper.h"
 #include "scopeHashTableDef.h"
+#include "recordsHashTableDef.h"
+
 #include "scopeHashTable.h" //should be commented
+#include "recordsHashTable.h"
+
+#include "enum.h"
 
 
 scopeHashTable *createScopeHashTable(int size, int multiplier){
@@ -175,31 +180,59 @@ scopeHashNode *createScopeHashNode(char *key, char *typeName, parseTreeNode *hea
 }
 
 
-void printScopeDataNode(scopeDataNode *sdn){
-    printf("typename: %s",sdn->typeName);
-    printf(" offset: %d",sdn->offset);
-    printf(" regIfPresent: %d", sdn->regIfPresent);
+void printScopeDataNode(scopeDataNode *sdn, char *fname, recordsHashTable *rht){
+    if (strcmp(sdn->typeName,"int") == 0 || strcmp(sdn->typeName,"real") == 0){
+        printf("Type: %s",sdn->typeName);
+    }
+    else {
+        recordHashNode *rhn = searchEntryRecordsHashTable(sdn->typeName, rht);
+        printf("Type:");
+        if (rhn != NULL){
+            typeNode *temp = rhn->data->type;
+            while (temp->next != NULL){
+                if (temp->fieldtype == TK_INT){
+                    printf(" int *");
+                }
+                else {
+                    printf(" real *");   
+                }
+                temp = temp->next;
+            }
+
+                if (temp->fieldtype == TK_INT){
+                    printf(" int");
+                }
+                else {
+                    printf(" real");   
+                }
+                //temp = temp->next;
+
+        }
+    }
+    printf(" Scope: %s",fname);
+    printf(" Offset: %d",sdn->offset);
+    //printf(" regIfPresent: %d", sdn->regIfPresent);
 }
 
-void printScopeHashNode(scopeHashNode *shn){
-    printf("key: %s data: ",shn->key);
-    printScopeDataNode(shn->data);
+void printScopeHashNode(scopeHashNode *shn, char *fname, recordsHashTable *rht){
+    printf("Lexeme: %s ",shn->key);
+    printScopeDataNode(shn->data,fname,rht);
     printf("\n");
 }
 
-void printScopeHashTable(scopeHashTable *ht){
+void printScopeHashTable(scopeHashTable *ht, char *fname, recordsHashTable *rht){
     if (ht == NULL){
         return;
     }
     int i;
     //printf("\nprinting table\n");
     for (i=0;i<ht->tableSize;i++){
-        printf("Entry %-3d:  ",i+1);
+        //printf("Entry %-3d:  ",i+1);
         if (ht->arr[i] == NULL || ht->arr[i] == ht->specialValue){
-            printf("NULL\n");
+            //printf("NULL\n");
         }
         else {
-            printScopeHashNode(ht->arr[i]);
+            printScopeHashNode(ht->arr[i], fname, rht);
         }
     }
     return;

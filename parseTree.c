@@ -71,14 +71,17 @@ void printParseTreeNode(parseTreeNode *ptn, FILE *fp){
     fprintf(fp,"Node: %-26s  ",ptn->nodeSymbol);
     fprintf(fp,"Lexeme: %-20s  ",ptn->lexemeCurrentNode);
     fprintf(fp,"Index: %-4d ",ptn->index);
-    fprintf(fp,"ParentIndex: %-4d ",(ptn->parent) ? ptn->parent->index : -1);
-    fprintf(fp,"ReplacedNode: %-4d ",ptn->replacedNode); //to be commented
-    fprintf(fp,"RuleNo: %-4d\n",ptn->ruleno); // to be commented
+    fprintf(fp,"ParentIndex: %-4d \n",(ptn->parent) ? ptn->parent->index : -1);
+    //fprintf(fp,"ReplacedNode: %-4d ",ptn->replacedNode); //to be commented
+    //fprintf(fp,"RuleNo: %-4d\n",ptn->ruleno); // to be commented
+    //fclose(fp);
+    //printf("%s\n",ptn->lexemeCurrentNode);
     return;
 }
 
 void dfsParseTree(parseTreeNode *ptn, FILE *fp){
     if (ptn == NULL){
+        //fclose(fp);
         return;
     }
     parseTreeNode *curr = ptn->child;
@@ -86,8 +89,22 @@ void dfsParseTree(parseTreeNode *ptn, FILE *fp){
         dfsParseTree(curr,fp);
         curr = curr->next;
     }
-
     printParseTreeNode(ptn,fp);
+    //fclose(fp);
     return;
 }
 
+void dfsp(parseTreeNode *ptn, int *cnt){
+    if (ptn == NULL){
+        return;
+    }
+    parseTreeNode *curr = ptn->child;
+    while (curr!=NULL){
+        dfsp(curr,cnt);
+        curr = curr->next;
+    }
+    //printf("prev%d\n",*cnt);
+    *cnt += 1;
+    //printf("after%d\n",*cnt);
+    return;
+}

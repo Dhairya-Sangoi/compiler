@@ -1,33 +1,28 @@
-Line: 4     Tok: TK_FUNID        Val: NAN   Parent: <function>                  Leaf: yes  Node: ----                        Lexeme: _sumN                 Index: 8    ParentIndex: 7    
-Line: 4     Tok: TK_INPUT        Val: NAN   Parent: <input_par>                 Leaf: yes  Node: ----                        Lexeme: input                 Index: 12   ParentIndex: 9    
-Line: 4     Tok: TK_PARAMETER    Val: NAN   Parent: <input_par>                 Leaf: yes  Node: ----                        Lexeme: parameter             Index: 13   ParentIndex: 9    
-Line: 4     Tok: TK_LIST         Val: NAN   Parent: <input_par>                 Leaf: yes  Node: ----                        Lexeme: list                  Index: 14   ParentIndex: 9    
-Line: 4     Tok: TK_SQL          Val: NAN   Parent: <input_par>                 Leaf: yes  Node: ----                        Lexeme: [                     Index: 15   ParentIndex: 9    
-Line: 4     Tok: TK_INT          Val: NAN   Parent: <primitiveDatatype>         Leaf: yes  Node: ----                        Lexeme: int                   Index: 25   ParentIndex: 23   
-Line: -1    Tok: ----            Val: NAN   Parent: <dataType>                  Leaf: no   Node: <primitiveDatatype>         Lexeme: ----                  Index: 23   ParentIndex: 19   
-Line: -1    Tok: ----            Val: NAN   Parent: <parameter_list>            Leaf: no   Node: <dataType>                  Lexeme: ----                  Index: 19   ParentIndex: 16   
-Line: 4     Tok: TK_ID           Val: NAN   Parent: <parameter_list>            Leaf: yes  Node: ----                        Lexeme: d5cc34                Index: 20   ParentIndex: 16   
-Line: 4     Tok: eps             Val: NAN   Parent: <remaining_list>            Leaf: yes  Node: ----                        Lexeme:                       Index: 6    ParentIndex: 21   
-Line: -1    Tok: ----            Val: NAN   Parent: <parameter_list>            Leaf: no   Node: <remaining_list>            Lexeme: ----                  Index: 21   ParentIndex: 16   
-Line: -1    Tok: ----            Val: NAN   Parent: <input_par>                 Leaf: no   Node: <parameter_list>            Lexeme: ----                  Index: 16   ParentIndex: 9    
-Line: 4     Tok: TK_SQR          Val: NAN   Parent: <input_par>                 Leaf: yes  Node: ----                        Lexeme: ]                     Index: 17   ParentIndex: 9    
-Line: -1    Tok: ----            Val: NAN   Parent: <function>                  Leaf: no   Node: <input_par>                 Lexeme: ----                  Index: 9    ParentIndex: 7    
-Line: 5     Tok: TK_OUTPUT       Val: NAN   Parent: <output_par>                Leaf: yes  Node: ----                        Lexeme: output                Index: 18   ParentIndex: 10   
-Line: 5     Tok: TK_PARAMETER    Val: NAN   Parent: <output_par>                Leaf: yes  Node: ----                        Lexeme: parameter             Index: 13   ParentIndex: 10   
-Line: 5     Tok: TK_LIST         Val: NAN   Parent: <output_par>                Leaf: yes  Node: ----                        Lexeme: list                  Index: 14   ParentIndex: 10   
-Line: 5     Tok: TK_SQL          Val: NAN   Parent: <output_par>                Leaf: yes  Node: ----                        Lexeme: [                     Index: 15   ParentIndex: 10   
-Line: 5     Tok: TK_REAL         Val: NAN   Parent: <primitiveDatatype>         Leaf: yes  Node: ----                        Lexeme: real                  Index: 24   ParentIndex: 23   
-Line: -1    Tok: ----            Val: NAN   Parent: <dataType>                  Leaf: no   Node: <primitiveDatatype>         Lexeme: ----                  Index: 23   ParentIndex: 19   
-Line: -1    Tok: ----            Val: NAN   Parent: <parameter_list>            Leaf: no   Node: <dataType>                  Lexeme: ----                  Index: 19   ParentIndex: 16   
-Line: 5     Tok: TK_ID           Val: NAN   Parent: <parameter_list>            Leaf: yes  Node: ----                        Lexeme: d3                    Index: 20   ParentIndex: 16   
-Line: 5     Tok: eps             Val: NAN   Parent: <remaining_list>            Leaf: yes  Node: ----                        Lexeme:                       Index: 6    ParentIndex: 21   
-Line: -1    Tok: ----            Val: NAN   Parent: <parameter_list>            Leaf: no   Node: <remaining_list>            Lexeme: ----                  Index: 21   ParentIndex: 16   
-Line: -1    Tok: ----            Val: NAN   Parent: <output_par>                Leaf: no   Node: <parameter_list>            Lexeme: ----                  Index: 16   ParentIndex: 10   
-Line: 5     Tok: TK_SQR          Val: NAN   Parent: <output_par>                Leaf: yes  Node: ----                        Lexeme: ]                     Index: 17   ParentIndex: 10   
-Line: -1    Tok: ----            Val: NAN   Parent: <function>                  Leaf: no   Node: <output_par>                Lexeme: ----                  Index: 10   ParentIndex: 7    
-Line: 5     Tok: TK_SEM          Val: NAN   Parent: <function>                  Leaf: yes  Node: ----                        Lexeme: ;                     Index: 11   ParentIndex: 7    
-Line: 6     Tok: eps             Val: NAN   Parent: <typeDefinitions>           Leaf: yes  Node: ----                        Lexeme:                       Index: 6    ParentIndex: 29   
+Line: 3     Tok: eps             Val: NAN   Parent: <otherFunctions>            Leaf: yes  Node: ----                        Lexeme:                       Index: 6    ParentIndex: 1    
+Line: -1    Tok: ----            Val: NAN   Parent: <program>                   Leaf: no   Node: <otherFunctions>            Lexeme: ----                  Index: 1    ParentIndex: 0    
+Line: 3     Tok: TK_MAIN         Val: NAN   Parent: <mainFunction>              Leaf: yes  Node: ----                        Lexeme: _main                 Index: 3    ParentIndex: 2    
+Line: 4     Tok: eps             Val: NAN   Parent: <typeDefinitions>           Leaf: yes  Node: ----                        Lexeme:                       Index: 6    ParentIndex: 29   
 Line: -1    Tok: ----            Val: NAN   Parent: <stmts>                     Leaf: no   Node: <typeDefinitions>           Lexeme: ----                  Index: 29   ParentIndex: 4    
+Line: 4     Tok: TK_TYPE         Val: NAN   Parent: <declaration>               Leaf: yes  Node: ----                        Lexeme: type                  Index: 38   ParentIndex: 41   
+Line: 4     Tok: TK_REAL         Val: NAN   Parent: <primitiveDatatype>         Leaf: yes  Node: ----                        Lexeme: real                  Index: 24   ParentIndex: 23   
+Line: -1    Tok: ----            Val: NAN   Parent: <dataType>                  Leaf: no   Node: <primitiveDatatype>         Lexeme: ----                  Index: 23   ParentIndex: 19   
+Line: -1    Tok: ----            Val: NAN   Parent: <declaration>               Leaf: no   Node: <dataType>                  Lexeme: ----                  Index: 19   ParentIndex: 41   
+Line: 4     Tok: TK_COLON        Val: NAN   Parent: <declaration>               Leaf: yes  Node: ----                        Lexeme: :                     Index: 39   ParentIndex: 41   
+Line: 4     Tok: TK_ID           Val: NAN   Parent: <declaration>               Leaf: yes  Node: ----                        Lexeme: c4bd56                Index: 20   ParentIndex: 41   
+Line: 4     Tok: eps             Val: NAN   Parent: <global_or_not>             Leaf: yes  Node: ----                        Lexeme:                       Index: 6    ParentIndex: 42   
+Line: -1    Tok: ----            Val: NAN   Parent: <declaration>               Leaf: no   Node: <global_or_not>             Lexeme: ----                  Index: 42   ParentIndex: 41   
+Line: 4     Tok: TK_SEM          Val: NAN   Parent: <declaration>               Leaf: yes  Node: ----                        Lexeme: ;                     Index: 11   ParentIndex: 41   
+Line: -1    Tok: ----            Val: NAN   Parent: <declarations>              Leaf: no   Node: <declaration>               Lexeme: ----                  Index: 41   ParentIndex: 30   
+Line: 5     Tok: TK_TYPE         Val: NAN   Parent: <declaration>               Leaf: yes  Node: ----                        Lexeme: type                  Index: 38   ParentIndex: 41   
+Line: 5     Tok: TK_INT          Val: NAN   Parent: <primitiveDatatype>         Leaf: yes  Node: ----                        Lexeme: int                   Index: 25   ParentIndex: 23   
+Line: -1    Tok: ----            Val: NAN   Parent: <dataType>                  Leaf: no   Node: <primitiveDatatype>         Lexeme: ----                  Index: 23   ParentIndex: 19   
+Line: -1    Tok: ----            Val: NAN   Parent: <declaration>               Leaf: no   Node: <dataType>                  Lexeme: ----                  Index: 19   ParentIndex: 41   
+Line: 5     Tok: TK_COLON        Val: NAN   Parent: <declaration>               Leaf: yes  Node: ----                        Lexeme: :                     Index: 39   ParentIndex: 41   
+Line: 5     Tok: TK_ID           Val: NAN   Parent: <declaration>               Leaf: yes  Node: ----                        Lexeme: c2                    Index: 20   ParentIndex: 41   
+Line: 5     Tok: eps             Val: NAN   Parent: <global_or_not>             Leaf: yes  Node: ----                        Lexeme:                       Index: 6    ParentIndex: 42   
+Line: -1    Tok: ----            Val: NAN   Parent: <declaration>               Leaf: no   Node: <global_or_not>             Lexeme: ----                  Index: 42   ParentIndex: 41   
+Line: 5     Tok: TK_SEM          Val: NAN   Parent: <declaration>               Leaf: yes  Node: ----                        Lexeme: ;                     Index: 11   ParentIndex: 41   
+Line: -1    Tok: ----            Val: NAN   Parent: <declarations>              Leaf: no   Node: <declaration>               Lexeme: ----                  Index: 41   ParentIndex: 30   
 Line: 6     Tok: TK_TYPE         Val: NAN   Parent: <declaration>               Leaf: yes  Node: ----                        Lexeme: type                  Index: 38   ParentIndex: 41   
 Line: 6     Tok: TK_INT          Val: NAN   Parent: <primitiveDatatype>         Leaf: yes  Node: ----                        Lexeme: int                   Index: 25   ParentIndex: 23   
 Line: -1    Tok: ----            Val: NAN   Parent: <dataType>                  Leaf: no   Node: <primitiveDatatype>         Lexeme: ----                  Index: 23   ParentIndex: 19   
@@ -39,252 +34,59 @@ Line: 6     Tok: TK_GLOBAL       Val: NAN   Parent: <global_or_not>             
 Line: -1    Tok: ----            Val: NAN   Parent: <declaration>               Leaf: no   Node: <global_or_not>             Lexeme: ----                  Index: 42   ParentIndex: 41   
 Line: 6     Tok: TK_SEM          Val: NAN   Parent: <declaration>               Leaf: yes  Node: ----                        Lexeme: ;                     Index: 11   ParentIndex: 41   
 Line: -1    Tok: ----            Val: NAN   Parent: <declarations>              Leaf: no   Node: <declaration>               Lexeme: ----                  Index: 41   ParentIndex: 30   
-Line: 7     Tok: TK_TYPE         Val: NAN   Parent: <declaration>               Leaf: yes  Node: ----                        Lexeme: type                  Index: 38   ParentIndex: 41   
-Line: 7     Tok: TK_INT          Val: NAN   Parent: <primitiveDatatype>         Leaf: yes  Node: ----                        Lexeme: int                   Index: 25   ParentIndex: 23   
-Line: -1    Tok: ----            Val: NAN   Parent: <dataType>                  Leaf: no   Node: <primitiveDatatype>         Lexeme: ----                  Index: 23   ParentIndex: 19   
-Line: -1    Tok: ----            Val: NAN   Parent: <declaration>               Leaf: no   Node: <dataType>                  Lexeme: ----                  Index: 19   ParentIndex: 41   
-Line: 7     Tok: TK_COLON        Val: NAN   Parent: <declaration>               Leaf: yes  Node: ----                        Lexeme: :                     Index: 39   ParentIndex: 41   
-Line: 7     Tok: TK_ID           Val: NAN   Parent: <declaration>               Leaf: yes  Node: ----                        Lexeme: b3                    Index: 20   ParentIndex: 41   
-Line: 7     Tok: eps             Val: NAN   Parent: <global_or_not>             Leaf: yes  Node: ----                        Lexeme:                       Index: 6    ParentIndex: 42   
-Line: -1    Tok: ----            Val: NAN   Parent: <declaration>               Leaf: no   Node: <global_or_not>             Lexeme: ----                  Index: 42   ParentIndex: 41   
-Line: 7     Tok: TK_SEM          Val: NAN   Parent: <declaration>               Leaf: yes  Node: ----                        Lexeme: ;                     Index: 11   ParentIndex: 41   
-Line: -1    Tok: ----            Val: NAN   Parent: <declarations>              Leaf: no   Node: <declaration>               Lexeme: ----                  Index: 41   ParentIndex: 30   
-Line: 8     Tok: TK_TYPE         Val: NAN   Parent: <declaration>               Leaf: yes  Node: ----                        Lexeme: type                  Index: 38   ParentIndex: 41   
-Line: 8     Tok: TK_REAL         Val: NAN   Parent: <primitiveDatatype>         Leaf: yes  Node: ----                        Lexeme: real                  Index: 24   ParentIndex: 23   
-Line: -1    Tok: ----            Val: NAN   Parent: <dataType>                  Leaf: no   Node: <primitiveDatatype>         Lexeme: ----                  Index: 23   ParentIndex: 19   
-Line: -1    Tok: ----            Val: NAN   Parent: <declaration>               Leaf: no   Node: <dataType>                  Lexeme: ----                  Index: 19   ParentIndex: 41   
-Line: 8     Tok: TK_COLON        Val: NAN   Parent: <declaration>               Leaf: yes  Node: ----                        Lexeme: :                     Index: 39   ParentIndex: 41   
-Line: 8     Tok: TK_ID           Val: NAN   Parent: <declaration>               Leaf: yes  Node: ----                        Lexeme: c3bd                  Index: 20   ParentIndex: 41   
-Line: 8     Tok: eps             Val: NAN   Parent: <global_or_not>             Leaf: yes  Node: ----                        Lexeme:                       Index: 6    ParentIndex: 42   
-Line: -1    Tok: ----            Val: NAN   Parent: <declaration>               Leaf: no   Node: <global_or_not>             Lexeme: ----                  Index: 42   ParentIndex: 41   
-Line: 8     Tok: TK_SEM          Val: NAN   Parent: <declaration>               Leaf: yes  Node: ----                        Lexeme: ;                     Index: 11   ParentIndex: 41   
-Line: -1    Tok: ----            Val: NAN   Parent: <declarations>              Leaf: no   Node: <declaration>               Lexeme: ----                  Index: 41   ParentIndex: 30   
-Line: 9     Tok: eps             Val: NAN   Parent: <declarations>              Leaf: yes  Node: ----                        Lexeme:                       Index: 6    ParentIndex: 30   
+Line: 7     Tok: eps             Val: NAN   Parent: <declarations>              Leaf: yes  Node: ----                        Lexeme:                       Index: 6    ParentIndex: 30   
 Line: -1    Tok: ----            Val: NAN   Parent: <declarations>              Leaf: no   Node: <declarations>              Lexeme: ----                  Index: 30   ParentIndex: 30   
 Line: -1    Tok: ----            Val: NAN   Parent: <declarations>              Leaf: no   Node: <declarations>              Lexeme: ----                  Index: 30   ParentIndex: 30   
 Line: -1    Tok: ----            Val: NAN   Parent: <declarations>              Leaf: no   Node: <declarations>              Lexeme: ----                  Index: 30   ParentIndex: 30   
 Line: -1    Tok: ----            Val: NAN   Parent: <stmts>                     Leaf: no   Node: <declarations>              Lexeme: ----                  Index: 30   ParentIndex: 4    
-Line: 9     Tok: TK_ID           Val: NAN   Parent: <singleOrRecId>             Leaf: yes  Node: ----                        Lexeme: b5b567                Index: 20   ParentIndex: 50   
-Line: 9     Tok: eps             Val: NAN   Parent: <singleOrRecIdPrime>        Leaf: yes  Node: ----                        Lexeme:                       Index: 6    ParentIndex: 53   
+Line: 7     Tok: TK_ID           Val: NAN   Parent: <singleOrRecId>             Leaf: yes  Node: ----                        Lexeme: c2                    Index: 20   ParentIndex: 50   
+Line: 7     Tok: eps             Val: NAN   Parent: <singleOrRecIdPrime>        Leaf: yes  Node: ----                        Lexeme:                       Index: 6    ParentIndex: 53   
 Line: -1    Tok: ----            Val: NAN   Parent: <singleOrRecId>             Leaf: no   Node: <singleOrRecIdPrime>        Lexeme: ----                  Index: 53   ParentIndex: 50   
 Line: -1    Tok: ----            Val: NAN   Parent: <assignmentStmt>            Leaf: no   Node: <singleOrRecId>             Lexeme: ----                  Index: 50   ParentIndex: 46   
-Line: 9     Tok: TK_ASSIGNOP     Val: NAN   Parent: <assignmentStmt>            Leaf: yes  Node: ----                        Lexeme: <---                  Index: 51   ParentIndex: 46   
-Line: 9     Tok: TK_NUM          Val: 1     Parent: <allVar>                    Leaf: yes  Node: ----                        Lexeme: 1                     Index: 75   ParentIndex: 73   
+Line: 7     Tok: TK_ASSIGNOP     Val: NAN   Parent: <assignmentStmt>            Leaf: yes  Node: ----                        Lexeme: <---                  Index: 51   ParentIndex: 46   
+Line: 7     Tok: TK_NUM          Val: 7     Parent: <allVar>                    Leaf: yes  Node: ----                        Lexeme: 7                     Index: 75   ParentIndex: 73   
 Line: -1    Tok: ----            Val: NAN   Parent: <factor>                    Leaf: no   Node: <allVar>                    Lexeme: ----                  Index: 73   ParentIndex: 80   
 Line: -1    Tok: ----            Val: NAN   Parent: <term>                      Leaf: no   Node: <factor>                    Lexeme: ----                  Index: 80   ParentIndex: 77   
-Line: 9     Tok: eps             Val: NAN   Parent: <termPrime>                 Leaf: yes  Node: ----                        Lexeme:                       Index: 6    ParentIndex: 81   
+Line: 7     Tok: eps             Val: NAN   Parent: <termPrime>                 Leaf: yes  Node: ----                        Lexeme:                       Index: 6    ParentIndex: 81   
 Line: -1    Tok: ----            Val: NAN   Parent: <term>                      Leaf: no   Node: <termPrime>                 Lexeme: ----                  Index: 81   ParentIndex: 77   
 Line: -1    Tok: ----            Val: NAN   Parent: <arithmeticExpression>      Leaf: no   Node: <term>                      Lexeme: ----                  Index: 77   ParentIndex: 52   
-Line: 9     Tok: eps             Val: NAN   Parent: <expPrime>                  Leaf: yes  Node: ----                        Lexeme:                       Index: 6    ParentIndex: 78   
+Line: 7     Tok: eps             Val: NAN   Parent: <expPrime>                  Leaf: yes  Node: ----                        Lexeme:                       Index: 6    ParentIndex: 78   
 Line: -1    Tok: ----            Val: NAN   Parent: <arithmeticExpression>      Leaf: no   Node: <expPrime>                  Lexeme: ----                  Index: 78   ParentIndex: 52   
 Line: -1    Tok: ----            Val: NAN   Parent: <assignmentStmt>            Leaf: no   Node: <arithmeticExpression>      Lexeme: ----                  Index: 52   ParentIndex: 46   
-Line: 9     Tok: TK_SEM          Val: NAN   Parent: <assignmentStmt>            Leaf: yes  Node: ----                        Lexeme: ;                     Index: 11   ParentIndex: 46   
+Line: 7     Tok: TK_SEM          Val: NAN   Parent: <assignmentStmt>            Leaf: yes  Node: ----                        Lexeme: ;                     Index: 11   ParentIndex: 46   
 Line: -1    Tok: ----            Val: NAN   Parent: <stmt>                      Leaf: no   Node: <assignmentStmt>            Lexeme: ----                  Index: 46   ParentIndex: 44   
 Line: -1    Tok: ----            Val: NAN   Parent: <otherStmts>                Leaf: no   Node: <stmt>                      Lexeme: ----                  Index: 44   ParentIndex: 31   
-Line: 10    Tok: TK_ID           Val: NAN   Parent: <singleOrRecId>             Leaf: yes  Node: ----                        Lexeme: d3                    Index: 20   ParentIndex: 50   
-Line: 10    Tok: eps             Val: NAN   Parent: <singleOrRecIdPrime>        Leaf: yes  Node: ----                        Lexeme:                       Index: 6    ParentIndex: 53   
-Line: -1    Tok: ----            Val: NAN   Parent: <singleOrRecId>             Leaf: no   Node: <singleOrRecIdPrime>        Lexeme: ----                  Index: 53   ParentIndex: 50   
-Line: -1    Tok: ----            Val: NAN   Parent: <assignmentStmt>            Leaf: no   Node: <singleOrRecId>             Lexeme: ----                  Index: 50   ParentIndex: 46   
-Line: 10    Tok: TK_ASSIGNOP     Val: NAN   Parent: <assignmentStmt>            Leaf: yes  Node: ----                        Lexeme: <---                  Index: 51   ParentIndex: 46   
-Line: 10    Tok: TK_RNUM         Val: 0.00  Parent: <allVar>                    Leaf: yes  Node: ----                        Lexeme: 0.00                  Index: 76   ParentIndex: 73   
-Line: -1    Tok: ----            Val: NAN   Parent: <factor>                    Leaf: no   Node: <allVar>                    Lexeme: ----                  Index: 73   ParentIndex: 80   
-Line: -1    Tok: ----            Val: NAN   Parent: <term>                      Leaf: no   Node: <factor>                    Lexeme: ----                  Index: 80   ParentIndex: 77   
-Line: 10    Tok: eps             Val: NAN   Parent: <termPrime>                 Leaf: yes  Node: ----                        Lexeme:                       Index: 6    ParentIndex: 81   
-Line: -1    Tok: ----            Val: NAN   Parent: <term>                      Leaf: no   Node: <termPrime>                 Lexeme: ----                  Index: 81   ParentIndex: 77   
-Line: -1    Tok: ----            Val: NAN   Parent: <arithmeticExpression>      Leaf: no   Node: <term>                      Lexeme: ----                  Index: 77   ParentIndex: 52   
-Line: 10    Tok: eps             Val: NAN   Parent: <expPrime>                  Leaf: yes  Node: ----                        Lexeme:                       Index: 6    ParentIndex: 78   
-Line: -1    Tok: ----            Val: NAN   Parent: <arithmeticExpression>      Leaf: no   Node: <expPrime>                  Lexeme: ----                  Index: 78   ParentIndex: 52   
-Line: -1    Tok: ----            Val: NAN   Parent: <assignmentStmt>            Leaf: no   Node: <arithmeticExpression>      Lexeme: ----                  Index: 52   ParentIndex: 46   
-Line: 10    Tok: TK_SEM          Val: NAN   Parent: <assignmentStmt>            Leaf: yes  Node: ----                        Lexeme: ;                     Index: 11   ParentIndex: 46   
-Line: -1    Tok: ----            Val: NAN   Parent: <stmt>                      Leaf: no   Node: <assignmentStmt>            Lexeme: ----                  Index: 46   ParentIndex: 44   
-Line: -1    Tok: ----            Val: NAN   Parent: <otherStmts>                Leaf: no   Node: <stmt>                      Lexeme: ----                  Index: 44   ParentIndex: 31   
-Line: 11    Tok: TK_WHILE        Val: NAN   Parent: <iterativeStmt>             Leaf: yes  Node: ----                        Lexeme: while                 Index: 61   ParentIndex: 47   
-Line: 11    Tok: TK_OP           Val: NAN   Parent: <iterativeStmt>             Leaf: yes  Node: ----                        Lexeme: (                     Index: 62   ParentIndex: 47   
-Line: 11    Tok: TK_ID           Val: NAN   Parent: <var>                       Leaf: yes  Node: ----                        Lexeme: b5b567                Index: 20   ParentIndex: 88   
-Line: -1    Tok: ----            Val: NAN   Parent: <booleanExpression>         Leaf: no   Node: <var>                       Lexeme: ----                  Index: 88   ParentIndex: 63   
-Line: 11    Tok: TK_LE           Val: NAN   Parent: <relationalOp>              Leaf: yes  Node: ----                        Lexeme: <=                    Index: 94   ParentIndex: 89   
-Line: -1    Tok: ----            Val: NAN   Parent: <booleanExpression>         Leaf: no   Node: <relationalOp>              Lexeme: ----                  Index: 89   ParentIndex: 63   
-Line: 11    Tok: TK_ID           Val: NAN   Parent: <var>                       Leaf: yes  Node: ----                        Lexeme: d5cc34                Index: 20   ParentIndex: 88   
-Line: -1    Tok: ----            Val: NAN   Parent: <booleanExpression>         Leaf: no   Node: <var>                       Lexeme: ----                  Index: 88   ParentIndex: 63   
-Line: -1    Tok: ----            Val: NAN   Parent: <iterativeStmt>             Leaf: no   Node: <booleanExpression>         Lexeme: ----                  Index: 63   ParentIndex: 47   
-Line: 11    Tok: TK_CL           Val: NAN   Parent: <iterativeStmt>             Leaf: yes  Node: ----                        Lexeme: )                     Index: 64   ParentIndex: 47   
-Line: 12    Tok: TK_READ         Val: NAN   Parent: <ioStmt>                    Leaf: yes  Node: ----                        Lexeme: read                  Index: 71   ParentIndex: 49   
-Line: 12    Tok: TK_OP           Val: NAN   Parent: <ioStmt>                    Leaf: yes  Node: ----                        Lexeme: (                     Index: 62   ParentIndex: 49   
-Line: 12    Tok: TK_ID           Val: NAN   Parent: <singleOrRecId>             Leaf: yes  Node: ----                        Lexeme: c3bd                  Index: 20   ParentIndex: 50   
-Line: 12    Tok: eps             Val: NAN   Parent: <singleOrRecIdPrime>        Leaf: yes  Node: ----                        Lexeme:                       Index: 6    ParentIndex: 53   
+Line: 8     Tok: TK_READ         Val: NAN   Parent: <ioStmt>                    Leaf: yes  Node: ----                        Lexeme: read                  Index: 71   ParentIndex: 49   
+Line: 8     Tok: TK_OP           Val: NAN   Parent: <ioStmt>                    Leaf: yes  Node: ----                        Lexeme: (                     Index: 62   ParentIndex: 49   
+Line: 8     Tok: TK_ID           Val: NAN   Parent: <singleOrRecId>             Leaf: yes  Node: ----                        Lexeme: c2                    Index: 20   ParentIndex: 50   
+Line: 8     Tok: eps             Val: NAN   Parent: <singleOrRecIdPrime>        Leaf: yes  Node: ----                        Lexeme:                       Index: 6    ParentIndex: 53   
 Line: -1    Tok: ----            Val: NAN   Parent: <singleOrRecId>             Leaf: no   Node: <singleOrRecIdPrime>        Lexeme: ----                  Index: 53   ParentIndex: 50   
 Line: -1    Tok: ----            Val: NAN   Parent: <ioStmt>                    Leaf: no   Node: <singleOrRecId>             Lexeme: ----                  Index: 50   ParentIndex: 49   
-Line: 12    Tok: TK_CL           Val: NAN   Parent: <ioStmt>                    Leaf: yes  Node: ----                        Lexeme: )                     Index: 64   ParentIndex: 49   
-Line: 12    Tok: TK_SEM          Val: NAN   Parent: <ioStmt>                    Leaf: yes  Node: ----                        Lexeme: ;                     Index: 11   ParentIndex: 49   
-Line: -1    Tok: ----            Val: NAN   Parent: <stmt>                      Leaf: no   Node: <ioStmt>                    Lexeme: ----                  Index: 49   ParentIndex: 44   
-Line: -1    Tok: ----            Val: NAN   Parent: <iterativeStmt>             Leaf: no   Node: <stmt>                      Lexeme: ----                  Index: 44   ParentIndex: 47   
-Line: 13    Tok: TK_ID           Val: NAN   Parent: <singleOrRecId>             Leaf: yes  Node: ----                        Lexeme: d3                    Index: 20   ParentIndex: 50   
-Line: 13    Tok: eps             Val: NAN   Parent: <singleOrRecIdPrime>        Leaf: yes  Node: ----                        Lexeme:                       Index: 6    ParentIndex: 53   
-Line: -1    Tok: ----            Val: NAN   Parent: <singleOrRecId>             Leaf: no   Node: <singleOrRecIdPrime>        Lexeme: ----                  Index: 53   ParentIndex: 50   
-Line: -1    Tok: ----            Val: NAN   Parent: <assignmentStmt>            Leaf: no   Node: <singleOrRecId>             Lexeme: ----                  Index: 50   ParentIndex: 46   
-Line: 13    Tok: TK_ASSIGNOP     Val: NAN   Parent: <assignmentStmt>            Leaf: yes  Node: ----                        Lexeme: <---                  Index: 51   ParentIndex: 46   
-Line: 13    Tok: TK_ID           Val: NAN   Parent: <allVar>                    Leaf: yes  Node: ----                        Lexeme: d3                    Index: 20   ParentIndex: 73   
-Line: 13    Tok: eps             Val: NAN   Parent: <allVarPrime>               Leaf: yes  Node: ----                        Lexeme:                       Index: 6    ParentIndex: 74   
-Line: -1    Tok: ----            Val: NAN   Parent: <allVar>                    Leaf: no   Node: <allVarPrime>               Lexeme: ----                  Index: 74   ParentIndex: 73   
-Line: -1    Tok: ----            Val: NAN   Parent: <factor>                    Leaf: no   Node: <allVar>                    Lexeme: ----                  Index: 73   ParentIndex: 80   
-Line: -1    Tok: ----            Val: NAN   Parent: <term>                      Leaf: no   Node: <factor>                    Lexeme: ----                  Index: 80   ParentIndex: 77   
-Line: 13    Tok: eps             Val: NAN   Parent: <termPrime>                 Leaf: yes  Node: ----                        Lexeme:                       Index: 6    ParentIndex: 81   
-Line: -1    Tok: ----            Val: NAN   Parent: <term>                      Leaf: no   Node: <termPrime>                 Lexeme: ----                  Index: 81   ParentIndex: 77   
-Line: -1    Tok: ----            Val: NAN   Parent: <arithmeticExpression>      Leaf: no   Node: <term>                      Lexeme: ----                  Index: 77   ParentIndex: 52   
-Line: 13    Tok: TK_PLUS         Val: NAN   Parent: <lowPrecedenceOperators>    Leaf: yes  Node: ----                        Lexeme: +                     Index: 86   ParentIndex: 79   
-Line: -1    Tok: ----            Val: NAN   Parent: <expPrime>                  Leaf: no   Node: <lowPrecedenceOperators>    Lexeme: ----                  Index: 79   ParentIndex: 78   
-Line: 13    Tok: TK_ID           Val: NAN   Parent: <allVar>                    Leaf: yes  Node: ----                        Lexeme: c3bd                  Index: 20   ParentIndex: 73   
-Line: 13    Tok: eps             Val: NAN   Parent: <allVarPrime>               Leaf: yes  Node: ----                        Lexeme:                       Index: 6    ParentIndex: 74   
-Line: -1    Tok: ----            Val: NAN   Parent: <allVar>                    Leaf: no   Node: <allVarPrime>               Lexeme: ----                  Index: 74   ParentIndex: 73   
-Line: -1    Tok: ----            Val: NAN   Parent: <factor>                    Leaf: no   Node: <allVar>                    Lexeme: ----                  Index: 73   ParentIndex: 80   
-Line: -1    Tok: ----            Val: NAN   Parent: <term>                      Leaf: no   Node: <factor>                    Lexeme: ----                  Index: 80   ParentIndex: 77   
-Line: 13    Tok: eps             Val: NAN   Parent: <termPrime>                 Leaf: yes  Node: ----                        Lexeme:                       Index: 6    ParentIndex: 81   
-Line: -1    Tok: ----            Val: NAN   Parent: <term>                      Leaf: no   Node: <termPrime>                 Lexeme: ----                  Index: 81   ParentIndex: 77   
-Line: -1    Tok: ----            Val: NAN   Parent: <expPrime>                  Leaf: no   Node: <term>                      Lexeme: ----                  Index: 77   ParentIndex: 78   
-Line: 13    Tok: eps             Val: NAN   Parent: <expPrime>                  Leaf: yes  Node: ----                        Lexeme:                       Index: 6    ParentIndex: 78   
-Line: -1    Tok: ----            Val: NAN   Parent: <expPrime>                  Leaf: no   Node: <expPrime>                  Lexeme: ----                  Index: 78   ParentIndex: 78   
-Line: -1    Tok: ----            Val: NAN   Parent: <arithmeticExpression>      Leaf: no   Node: <expPrime>                  Lexeme: ----                  Index: 78   ParentIndex: 52   
-Line: -1    Tok: ----            Val: NAN   Parent: <assignmentStmt>            Leaf: no   Node: <arithmeticExpression>      Lexeme: ----                  Index: 52   ParentIndex: 46   
-Line: 13    Tok: TK_SEM          Val: NAN   Parent: <assignmentStmt>            Leaf: yes  Node: ----                        Lexeme: ;                     Index: 11   ParentIndex: 46   
-Line: -1    Tok: ----            Val: NAN   Parent: <stmt>                      Leaf: no   Node: <assignmentStmt>            Lexeme: ----                  Index: 46   ParentIndex: 44   
-Line: -1    Tok: ----            Val: NAN   Parent: <otherStmts>                Leaf: no   Node: <stmt>                      Lexeme: ----                  Index: 44   ParentIndex: 31   
-Line: 14    Tok: eps             Val: NAN   Parent: <otherStmts>                Leaf: yes  Node: ----                        Lexeme:                       Index: 6    ParentIndex: 31   
-Line: -1    Tok: ----            Val: NAN   Parent: <otherStmts>                Leaf: no   Node: <otherStmts>                Lexeme: ----                  Index: 31   ParentIndex: 31   
-Line: -1    Tok: ----            Val: NAN   Parent: <iterativeStmt>             Leaf: no   Node: <otherStmts>                Lexeme: ----                  Index: 31   ParentIndex: 47   
-Line: 14    Tok: TK_ENDWHILE     Val: NAN   Parent: <iterativeStmt>             Leaf: yes  Node: ----                        Lexeme: endwhile              Index: 65   ParentIndex: 47   
-Line: -1    Tok: ----            Val: NAN   Parent: <stmt>                      Leaf: no   Node: <iterativeStmt>             Lexeme: ----                  Index: 47   ParentIndex: 44   
-Line: -1    Tok: ----            Val: NAN   Parent: <otherStmts>                Leaf: no   Node: <stmt>                      Lexeme: ----                  Index: 44   ParentIndex: 31   
-Line: 15    Tok: eps             Val: NAN   Parent: <otherStmts>                Leaf: yes  Node: ----                        Lexeme:                       Index: 6    ParentIndex: 31   
-Line: -1    Tok: ----            Val: NAN   Parent: <otherStmts>                Leaf: no   Node: <otherStmts>                Lexeme: ----                  Index: 31   ParentIndex: 31   
-Line: -1    Tok: ----            Val: NAN   Parent: <otherStmts>                Leaf: no   Node: <otherStmts>                Lexeme: ----                  Index: 31   ParentIndex: 31   
-Line: -1    Tok: ----            Val: NAN   Parent: <otherStmts>                Leaf: no   Node: <otherStmts>                Lexeme: ----                  Index: 31   ParentIndex: 31   
-Line: -1    Tok: ----            Val: NAN   Parent: <stmts>                     Leaf: no   Node: <otherStmts>                Lexeme: ----                  Index: 31   ParentIndex: 4    
-Line: 15    Tok: TK_RETURN       Val: NAN   Parent: <returnStmt>                Leaf: yes  Node: ----                        Lexeme: return                Index: 99   ParentIndex: 32   
-Line: 15    Tok: TK_SQL          Val: NAN   Parent: <optionalReturn>            Leaf: yes  Node: ----                        Lexeme: [                     Index: 15   ParentIndex: 100  
-Line: 15    Tok: TK_ID           Val: NAN   Parent: <idList>                    Leaf: yes  Node: ----                        Lexeme: b5b567                Index: 20   ParentIndex: 60   
-Line: 15    Tok: eps             Val: NAN   Parent: <more_ids>                  Leaf: yes  Node: ----                        Lexeme:                       Index: 6    ParentIndex: 101  
-Line: -1    Tok: ----            Val: NAN   Parent: <idList>                    Leaf: no   Node: <more_ids>                  Lexeme: ----                  Index: 101  ParentIndex: 60   
-Line: -1    Tok: ----            Val: NAN   Parent: <optionalReturn>            Leaf: no   Node: <idList>                    Lexeme: ----                  Index: 60   ParentIndex: 100  
-Line: 15    Tok: TK_SQR          Val: NAN   Parent: <optionalReturn>            Leaf: yes  Node: ----                        Lexeme: ]                     Index: 17   ParentIndex: 100  
-Line: -1    Tok: ----            Val: NAN   Parent: <returnStmt>                Leaf: no   Node: <optionalReturn>            Lexeme: ----                  Index: 100  ParentIndex: 32   
-Line: 15    Tok: TK_SEM          Val: NAN   Parent: <returnStmt>                Leaf: yes  Node: ----                        Lexeme: ;                     Index: 11   ParentIndex: 32   
-Line: -1    Tok: ----            Val: NAN   Parent: <stmts>                     Leaf: no   Node: <returnStmt>                Lexeme: ----                  Index: 32   ParentIndex: 4    
-Line: -1    Tok: ----            Val: NAN   Parent: <function>                  Leaf: no   Node: <stmts>                     Lexeme: ----                  Index: 4    ParentIndex: 7    
-Line: 16    Tok: TK_END          Val: NAN   Parent: <function>                  Leaf: yes  Node: ----                        Lexeme: end                   Index: 5    ParentIndex: 7    
-Line: -1    Tok: ----            Val: NAN   Parent: <otherFunctions>            Leaf: no   Node: <function>                  Lexeme: ----                  Index: 7    ParentIndex: 1    
-Line: 18    Tok: eps             Val: NAN   Parent: <otherFunctions>            Leaf: yes  Node: ----                        Lexeme:                       Index: 6    ParentIndex: 1    
-Line: -1    Tok: ----            Val: NAN   Parent: <otherFunctions>            Leaf: no   Node: <otherFunctions>            Lexeme: ----                  Index: 1    ParentIndex: 1    
-Line: -1    Tok: ----            Val: NAN   Parent: <program>                   Leaf: no   Node: <otherFunctions>            Lexeme: ----                  Index: 1    ParentIndex: 0    
-Line: 18    Tok: TK_MAIN         Val: NAN   Parent: <mainFunction>              Leaf: yes  Node: ----                        Lexeme: _main                 Index: 3    ParentIndex: 2    
-Line: 19    Tok: eps             Val: NAN   Parent: <typeDefinitions>           Leaf: yes  Node: ----                        Lexeme:                       Index: 6    ParentIndex: 29   
-Line: -1    Tok: ----            Val: NAN   Parent: <stmts>                     Leaf: no   Node: <typeDefinitions>           Lexeme: ----                  Index: 29   ParentIndex: 4    
-Line: 19    Tok: TK_TYPE         Val: NAN   Parent: <declaration>               Leaf: yes  Node: ----                        Lexeme: type                  Index: 38   ParentIndex: 41   
-Line: 19    Tok: TK_REAL         Val: NAN   Parent: <primitiveDatatype>         Leaf: yes  Node: ----                        Lexeme: real                  Index: 24   ParentIndex: 23   
-Line: -1    Tok: ----            Val: NAN   Parent: <dataType>                  Leaf: no   Node: <primitiveDatatype>         Lexeme: ----                  Index: 23   ParentIndex: 19   
-Line: -1    Tok: ----            Val: NAN   Parent: <declaration>               Leaf: no   Node: <dataType>                  Lexeme: ----                  Index: 19   ParentIndex: 41   
-Line: 19    Tok: TK_COLON        Val: NAN   Parent: <declaration>               Leaf: yes  Node: ----                        Lexeme: :                     Index: 39   ParentIndex: 41   
-Line: 19    Tok: TK_ID           Val: NAN   Parent: <declaration>               Leaf: yes  Node: ----                        Lexeme: c4bd56                Index: 20   ParentIndex: 41   
-Line: 19    Tok: eps             Val: NAN   Parent: <global_or_not>             Leaf: yes  Node: ----                        Lexeme:                       Index: 6    ParentIndex: 42   
-Line: -1    Tok: ----            Val: NAN   Parent: <declaration>               Leaf: no   Node: <global_or_not>             Lexeme: ----                  Index: 42   ParentIndex: 41   
-Line: 19    Tok: TK_SEM          Val: NAN   Parent: <declaration>               Leaf: yes  Node: ----                        Lexeme: ;                     Index: 11   ParentIndex: 41   
-Line: -1    Tok: ----            Val: NAN   Parent: <declarations>              Leaf: no   Node: <declaration>               Lexeme: ----                  Index: 41   ParentIndex: 30   
-Line: 20    Tok: TK_TYPE         Val: NAN   Parent: <declaration>               Leaf: yes  Node: ----                        Lexeme: type                  Index: 38   ParentIndex: 41   
-Line: 20    Tok: TK_INT          Val: NAN   Parent: <primitiveDatatype>         Leaf: yes  Node: ----                        Lexeme: int                   Index: 25   ParentIndex: 23   
-Line: -1    Tok: ----            Val: NAN   Parent: <dataType>                  Leaf: no   Node: <primitiveDatatype>         Lexeme: ----                  Index: 23   ParentIndex: 19   
-Line: -1    Tok: ----            Val: NAN   Parent: <declaration>               Leaf: no   Node: <dataType>                  Lexeme: ----                  Index: 19   ParentIndex: 41   
-Line: 20    Tok: TK_COLON        Val: NAN   Parent: <declaration>               Leaf: yes  Node: ----                        Lexeme: :                     Index: 39   ParentIndex: 41   
-Line: 20    Tok: TK_ID           Val: NAN   Parent: <declaration>               Leaf: yes  Node: ----                        Lexeme: c2                    Index: 20   ParentIndex: 41   
-Line: 20    Tok: eps             Val: NAN   Parent: <global_or_not>             Leaf: yes  Node: ----                        Lexeme:                       Index: 6    ParentIndex: 42   
-Line: -1    Tok: ----            Val: NAN   Parent: <declaration>               Leaf: no   Node: <global_or_not>             Lexeme: ----                  Index: 42   ParentIndex: 41   
-Line: 20    Tok: TK_SEM          Val: NAN   Parent: <declaration>               Leaf: yes  Node: ----                        Lexeme: ;                     Index: 11   ParentIndex: 41   
-Line: -1    Tok: ----            Val: NAN   Parent: <declarations>              Leaf: no   Node: <declaration>               Lexeme: ----                  Index: 41   ParentIndex: 30   
-Line: 21    Tok: TK_TYPE         Val: NAN   Parent: <declaration>               Leaf: yes  Node: ----                        Lexeme: type                  Index: 38   ParentIndex: 41   
-Line: 21    Tok: TK_INT          Val: NAN   Parent: <primitiveDatatype>         Leaf: yes  Node: ----                        Lexeme: int                   Index: 25   ParentIndex: 23   
-Line: -1    Tok: ----            Val: NAN   Parent: <dataType>                  Leaf: no   Node: <primitiveDatatype>         Lexeme: ----                  Index: 23   ParentIndex: 19   
-Line: -1    Tok: ----            Val: NAN   Parent: <declaration>               Leaf: no   Node: <dataType>                  Lexeme: ----                  Index: 19   ParentIndex: 41   
-Line: 21    Tok: TK_COLON        Val: NAN   Parent: <declaration>               Leaf: yes  Node: ----                        Lexeme: :                     Index: 39   ParentIndex: 41   
-Line: 21    Tok: TK_ID           Val: NAN   Parent: <declaration>               Leaf: yes  Node: ----                        Lexeme: b5b567                Index: 20   ParentIndex: 41   
-Line: 21    Tok: TK_COLON        Val: NAN   Parent: <global_or_not>             Leaf: yes  Node: ----                        Lexeme: :                     Index: 39   ParentIndex: 42   
-Line: 21    Tok: TK_GLOBAL       Val: NAN   Parent: <global_or_not>             Leaf: yes  Node: ----                        Lexeme: global                Index: 43   ParentIndex: 42   
-Line: -1    Tok: ----            Val: NAN   Parent: <declaration>               Leaf: no   Node: <global_or_not>             Lexeme: ----                  Index: 42   ParentIndex: 41   
-Line: 21    Tok: TK_SEM          Val: NAN   Parent: <declaration>               Leaf: yes  Node: ----                        Lexeme: ;                     Index: 11   ParentIndex: 41   
-Line: -1    Tok: ----            Val: NAN   Parent: <declarations>              Leaf: no   Node: <declaration>               Lexeme: ----                  Index: 41   ParentIndex: 30   
-Line: 22    Tok: eps             Val: NAN   Parent: <declarations>              Leaf: yes  Node: ----                        Lexeme:                       Index: 6    ParentIndex: 30   
-Line: -1    Tok: ----            Val: NAN   Parent: <declarations>              Leaf: no   Node: <declarations>              Lexeme: ----                  Index: 30   ParentIndex: 30   
-Line: -1    Tok: ----            Val: NAN   Parent: <declarations>              Leaf: no   Node: <declarations>              Lexeme: ----                  Index: 30   ParentIndex: 30   
-Line: -1    Tok: ----            Val: NAN   Parent: <declarations>              Leaf: no   Node: <declarations>              Lexeme: ----                  Index: 30   ParentIndex: 30   
-Line: -1    Tok: ----            Val: NAN   Parent: <stmts>                     Leaf: no   Node: <declarations>              Lexeme: ----                  Index: 30   ParentIndex: 4    
-Line: 22    Tok: TK_ID           Val: NAN   Parent: <singleOrRecId>             Leaf: yes  Node: ----                        Lexeme: b3                    Index: 20   ParentIndex: 50   
-Line: 22    Tok: eps             Val: NAN   Parent: <singleOrRecIdPrime>        Leaf: yes  Node: ----                        Lexeme:                       Index: 6    ParentIndex: 53   
-Line: -1    Tok: ----            Val: NAN   Parent: <singleOrRecId>             Leaf: no   Node: <singleOrRecIdPrime>        Lexeme: ----                  Index: 53   ParentIndex: 50   
-Line: -1    Tok: ----            Val: NAN   Parent: <assignmentStmt>            Leaf: no   Node: <singleOrRecId>             Lexeme: ----                  Index: 50   ParentIndex: 46   
-Line: 22    Tok: TK_ASSIGNOP     Val: NAN   Parent: <assignmentStmt>            Leaf: yes  Node: ----                        Lexeme: <---                  Index: 51   ParentIndex: 46   
-Line: 22    Tok: TK_NUM          Val: 7     Parent: <allVar>                    Leaf: yes  Node: ----                        Lexeme: 7                     Index: 75   ParentIndex: 73   
-Line: -1    Tok: ----            Val: NAN   Parent: <factor>                    Leaf: no   Node: <allVar>                    Lexeme: ----                  Index: 73   ParentIndex: 80   
-Line: -1    Tok: ----            Val: NAN   Parent: <term>                      Leaf: no   Node: <factor>                    Lexeme: ----                  Index: 80   ParentIndex: 77   
-Line: 22    Tok: eps             Val: NAN   Parent: <termPrime>                 Leaf: yes  Node: ----                        Lexeme:                       Index: 6    ParentIndex: 81   
-Line: -1    Tok: ----            Val: NAN   Parent: <term>                      Leaf: no   Node: <termPrime>                 Lexeme: ----                  Index: 81   ParentIndex: 77   
-Line: -1    Tok: ----            Val: NAN   Parent: <arithmeticExpression>      Leaf: no   Node: <term>                      Lexeme: ----                  Index: 77   ParentIndex: 52   
-Line: 22    Tok: eps             Val: NAN   Parent: <expPrime>                  Leaf: yes  Node: ----                        Lexeme:                       Index: 6    ParentIndex: 78   
-Line: -1    Tok: ----            Val: NAN   Parent: <arithmeticExpression>      Leaf: no   Node: <expPrime>                  Lexeme: ----                  Index: 78   ParentIndex: 52   
-Line: -1    Tok: ----            Val: NAN   Parent: <assignmentStmt>            Leaf: no   Node: <arithmeticExpression>      Lexeme: ----                  Index: 52   ParentIndex: 46   
-Line: 22    Tok: TK_SEM          Val: NAN   Parent: <assignmentStmt>            Leaf: yes  Node: ----                        Lexeme: ;                     Index: 11   ParentIndex: 46   
-Line: -1    Tok: ----            Val: NAN   Parent: <stmt>                      Leaf: no   Node: <assignmentStmt>            Lexeme: ----                  Index: 46   ParentIndex: 44   
-Line: -1    Tok: ----            Val: NAN   Parent: <otherStmts>                Leaf: no   Node: <stmt>                      Lexeme: ----                  Index: 44   ParentIndex: 31   
-Line: 23    Tok: TK_READ         Val: NAN   Parent: <ioStmt>                    Leaf: yes  Node: ----                        Lexeme: read                  Index: 71   ParentIndex: 49   
-Line: 23    Tok: TK_OP           Val: NAN   Parent: <ioStmt>                    Leaf: yes  Node: ----                        Lexeme: (                     Index: 62   ParentIndex: 49   
-Line: 23    Tok: TK_ID           Val: NAN   Parent: <singleOrRecId>             Leaf: yes  Node: ----                        Lexeme: c2                    Index: 20   ParentIndex: 50   
-Line: 23    Tok: eps             Val: NAN   Parent: <singleOrRecIdPrime>        Leaf: yes  Node: ----                        Lexeme:                       Index: 6    ParentIndex: 53   
-Line: -1    Tok: ----            Val: NAN   Parent: <singleOrRecId>             Leaf: no   Node: <singleOrRecIdPrime>        Lexeme: ----                  Index: 53   ParentIndex: 50   
-Line: -1    Tok: ----            Val: NAN   Parent: <ioStmt>                    Leaf: no   Node: <singleOrRecId>             Lexeme: ----                  Index: 50   ParentIndex: 49   
-Line: 23    Tok: TK_CL           Val: NAN   Parent: <ioStmt>                    Leaf: yes  Node: ----                        Lexeme: )                     Index: 64   ParentIndex: 49   
-Line: 23    Tok: TK_SEM          Val: NAN   Parent: <ioStmt>                    Leaf: yes  Node: ----                        Lexeme: ;                     Index: 11   ParentIndex: 49   
+Line: 8     Tok: TK_CL           Val: NAN   Parent: <ioStmt>                    Leaf: yes  Node: ----                        Lexeme: )                     Index: 64   ParentIndex: 49   
+Line: 8     Tok: TK_SEM          Val: NAN   Parent: <ioStmt>                    Leaf: yes  Node: ----                        Lexeme: ;                     Index: 11   ParentIndex: 49   
 Line: -1    Tok: ----            Val: NAN   Parent: <stmt>                      Leaf: no   Node: <ioStmt>                    Lexeme: ----                  Index: 49   ParentIndex: 44   
 Line: -1    Tok: ----            Val: NAN   Parent: <otherStmts>                Leaf: no   Node: <stmt>                      Lexeme: ----                  Index: 44   ParentIndex: 31   
-Line: 24    Tok: TK_SQL          Val: NAN   Parent: <outputParameters>          Leaf: yes  Node: ----                        Lexeme: [                     Index: 15   ParentIndex: 55   
-Line: 24    Tok: TK_ID           Val: NAN   Parent: <idList>                    Leaf: yes  Node: ----                        Lexeme: c4bd56                Index: 20   ParentIndex: 60   
-Line: 24    Tok: eps             Val: NAN   Parent: <more_ids>                  Leaf: yes  Node: ----                        Lexeme:                       Index: 6    ParentIndex: 101  
-Line: -1    Tok: ----            Val: NAN   Parent: <idList>                    Leaf: no   Node: <more_ids>                  Lexeme: ----                  Index: 101  ParentIndex: 60   
-Line: -1    Tok: ----            Val: NAN   Parent: <outputParameters>          Leaf: no   Node: <idList>                    Lexeme: ----                  Index: 60   ParentIndex: 55   
-Line: 24    Tok: TK_SQR          Val: NAN   Parent: <outputParameters>          Leaf: yes  Node: ----                        Lexeme: ]                     Index: 17   ParentIndex: 55   
-Line: 24    Tok: TK_ASSIGNOP     Val: NAN   Parent: <outputParameters>          Leaf: yes  Node: ----                        Lexeme: <---                  Index: 51   ParentIndex: 55   
-Line: -1    Tok: ----            Val: NAN   Parent: <funCallStmt>               Leaf: no   Node: <outputParameters>          Lexeme: ----                  Index: 55   ParentIndex: 45   
-Line: 24    Tok: TK_CALL         Val: NAN   Parent: <funCallStmt>               Leaf: yes  Node: ----                        Lexeme: call                  Index: 56   ParentIndex: 45   
-Line: 24    Tok: TK_FUNID        Val: NAN   Parent: <funCallStmt>               Leaf: yes  Node: ----                        Lexeme: _sumN                 Index: 8    ParentIndex: 45   
-Line: 24    Tok: TK_WITH         Val: NAN   Parent: <funCallStmt>               Leaf: yes  Node: ----                        Lexeme: with                  Index: 57   ParentIndex: 45   
-Line: 24    Tok: TK_PARAMETERS   Val: NAN   Parent: <funCallStmt>               Leaf: yes  Node: ----                        Lexeme: parameters            Index: 58   ParentIndex: 45   
-Line: 24    Tok: TK_SQL          Val: NAN   Parent: <inputParameters>           Leaf: yes  Node: ----                        Lexeme: [                     Index: 15   ParentIndex: 59   
-Line: 24    Tok: TK_ID           Val: NAN   Parent: <idList>                    Leaf: yes  Node: ----                        Lexeme: c2                    Index: 20   ParentIndex: 60   
-Line: 24    Tok: eps             Val: NAN   Parent: <more_ids>                  Leaf: yes  Node: ----                        Lexeme:                       Index: 6    ParentIndex: 101  
-Line: -1    Tok: ----            Val: NAN   Parent: <idList>                    Leaf: no   Node: <more_ids>                  Lexeme: ----                  Index: 101  ParentIndex: 60   
-Line: -1    Tok: ----            Val: NAN   Parent: <inputParameters>           Leaf: no   Node: <idList>                    Lexeme: ----                  Index: 60   ParentIndex: 59   
-Line: 24    Tok: TK_SQR          Val: NAN   Parent: <inputParameters>           Leaf: yes  Node: ----                        Lexeme: ]                     Index: 17   ParentIndex: 59   
-Line: -1    Tok: ----            Val: NAN   Parent: <funCallStmt>               Leaf: no   Node: <inputParameters>           Lexeme: ----                  Index: 59   ParentIndex: 45   
-Line: 24    Tok: TK_SEM          Val: NAN   Parent: <funCallStmt>               Leaf: yes  Node: ----                        Lexeme: ;                     Index: 11   ParentIndex: 45   
-Line: -1    Tok: ----            Val: NAN   Parent: <stmt>                      Leaf: no   Node: <funCallStmt>               Lexeme: ----                  Index: 45   ParentIndex: 44   
-Line: -1    Tok: ----            Val: NAN   Parent: <otherStmts>                Leaf: no   Node: <stmt>                      Lexeme: ----                  Index: 44   ParentIndex: 31   
-Line: 25    Tok: TK_WRITE        Val: NAN   Parent: <ioStmt>                    Leaf: yes  Node: ----                        Lexeme: write                 Index: 72   ParentIndex: 49   
-Line: 25    Tok: TK_OP           Val: NAN   Parent: <ioStmt>                    Leaf: yes  Node: ----                        Lexeme: (                     Index: 62   ParentIndex: 49   
-Line: 25    Tok: TK_ID           Val: NAN   Parent: <allVar>                    Leaf: yes  Node: ----                        Lexeme: c4bd56                Index: 20   ParentIndex: 73   
-Line: 25    Tok: eps             Val: NAN   Parent: <allVarPrime>               Leaf: yes  Node: ----                        Lexeme:                       Index: 6    ParentIndex: 74   
+Line: 9     Tok: TK_WRITE        Val: NAN   Parent: <ioStmt>                    Leaf: yes  Node: ----                        Lexeme: write                 Index: 72   ParentIndex: 49   
+Line: 9     Tok: TK_OP           Val: NAN   Parent: <ioStmt>                    Leaf: yes  Node: ----                        Lexeme: (                     Index: 62   ParentIndex: 49   
+Line: 9     Tok: TK_ID           Val: NAN   Parent: <allVar>                    Leaf: yes  Node: ----                        Lexeme: c4bd56                Index: 20   ParentIndex: 73   
+Line: 9     Tok: eps             Val: NAN   Parent: <allVarPrime>               Leaf: yes  Node: ----                        Lexeme:                       Index: 6    ParentIndex: 74   
 Line: -1    Tok: ----            Val: NAN   Parent: <allVar>                    Leaf: no   Node: <allVarPrime>               Lexeme: ----                  Index: 74   ParentIndex: 73   
 Line: -1    Tok: ----            Val: NAN   Parent: <ioStmt>                    Leaf: no   Node: <allVar>                    Lexeme: ----                  Index: 73   ParentIndex: 49   
-Line: 25    Tok: TK_CL           Val: NAN   Parent: <ioStmt>                    Leaf: yes  Node: ----                        Lexeme: )                     Index: 64   ParentIndex: 49   
-Line: 25    Tok: TK_SEM          Val: NAN   Parent: <ioStmt>                    Leaf: yes  Node: ----                        Lexeme: ;                     Index: 11   ParentIndex: 49   
+Line: 9     Tok: TK_CL           Val: NAN   Parent: <ioStmt>                    Leaf: yes  Node: ----                        Lexeme: )                     Index: 64   ParentIndex: 49   
+Line: 9     Tok: TK_SEM          Val: NAN   Parent: <ioStmt>                    Leaf: yes  Node: ----                        Lexeme: ;                     Index: 11   ParentIndex: 49   
 Line: -1    Tok: ----            Val: NAN   Parent: <stmt>                      Leaf: no   Node: <ioStmt>                    Lexeme: ----                  Index: 49   ParentIndex: 44   
 Line: -1    Tok: ----            Val: NAN   Parent: <otherStmts>                Leaf: no   Node: <stmt>                      Lexeme: ----                  Index: 44   ParentIndex: 31   
-Line: 26    Tok: eps             Val: NAN   Parent: <otherStmts>                Leaf: yes  Node: ----                        Lexeme:                       Index: 6    ParentIndex: 31   
-Line: -1    Tok: ----            Val: NAN   Parent: <otherStmts>                Leaf: no   Node: <otherStmts>                Lexeme: ----                  Index: 31   ParentIndex: 31   
+Line: 10    Tok: eps             Val: NAN   Parent: <otherStmts>                Leaf: yes  Node: ----                        Lexeme:                       Index: 6    ParentIndex: 31   
 Line: -1    Tok: ----            Val: NAN   Parent: <otherStmts>                Leaf: no   Node: <otherStmts>                Lexeme: ----                  Index: 31   ParentIndex: 31   
 Line: -1    Tok: ----            Val: NAN   Parent: <otherStmts>                Leaf: no   Node: <otherStmts>                Lexeme: ----                  Index: 31   ParentIndex: 31   
 Line: -1    Tok: ----            Val: NAN   Parent: <otherStmts>                Leaf: no   Node: <otherStmts>                Lexeme: ----                  Index: 31   ParentIndex: 31   
 Line: -1    Tok: ----            Val: NAN   Parent: <stmts>                     Leaf: no   Node: <otherStmts>                Lexeme: ----                  Index: 31   ParentIndex: 4    
-Line: 26    Tok: TK_RETURN       Val: NAN   Parent: <returnStmt>                Leaf: yes  Node: ----                        Lexeme: return                Index: 99   ParentIndex: 32   
-Line: 26    Tok: eps             Val: NAN   Parent: <optionalReturn>            Leaf: yes  Node: ----                        Lexeme:                       Index: 6    ParentIndex: 100  
+Line: 10    Tok: TK_RETURN       Val: NAN   Parent: <returnStmt>                Leaf: yes  Node: ----                        Lexeme: return                Index: 99   ParentIndex: 32   
+Line: 10    Tok: eps             Val: NAN   Parent: <optionalReturn>            Leaf: yes  Node: ----                        Lexeme:                       Index: 6    ParentIndex: 100  
 Line: -1    Tok: ----            Val: NAN   Parent: <returnStmt>                Leaf: no   Node: <optionalReturn>            Lexeme: ----                  Index: 100  ParentIndex: 32   
-Line: 26    Tok: TK_SEM          Val: NAN   Parent: <returnStmt>                Leaf: yes  Node: ----                        Lexeme: ;                     Index: 11   ParentIndex: 32   
+Line: 10    Tok: TK_SEM          Val: NAN   Parent: <returnStmt>                Leaf: yes  Node: ----                        Lexeme: ;                     Index: 11   ParentIndex: 32   
 Line: -1    Tok: ----            Val: NAN   Parent: <stmts>                     Leaf: no   Node: <returnStmt>                Lexeme: ----                  Index: 32   ParentIndex: 4    
 Line: -1    Tok: ----            Val: NAN   Parent: <mainFunction>              Leaf: no   Node: <stmts>                     Lexeme: ----                  Index: 4    ParentIndex: 2    
-Line: 27    Tok: TK_END          Val: NAN   Parent: <mainFunction>              Leaf: yes  Node: ----                        Lexeme: end                   Index: 5    ParentIndex: 2    
+Line: 11    Tok: TK_END          Val: NAN   Parent: <mainFunction>              Leaf: yes  Node: ----                        Lexeme: end                   Index: 5    ParentIndex: 2    
 Line: -1    Tok: ----            Val: NAN   Parent: <program>                   Leaf: no   Node: <mainFunction>              Lexeme: ----                  Index: 2    ParentIndex: 0    
 Line: -1    Tok: (null)          Val: NAN   Parent: (null)                      Leaf: no   Node: <program>                   Lexeme: ----                  Index: 0    ParentIndex: -1   

@@ -109,6 +109,7 @@ int main(int argc, char *argv[])
     parsetree = (char *)malloc(sizeof(char) * 100);
 
     FILE *asmfile;
+    int isopen = 0;
     
     if (success == 1){
         fp1 = fopen("parsetree.txt","w+");
@@ -117,6 +118,7 @@ int main(int argc, char *argv[])
         makeAST(pt->head,newRules,NULL);
         dfsp(pt->head, &astnodecount);
         asmfile = fopen(argv[2],"w");
+        isopen = 1;
         success2 = makeScopeTables(pt->head,rht,afht,globalScope,q,p1[1],asmfile); //change the last parameter
         close(p1[1]);
         semanticmessage = (char *)malloc(sizeof(char)*100000);
@@ -235,7 +237,16 @@ int main(int argc, char *argv[])
                 break;
 
             case '7':
-                printf("Generated <%s> file.\n", argv[2]);
+                if (success2 == 1){
+                    printf("Generated <%s> file.\n", argv[2]);
+                    if (isopen == 1){
+                        fclose(asmfile);
+                        isopen = 0;
+                    }
+                }
+                else {
+                    printf("Couldn't generate file <%s> since code had syntactic or semantic mistakes.\n", argv[2]);
+                }
                 break;
             default:
                 printf("Exiting Compiler Project. It was a nice learning experience :)\n");

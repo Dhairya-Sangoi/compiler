@@ -4529,10 +4529,10 @@ int makeScopeTables(ASTNode *head, recordsHashTable *rht, allFunctionsHashTable 
 
     scopeHashTable *currentScope = searchEntryAllFunctionsHashTable("_main",afht)->data->scope;
 
-    printf("\n\nmaxoffset: %d\n\n", *maxoffset);
+    //printf("\n\nmaxoffset: %d\n\n", *maxoffset);
     *maxoffset += globalScope->offset;
     *maxoffset += currentScope->offset;
-    printf("\n\nmaxoffset: %d\n\n", *maxoffset);
+    //printf("\n\nmaxoffset: %d\n\n", *maxoffset);
 
     reg *rg[20];
     rg[0] = createRegisterEntry(EAX,"EAX");

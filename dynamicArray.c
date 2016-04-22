@@ -50,6 +50,7 @@ int searchEntryDynamicArrayAux(int lbl, int *arr, int start, int end){
 }
 
 int searchEntryDynamicArray(int lbl, dynamicArray *da){
+    //return 1;
     return searchEntryDynamicArrayAux(lbl, da->arr, 0, da->size - 1);
 }
 

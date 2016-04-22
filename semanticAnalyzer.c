@@ -491,7 +491,7 @@ void dfsForScopeTables(ASTNode *head, recordsHashTable *rht, allFunctionsHashTab
                 fprintf(fp,"Line <%d>: The identifier <%s> is declared more than once.\n", child2->lineno, child2->lexemeCurrentNode);
                 *success = 0;
             }
-            IONode **headptr = ion;
+            //IONode **headptr = ion;
             *ion = createIONode(child1->lexemeCurrentNode, child2->lexemeCurrentNode);
             dfsForScopeTables(child3,rht,afht,currentScope,globalScope,NULL,NULL,&((*ion)->next),NULL,fname, offset,fp,success);
             break;
@@ -597,7 +597,7 @@ void dfsForScopeTables(ASTNode *head, recordsHashTable *rht, allFunctionsHashTab
         {
             ASTNode *child1 = head->child;
             ASTNode *child2 = child1->next;
-            ASTNode *child3 = child2->next;
+            //ASTNode *child3 = child2->next;
             if (strcmp(fname,child2->lexemeCurrentNode) == 0){
                 fprintf(fp,"Line <%d>: The funcion <%s> is invoked recursively.\n", child2->lineno, child2->lexemeCurrentNode);
                 *success = 0;
@@ -2064,7 +2064,7 @@ void dfsForSemanticAnalysis(ASTNode *head, recordsHashTable *rht, allFunctionsHa
             }
 
             if (strcmp(*argtype,"error") == 0 && child1->index == ALLVAR && child2->index == ALLVAR){
-                fprintf(fp,"Line <%d>: The lhs type <%s> for <%s> is not same as the rhs type <%s> for <%s>.\n",child1->child->lineno, arg1, child1->child->lexemeCurrentNode, arg2, child2->child->lexemeCurrentNode);
+                fprintf(fp,"Line <%d>: The lhs type <%s> for <%s> and rhs type <%s> for <%s> are not compatible.\n",child1->child->lineno, arg1, child1->child->lexemeCurrentNode, arg2, child2->child->lexemeCurrentNode);
             }
 
 
@@ -2398,17 +2398,32 @@ void dfsForSemanticAnalysis(ASTNode *head, recordsHashTable *rht, allFunctionsHa
                 addEntryQuadruple(q,JUMP,UNION_LABEL,-1,-1,&beglabel,NULL,NULL,mylbl4);
                 addEntryDynamicArray(beglabel,da);
                 if (tailWhile->isChanged == 0){
-                    scopeHashTable *wsht = tailWhile->wsht;
+                    //scopeHashTable *wsht = tailWhile->wsht;
                     int l = -1;
-                    int i;
+                    int r = -1;
+                    ASTNode *temper = head->child;
+                    while (temper->child!=NULL){
+                        temper = temper->child;
+                    }
+                    l = temper->lineno;
+                    temper = (head->child->next->next != NULL && head->child->next->next->index != EPS) ? head->child->next->next : head->child->next;
+                    while (temper->child != NULL){
+                        temper = temper->child;
+                        while (temper->next != NULL && temper->next->index != EPS){
+                            temper = temper->next;
+                        }
+                    }
+                    r = temper->lineno;
+                    //int i;
+                    /*
                     for (i=0;i<wsht->tableSize;i++){
                         if (wsht->arr[i] != NULL && wsht->arr[i] != wsht->specialValue && wsht->arr[i]->data != NULL){
                             l = wsht->arr[i]->data->head->lineno;
                             break;
                         }
-                    }
+                    }*/
                     *success = 0; 
-                    fprintf(fp,"Line <%d>: None of the variables participating in the iterations of the while loop gets updated.\n", l);
+                    fprintf(fp,"Line <%d>-<%d>: None of the variables participating in the iterations of the while loop gets updated.\n", l, r+1);
                     //printf("Error 15:A  while statement  must redefine the variable that participates in the iterations\n");
                 }
             }
@@ -2428,7 +2443,7 @@ void dfsForSemanticAnalysis(ASTNode *head, recordsHashTable *rht, allFunctionsHa
             ASTNode *singrec = head->next;
             ASTNode *arg = (singrec->child->next->index == EPS) ? singrec->child :  singrec;
             //scopeHashNode *shn = (singrec->child->next->index == EPS) ?
-            int argtype,opcode;
+            int opcode; //removed argtype
             if (arg == singrec){ //reading in one of the fields of record
                 scopeHashNode *shn = searchEntryScopeHashTable(singrec->child->lexemeCurrentNode,currentScope);
                 if (shn == NULL){
@@ -2561,12 +2576,14 @@ void makeCode(quadrupleNode *qn, scopeHashTable *currentScope, scopeHashTable *g
         case LABEL:
             {
                 fprintf(fp,"l%d:\n",qn->label);
+                flushRegisters(registers,total_registers);
                 break;
             }
         case JUMP:
             {
                 if (searchEntryDynamicArray(qn->label,usedLabels) == 1){
                     fprintf(fp,"l%d:\n",qn->label);
+                    flushRegisters(registers,total_registers);
                 }
                 fprintf(fp,"\tjmp l%d\n", qn->arg1->data->jump_label);
                 break;
@@ -2580,6 +2597,7 @@ void makeCode(quadrupleNode *qn, scopeHashTable *currentScope, scopeHashTable *g
             {
                 if (searchEntryDynamicArray(qn->label,usedLabels) == 1){
                     fprintf(fp,"l%d:\n",qn->label);
+                    flushRegisters(registers,total_registers);
                 }
                 if (qn->arg1->type == UNION_INT && qn->arg2->type == UNION_INT){
                     int reg1 = getEmptyRegister(registers);
@@ -2711,6 +2729,7 @@ void makeCode(quadrupleNode *qn, scopeHashTable *currentScope, scopeHashTable *g
             {
                 if (searchEntryDynamicArray(qn->label,usedLabels) == 1){
                     fprintf(fp,"l%d:\n",qn->label);
+                    flushRegisters(registers,total_registers);
                 }
                 if (qn->arg1->type == UNION_INT && qn->arg2->type == UNION_INT){
                     int reg1 = getEmptyRegister(registers);
@@ -2788,6 +2807,7 @@ void makeCode(quadrupleNode *qn, scopeHashTable *currentScope, scopeHashTable *g
             {
                 if (searchEntryDynamicArray(qn->label,usedLabels) == 1){
                     fprintf(fp,"l%d:\n",qn->label);
+                    flushRegisters(registers,total_registers);
                 }
                 if (qn->arg1->type == UNION_INT && qn->arg2->type == UNION_INT){
                     int reg1 = getEmptyRegister(registers);
@@ -2859,6 +2879,7 @@ void makeCode(quadrupleNode *qn, scopeHashTable *currentScope, scopeHashTable *g
             {
                 if (searchEntryDynamicArray(qn->label,usedLabels) == 1){
                     fprintf(fp,"l%d:\n",qn->label);
+                    flushRegisters(registers,total_registers);
                 }
                 if (qn->arg1->type == UNION_INT && qn->arg2->type == UNION_INT){
                     int reg1 = getEmptyRegister(registers);
@@ -2937,10 +2958,12 @@ void makeCode(quadrupleNode *qn, scopeHashTable *currentScope, scopeHashTable *g
             {
                 if (searchEntryDynamicArray(qn->label,usedLabels) == 1){
                     fprintf(fp,"l%d:\n",qn->label);
+                    flushRegisters(registers,total_registers);
                 }
                 if (qn->arg1->type == UNION_INT && qn->arg2->type == UNION_INT){
-                    fprintf(fp,"\tmov EDX, 0\n");
+                    //fprintf(fp,"\tmov EDX, 0\n");
                     fprintf(fp,"\tmov EAX, %d\n", qn->arg1->data->int_val);
+                    fprintf(fp,"\tcdq\n");
                     registers[EAX]->offsetIfPresent = 1;
                     registers[EDX]->offsetIfPresent = 1;
                     int reg1 = getEmptyRegister(registers);
@@ -2956,7 +2979,7 @@ void makeCode(quadrupleNode *qn, scopeHashTable *currentScope, scopeHashTable *g
                     registers[EAX]->offsetIfPresent = offset2;
                 }
                 else if (qn->arg1->type != UNION_INT && qn->arg2->type == UNION_INT){
-                    fprintf(fp,"\tmov EDX, 0\n");
+                    //fprintf(fp,"\tmov EDX, 0\n");
                     int offset1 = getOffset(qn->arg1,qn->opcode,currentScope,globalScope,rht,NULL);
                     int reg1 = searchRegister(registers,total_registers,offset1);
                     if (reg1 == -1){
@@ -2966,6 +2989,7 @@ void makeCode(quadrupleNode *qn, scopeHashTable *currentScope, scopeHashTable *g
                     else {
                         fprintf(fp,"\tmov EAX, %s\n", registers[reg1]->regName);
                     }
+                    fprintf(fp,"\tcdq\n");
                     int reg2 = getEmptyRegister(registers);
                     if (reg2 == -1){
                         reg2 = EDI;
@@ -2977,8 +3001,9 @@ void makeCode(quadrupleNode *qn, scopeHashTable *currentScope, scopeHashTable *g
                     registers[EAX]->offsetIfPresent = offset2;
                 }
                 else if (qn->arg1->type == UNION_INT && qn->arg2->type != UNION_INT){
-                    fprintf(fp,"\tmov EDX, 0\n");
+                    //fprintf(fp,"\tmov EDX, 0\n");
                     fprintf(fp,"\tmov EAX, %d\n", qn->arg1->data->int_val);
+                    fprintf(fp,"\tcdq\n");
                     int offset1 = getOffset(qn->arg2,qn->opcode,currentScope,globalScope,rht,NULL);
                     int reg1 = searchRegister(registers,total_registers,offset1);
                     if (reg1 == -1){
@@ -2992,7 +3017,7 @@ void makeCode(quadrupleNode *qn, scopeHashTable *currentScope, scopeHashTable *g
                     registers[EAX]->offsetIfPresent = offset2;
                 }
                 else {
-                    fprintf(fp,"\tmov EDX, 0\n");
+                    //fprintf(fp,"\tmov EDX, 0\n");
                     int offset1 = getOffset(qn->arg1,qn->opcode,currentScope,globalScope,rht,NULL);
                     int reg1 = searchRegister(registers,total_registers,offset1);
                     if (reg1 == -1){
@@ -3002,6 +3027,7 @@ void makeCode(quadrupleNode *qn, scopeHashTable *currentScope, scopeHashTable *g
                     else {
                         fprintf(fp,"\tmov EAX, %s\n", registers[reg1]->regName);
                     }
+                    fprintf(fp,"\tcdq\n");
                     fprintf(fp,"\tidiv   dword [programdata + %d]\n", getOffset(qn->arg2,qn->opcode,currentScope,globalScope,rht,NULL));
                     int offset2 = getOffset(qn->result,qn->opcode,currentScope,globalScope,rht,NULL);
                     fprintf(fp,"\tmov dword [programdata + %d], EAX\n", offset2 );
@@ -3013,6 +3039,7 @@ void makeCode(quadrupleNode *qn, scopeHashTable *currentScope, scopeHashTable *g
             {
                 if (searchEntryDynamicArray(qn->label,usedLabels)){
                     fprintf(fp,"l%d:\n",qn->label);
+                    flushRegisters(registers,total_registers);
                 }
                 if (qn->arg1->type == UNION_INT){
                     fprintf(fp,"\tmov dword [programdata + %d], %d\n", getOffset(qn->result,qn->opcode,currentScope,globalScope,rht,NULL), qn->arg1->data->int_val);
@@ -3041,6 +3068,7 @@ void makeCode(quadrupleNode *qn, scopeHashTable *currentScope, scopeHashTable *g
             {
                 if (searchEntryDynamicArray(qn->label,usedLabels) == 1){
                     fprintf(fp,"l%d:\n",qn->label);
+                    flushRegisters(registers,total_registers);
                 }
                 if (qn->arg1->type == UNION_REAL && qn->arg2->type == UNION_REAL){
                     int reg1 = getEmptyRegister(registers);
@@ -3162,6 +3190,7 @@ void makeCode(quadrupleNode *qn, scopeHashTable *currentScope, scopeHashTable *g
             {
                 if (searchEntryDynamicArray(qn->label,usedLabels) == 1){
                     fprintf(fp,"l%d:\n",qn->label);
+                    flushRegisters(registers,total_registers);
                 }
                 if (qn->arg1->type == UNION_REAL && qn->arg2->type == UNION_REAL){
                     int reg1 = getEmptyRegister(registers);
@@ -3277,6 +3306,7 @@ void makeCode(quadrupleNode *qn, scopeHashTable *currentScope, scopeHashTable *g
             {
                 if (searchEntryDynamicArray(qn->label,usedLabels) == 1){
                     fprintf(fp,"l%d:\n",qn->label);
+                    flushRegisters(registers,total_registers);
                 }
                 if (qn->arg1->type == UNION_REAL && qn->arg2->type == UNION_REAL){
                     int reg1 = getEmptyRegister(registers);
@@ -3401,6 +3431,7 @@ void makeCode(quadrupleNode *qn, scopeHashTable *currentScope, scopeHashTable *g
             {
                 if (searchEntryDynamicArray(qn->label,usedLabels) == 1){
                     fprintf(fp,"l%d:\n",qn->label);
+                    flushRegisters(registers,total_registers);
                 }
                 if (qn->arg1->type == UNION_REAL && qn->arg2->type == UNION_REAL){
                     int reg1 = getEmptyRegister(registers);
@@ -3525,6 +3556,7 @@ void makeCode(quadrupleNode *qn, scopeHashTable *currentScope, scopeHashTable *g
             {
                 if (searchEntryDynamicArray(qn->label,usedLabels) == 1){
                     fprintf(fp,"l%d:\n",qn->label);
+                    flushRegisters(registers,total_registers);
                 }
                 if (qn->arg1->type == UNION_REAL && qn->arg2->type == UNION_REAL){
                     int reg1 = getEmptyRegister(registers);
@@ -3649,6 +3681,7 @@ void makeCode(quadrupleNode *qn, scopeHashTable *currentScope, scopeHashTable *g
             {
                 if (searchEntryDynamicArray(qn->label,usedLabels) == 1){
                     fprintf(fp,"l%d:\n",qn->label);
+                    flushRegisters(registers,total_registers);
                 }
                 if (qn->arg1->type == UNION_REAL && qn->arg2->type == UNION_REAL){
                     int reg1 = getEmptyRegister(registers);
@@ -3773,6 +3806,7 @@ void makeCode(quadrupleNode *qn, scopeHashTable *currentScope, scopeHashTable *g
             {
                 if (searchEntryDynamicArray(qn->label,usedLabels)){
                     fprintf(fp,"l%d:\n",qn->label);
+                    flushRegisters(registers,total_registers);
                 }
                 if (qn->arg1->type == UNION_REAL){
                     float data1 = qn->arg1->data->real_val;
@@ -3822,6 +3856,7 @@ void makeCode(quadrupleNode *qn, scopeHashTable *currentScope, scopeHashTable *g
             {
                 if (searchEntryDynamicArray(qn->label,usedLabels) == 1){
                     fprintf(fp,"l%d:\n",qn->label);
+                    flushRegisters(registers,total_registers);
                 }
                 if (qn->arg1->type == UNION_REAL && qn->arg2->type == UNION_REAL){
                     int reg1 = getEmptyRegister(registers);
@@ -4034,6 +4069,7 @@ void makeCode(quadrupleNode *qn, scopeHashTable *currentScope, scopeHashTable *g
             {
                 if (searchEntryDynamicArray(qn->label,usedLabels) == 1){
                     fprintf(fp,"l%d:\n",qn->label);
+                    flushRegisters(registers,total_registers);
                 }
                 if (qn->arg1->type == UNION_REAL && qn->arg2->type == UNION_REAL){
                     int reg1 = getEmptyRegister(registers);
@@ -4233,6 +4269,7 @@ void makeCode(quadrupleNode *qn, scopeHashTable *currentScope, scopeHashTable *g
             {
                 if (searchEntryDynamicArray(qn->label,usedLabels) == 1){
                     fprintf(fp,"l%d:\n",qn->label);
+                    flushRegisters(registers,total_registers);
                 }
                 if (qn->arg1->type == UNION_REAL || qn->arg2->type == UNION_REAL){
                     float data2;
@@ -4455,6 +4492,79 @@ void makeCode(quadrupleNode *qn, scopeHashTable *currentScope, scopeHashTable *g
                 break;
             }
         
+        case READ_INT:
+            {
+                if (searchEntryDynamicArray(qn->label,usedLabels) == 1){
+                    fprintf(fp,"l%d:\n",qn->label);
+                    flushRegisters(registers,total_registers);
+                }
+                int offset1 = getOffset(qn->arg1,qn->opcode,currentScope,globalScope,rht,NULL);
+
+
+                fprintf(fp,"\tpusha\n");
+                fprintf(fp,"\tpush programdata + %d\n", offset1);
+                fprintf(fp,"\tpush formatscan\n");
+                fprintf(fp,"\tcall scanf\n");
+                fprintf(fp,"\tadd esp, 8\n");
+                fprintf(fp,"\tpopa\n");
+                break;
+            }
+        
+        case WRITE_INT:
+            {
+                if (searchEntryDynamicArray(qn->label,usedLabels) == 1){
+                    fprintf(fp,"l%d:\n",qn->label);
+                    flushRegisters(registers,total_registers);
+                }
+                int offset1 = getOffset(qn->arg1,qn->opcode,currentScope,globalScope,rht,NULL);
+
+
+                fprintf(fp,"\tpusha\n");
+                fprintf(fp,"\tpush dword [programdata + %d]\n", offset1);
+                fprintf(fp,"\tpush formatprint\n");
+                fprintf(fp,"\tcall printf\n");
+                fprintf(fp,"\tadd esp, 8\n");
+                fprintf(fp,"\tpopa\n");
+                break;
+            }
+        
+
+        case READ_REAL:
+            {
+                if (searchEntryDynamicArray(qn->label,usedLabels) == 1){
+                    fprintf(fp,"l%d:\n",qn->label);
+                    flushRegisters(registers,total_registers);
+                }
+                int offset1 = getOffset(qn->arg1,qn->opcode,currentScope,globalScope,rht,NULL);
+
+                fprintf(fp,"\tpusha\n");
+                fprintf(fp,"\tpush programdata + %d\n", offset1);
+                fprintf(fp,"\tpush formatscanreal\n");
+                fprintf(fp,"\tcall scanf\n");
+                fprintf(fp,"\tadd esp, 8\n");
+                fprintf(fp,"\tpopa\n");
+                break;
+            }
+        
+        case WRITE_REAL:
+            {
+                if (searchEntryDynamicArray(qn->label,usedLabels) == 1){
+                    fprintf(fp,"l%d:\n",qn->label);
+                    flushRegisters(registers,total_registers);
+                }
+                int offset1 = getOffset(qn->arg1,qn->opcode,currentScope,globalScope,rht,NULL);
+
+                fprintf(fp,"\tpusha\n");
+                fprintf(fp,"\tpush dword [programdata + %d]\n", offset1);
+                fprintf(fp,"\tpush formatprintreal\n");
+                fprintf(fp,"\tcall printf\n");
+                fprintf(fp,"\tadd esp, 8\n");
+                fprintf(fp,"\tpopa\n");
+                break;
+            }
+
+
+
         }//end switch for opcode
 
 }
@@ -4514,6 +4624,12 @@ int makeScopeTables(ASTNode *head, recordsHashTable *rht, allFunctionsHashTable 
         //*p = NULL;
         //return 0;
     }
+
+    int hasOtherFunctions = 0;
+    if (head->child->index != EPS){
+        hasOtherFunctions = 1;
+    }
+
     //printDynamicArray(da);
     sortDynamicArray(da);
     //printDynamicArray(da);
@@ -4524,7 +4640,8 @@ int makeScopeTables(ASTNode *head, recordsHashTable *rht, allFunctionsHashTable 
 
 
     //printQuadruple(q);
-    if (*success == 1){
+    //exit(0); //to be commented
+    if (*success == 1 && hasOtherFunctions == 0){
 
 
     scopeHashTable *currentScope = searchEntryAllFunctionsHashTable("_main",afht)->data->scope;
@@ -4560,7 +4677,13 @@ int makeScopeTables(ASTNode *head, recordsHashTable *rht, allFunctionsHashTable 
     FILE *fp = asmfile;//fopen("code.asm","w");
     
     {
+        fprintf(fp,"\textern printf\n");
+        fprintf(fp,"\textern scanf\n");
         fprintf(fp,"\tSECTION .data\n");
+        fprintf(fp,"\t\tformatscan db '%%d', 0\n");//used for scanf
+        fprintf(fp,"\t\tformatscanreal db '%%f', 0\n");//used for scanf
+        fprintf(fp,"\t\tformatprint db '%%d', 10, 0\n");//used for printf
+        fprintf(fp,"\t\tformatprintreal db '%%f', 10, 0\n");//used for printf
         fprintf(fp,"\tSECTION .bss\n");
         fprintf(fp,"programdata\tresd\t%d\n", *maxoffset);
         fprintf(fp,"\tSECTION .text\n");
@@ -4617,6 +4740,11 @@ int makeScopeTables(ASTNode *head, recordsHashTable *rht, allFunctionsHashTable 
                 temp->arg1->data = (operand *)malloc(sizeof(operand));
                 temp->arg2->data = (operand *)malloc(sizeof(operand));
                 temp->result->data = (operand *)malloc(sizeof(operand));
+
+                if (searchEntryDynamicArray(qn->label,da) == 1){
+                    fprintf(fp,"l%d:\n",qn->label);
+                    flushRegisters(rg,20);
+                }
                 
                 //temp->arg1->type = UNION_OFFSET;
                 //temp->arg2->type = UNION_OFFSET;
@@ -4769,7 +4897,7 @@ int makeScopeTables(ASTNode *head, recordsHashTable *rht, allFunctionsHashTable 
 
                             if (flagint == 1 && temp->opcode == MULT_REAL){
                                 int off = (flag == 1) ? offarg1 + 4 : offarg2 + 4;
-                                fprintf(fp,"\tmov ESP, dword [programdata + %d]\n", off);
+                                fprintf(fp,"\tmov EBP, dword [programdata + %d]\n", off);
                                 fprintf(fp,"\tmov dword [programdata + %d], 0\n", off);
                             }
 
@@ -4777,7 +4905,7 @@ int makeScopeTables(ASTNode *head, recordsHashTable *rht, allFunctionsHashTable 
 
                             if (flagint == 1 && temp->opcode == MULT_REAL){
                                 int off = (flag == 1) ? offarg1 + 4 : offarg2 + 4;
-                                fprintf(fp,"\tmov dword [programdata + %d], ESP\n", off);
+                                fprintf(fp,"\tmov dword [programdata + %d], EBP\n", off);
                             }
 
                             offres += ( (tn->fieldtype == TK_INT) ? INT_SIZE : REAL_SIZE );
@@ -4792,6 +4920,138 @@ int makeScopeTables(ASTNode *head, recordsHashTable *rht, allFunctionsHashTable 
                         break;
 
                     }
+
+                
+
+                case DIV_RECORD:
+                    {
+                        int flag = 2;
+                        int flagint = 0;
+                        if (qn->arg1->type == UNION_INT || qn->arg1->type == UNION_REAL  ){
+                            flag = 1;
+                        }
+                        else if (qn->arg1->type == UNION_ID){
+                            ASTNode *temp2 = qn->arg1->data->identifier;
+                            scopeHashNode *shn = searchEntryScopeHashTable(temp2->lexemeCurrentNode,currentScope);
+                            if (shn == NULL){
+                                shn = searchEntryScopeHashTable(temp2->lexemeCurrentNode,globalScope);
+                            }
+                            if (shn != NULL){
+                                if (strcmp(shn->data->typeName,"int") == 0 || strcmp(shn->data->typeName,"real") == 0 ){
+                                    flag = 1;
+                                    if (strcmp(shn->data->typeName,"int") == 0){
+                                        flagint = 1;
+                                    }
+                                }
+                            }
+                        }  
+                        
+                        if (flag == 2){
+                            if (qn->arg2->type == UNION_ID){
+                                ASTNode *temp2 = qn->arg2->data->identifier;
+                                scopeHashNode *shn = searchEntryScopeHashTable(temp2->lexemeCurrentNode,currentScope);
+                                if (shn == NULL){
+                                    shn = searchEntryScopeHashTable(temp2->lexemeCurrentNode,globalScope);
+                                }
+                                if (shn != NULL){
+                                    if (strcmp(shn->data->typeName,"int") == 0 ){
+                                        flagint = 1;
+                                    }
+                                }
+                            }   
+                        }
+
+                        if (flag == 1){
+                            break;
+                        }
+
+                        while (tn != NULL){
+                            temp->opcode = (tn->fieldtype == TK_INT) ? DIV_INT : DIV_REAL;
+                            if (flag == 1){
+                                //right code
+                                /*
+                                if (qn->arg1->type == UNION_ID){
+                                    temp->arg1->type = UNION_OFFSET;
+                                }
+                                else {
+                                    temp->arg1->type = (tn->fieldtype == TK_INT) ? UNION_INT : UNION_REAL;                                    
+                                }
+                                if (temp->arg1->type == UNION_INT){
+                                    temp->arg1->data->int_val = (qn->arg1->type == UNION_INT) ? qn->arg1->data->int_val : (int) qn->arg1->data->real_val;
+                                }
+                                else if (temp->arg1->type == UNION_REAL){
+                                    temp->arg1->data->real_val = (qn->arg1->type == UNION_INT) ? (float)qn->arg1->data->int_val : qn->arg1->data->real_val;
+                                }
+                                else {
+                                    temp->arg1->data->offset = offarg1;
+                                }
+
+                                //right code
+                                temp->arg2->type = UNION_OFFSET;
+                                temp->arg2->data->offset = offarg2;
+
+                                */
+
+
+
+                            }
+                            else {
+                                if (qn->arg2->type == UNION_ID){
+                                    temp->arg2->type = UNION_OFFSET;
+                                }
+                                else {
+                                    temp->arg2->type = (tn->fieldtype == TK_INT) ? UNION_INT : UNION_REAL;                                    
+                                }
+                                if (temp->arg2->type == UNION_INT){
+                                    temp->arg2->data->int_val = (qn->arg2->type == UNION_INT) ? qn->arg2->data->int_val : (int) qn->arg2->data->real_val;
+                                }
+                                else if (temp->arg2->type == UNION_REAL){
+                                    temp->arg2->data->real_val = (qn->arg2->type == UNION_INT) ? (float)qn->arg2->data->int_val : qn->arg2->data->real_val;
+                                }
+                                else {
+                                    temp->arg2->data->offset = offarg2;
+                                }
+
+                                //right code
+                                temp->arg1->type = UNION_OFFSET;
+                                temp->arg1->data->offset = offarg1;
+
+                            }
+                            temp->result->type = UNION_OFFSET;
+                            temp->result->data->offset = offres;
+
+                            if (flagint == 1 && temp->opcode == MULT_REAL){
+                                int off = (flag == 1) ? offarg1 + 4 : offarg2 + 4;
+                                fprintf(fp,"\tmov EBP, dword [programdata + %d]\n", off);
+                                fprintf(fp,"\tmov dword [programdata + %d], 0\n", off);
+                            }
+
+                            makeCode(temp, currentScope, globalScope, rht, da, rg, 20, ptrAvailableLabels, fp);
+
+                            if (flagint == 1 && temp->opcode == MULT_REAL){
+                                int off = (flag == 1) ? offarg1 + 4 : offarg2 + 4;
+                                fprintf(fp,"\tmov dword [programdata + %d], EBP\n", off);
+                            }
+
+                            offres += ( (tn->fieldtype == TK_INT) ? INT_SIZE : REAL_SIZE );
+                            if (flag == 1){
+                                offarg2 += ( (tn->fieldtype == TK_INT) ? INT_SIZE : REAL_SIZE );    
+                            }
+                            else {
+                                offarg1 += ( (tn->fieldtype == TK_INT) ? INT_SIZE : REAL_SIZE );    
+                            }
+                            tn = tn->next;
+                        }
+                        break;
+
+                    }
+
+                
+
+
+
+
+
 
                 case JEQ_RECORD:
                     {
@@ -4968,6 +5228,26 @@ int makeScopeTables(ASTNode *head, recordsHashTable *rht, allFunctionsHashTable 
                         break;
                     
                     }
+
+                case WRITE_RECORD:
+                    {
+                        while (tn != NULL){
+                            temp->opcode = (tn->fieldtype == TK_INT) ? WRITE_INT : WRITE_REAL;
+                            temp->arg1->type = UNION_OFFSET;
+                            temp->result->type = UNION_OFFSET;
+                            temp->arg1->data->offset = offarg1;
+                            temp->result->data->offset = offres;
+                            makeCode(temp, currentScope, globalScope, rht, da, rg, 20, ptrAvailableLabels, fp);
+                            offres += ( (tn->fieldtype == TK_INT) ? INT_SIZE : REAL_SIZE );
+                            offarg1 += ( (tn->fieldtype == TK_INT) ? INT_SIZE : REAL_SIZE );
+                            tn = tn->next;
+                        }
+                        break;
+
+                    }
+
+
+
 
                 }//END SWITCH
             

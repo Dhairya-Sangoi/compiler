@@ -182,7 +182,7 @@ scopeHashNode *createScopeHashNode(char *key, char *typeName, parseTreeNode *hea
 
 void printScopeDataNode(scopeDataNode *sdn, char *fname, recordsHashTable *rht){
     if (strcmp(sdn->typeName,"int") == 0 || strcmp(sdn->typeName,"real") == 0){
-        printf("Type: %s",sdn->typeName);
+        printf("\tType: %-15s",sdn->typeName);
     }
     else {
         recordHashNode *rhn = searchEntryRecordsHashTable(sdn->typeName, rht);
@@ -209,13 +209,13 @@ void printScopeDataNode(scopeDataNode *sdn, char *fname, recordsHashTable *rht){
 
         }
     }
-    printf(" Scope: %s",fname);
-    printf(" Offset: %d",sdn->offset);
+    printf("\tScope: %-15s",fname);
+    printf("\tOffset: %d",sdn->offset);
     //printf(" regIfPresent: %d", sdn->regIfPresent);
 }
-
+//printf("Lexeme: %-30s \tToken: %-15s \tLineno: %d\n", temp->tok.name,allTokens[temp->tok.index]->name,temp->tok.lineno);
 void printScopeHashNode(scopeHashNode *shn, char *fname, recordsHashTable *rht){
-    printf("Lexeme: %s ",shn->key);
+    printf("Lexeme: %-20s ",shn->key);
     printScopeDataNode(shn->data,fname,rht);
     printf("\n");
 }

@@ -51,6 +51,14 @@ void addValueRegister(reg **rgs, int size, int rg, int offset){
 	return;
 }
 
+void flushRegisters(reg **rgs, int size){
+	int i;
+	for (i=0;i<size;i++){
+		rgs[i]->offsetIfPresent = -1;
+	}
+	return;
+}
+
 int getOffset(typedUnion *arg, int opcode, scopeHashTable *currentScope, scopeHashTable *globalScope, recordsHashTable *rht, char *type){
 	if (arg == NULL || arg->type == UNION_INT || arg->type == UNION_REAL || arg->type == UNION_LABEL){
 		return -1;

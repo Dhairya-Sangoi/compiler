@@ -1,0 +1,40 @@
+%fibonacci series assumed to be starting  from 1, 1, 2, 3, 5, 8, ....
+%square is the square of num
+%factorial is factorial of the num
+%sumn is sum of first n numbers
+%fibonacci is nth fibonacci number
+_main 
+	record #operations
+		type int : factorial; 
+		type int: sumn; 
+		type int: square;
+		type int: fibonacci;
+	endrecord;
+
+	type record #operations : d4;
+	type int : b5;
+	type int : b4;
+	type int : b3;
+	type int : d5cb34567;
+	b4 <---0;
+	b5 <--- 1;
+	read(d5cb34567);
+	d4.factorial <--- 1;
+	d4.sumn <--- 0;
+	d4.square <---0;
+	d4.fibonacci <---1;
+	while(b5<=d5cb34567)
+		d4.factorial <--- d4.factorial * b5;
+		d4.sumn <--- d4.sumn + b5;
+		d4.square <--- d4.square + d5cb34567;
+		if (b5 < d5cb34567)
+		then
+		b3 <--- d4.fibonacci;
+		d4.fibonacci <--- d4.fibonacci + b4;
+		b4 <---b3;
+		endif
+		b5 <--- b5 + 1;
+	endwhile
+	write(d4);
+	return;
+end

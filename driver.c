@@ -36,6 +36,8 @@
 #include "semanticAnalyzerDef.h"
 #include "semanticAnalyzer.h"
 
+#include "enum.h"
+
 int main(int argc, char *argv[])
 {
 
@@ -110,6 +112,9 @@ int main(int argc, char *argv[])
 
     FILE *asmfile;
     int isopen = 0;
+
+    int hasOtherFunctions = 0;
+    
     
     if (success == 1){
         fp1 = fopen("parsetree.txt","w+");
@@ -117,6 +122,9 @@ int main(int argc, char *argv[])
         dfsp(pt->head, &parsenodecount);
         makeAST(pt->head,newRules,NULL);
         dfsp(pt->head, &astnodecount);
+        if (pt->head->child->index != EPS){
+           hasOtherFunctions = 1;
+        }
         asmfile = fopen(argv[2],"w");
         isopen = 1;
         success2 = makeScopeTables(pt->head,rht,afht,globalScope,q,p1[1],asmfile); //change the last parameter
@@ -157,11 +165,6 @@ int main(int argc, char *argv[])
 
     printf("(a) FIRST and FOLLOW set automated.\n(b) Both lexical and syntax analysis modules implemented.\n(c) Modules working for all test cases.\n");
 
-    
-    
-
-
-
 
     while (1){
         printf("\n**************************************************************************\n");
@@ -169,10 +172,10 @@ int main(int argc, char *argv[])
         printf("1: For printing the token list\n");
         printf("2: For parsing to verify the syntactic correctness of the input source code\n");
         printf("3: For printing the abstract syntax tree\n");
-        printf("3: For printing the abstract syntax tree\n");
-        printf("3: For printing the abstract syntax tree\n");
-        printf("3: For printing the abstract syntax tree\n");
-        printf("4: For creating the parse tree and printing it appropriately\n");
+        printf("4: For displaying the amount of allocated memory and number of nodes\n");
+        printf("5: For printing the Symbol Table\n");
+        printf("6: For compiling to verify the syntactic and semantic correctness\n");
+        printf("7: For producing assembly code\n");
         printf("   Any other to exit the program\n\nChoice: ");
         char choice;
         scanf(" %c",&choice);
@@ -204,8 +207,8 @@ int main(int argc, char *argv[])
             case '4':
                 if (success){
                     printf("Parse tree\tNumber of nodes = %d\tAllocated Memory =  %d Bytes\n", parsenodecount, sizenode*(parsenodecount));
-                    printf("AST\tNumber of nodes = %d\tAllocated Memory =  %d Bytes\n", astnodecount, sizenode*(astnodecount));
-                    printf("Compression Peercentage =  %f%%", compression);
+                    printf("AST       \tNumber of nodes = %d\tAllocated Memory =  %d Bytes\n", astnodecount, sizenode*(astnodecount));
+                    printf("Compression Percentage =  %f%%", compression);
                 }
                 else {
                     printf("Didn't generate parse tree and abstract syntax tree since compilation failed\n");
@@ -215,6 +218,7 @@ int main(int argc, char *argv[])
             case '5':
                 if (success == 1 && success2 == 1){
                     printf("Symbol Table Entries: \n");
+                    printScopeHashTable(globalScope,"_global",rht);
                     printAllFunctionsHashTable(afht,rht);
                 }
                 else {
@@ -232,12 +236,15 @@ int main(int argc, char *argv[])
                         printf("Semantic Errors:\n");
                         printf("%s\n",semanticmessage);
                     }
+                    else {
+                        printf("No syntactical and semantic errors. Compilation Successfull.\n");
+                    }
                 }
                 
                 break;
 
             case '7':
-                if (success2 == 1){
+                if (success2 == 1 && hasOtherFunctions == 0){
                     printf("Generated <%s> file.\n", argv[2]);
                     if (isopen == 1){
                         fclose(asmfile);
@@ -245,12 +252,12 @@ int main(int argc, char *argv[])
                     }
                 }
                 else {
-                    printf("Couldn't generate file <%s> since code had syntactic or semantic mistakes.\n", argv[2]);
+                    printf("Couldn't generate file <%s> since code had syntactic or semantic mistakes or more than one fuctions.\n", argv[2]);
                 }
                 break;
             default:
                 printf("Exiting Compiler Project. It was a nice learning experience :)\n");
-                
+                remove("parsetree.txt");
                 //delete parsetree.txt
                 return 0;
         }

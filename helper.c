@@ -351,7 +351,7 @@ void printTokenList(tokenlist *temp,token **allTokens){
 		return;
 	}
     while (temp->next != NULL){
-        printf("lexeme: %-30s \ttoken: %-15s \tlineno: %d\n", temp->tok.name,allTokens[temp->tok.index]->name,temp->tok.lineno);
+        printf("Lexeme: %-30s \tToken: %-15s \tLineno: %d\n", temp->tok.name,allTokens[temp->tok.index]->name,temp->tok.lineno);
         temp = temp->next;
     }
 }

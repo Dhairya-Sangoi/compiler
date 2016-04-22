@@ -10,5 +10,6 @@ void addValueRegister(reg **rgs, int size, int rg, int offset);//add offset to r
 int getOffset(typedUnion *arg, int opcode, scopeHashTable *currentScope, scopeHashTable *globalScope, recordsHashTable *rht, char *type);
 int getEmptyRegister(reg **rg);
 void printRegister(reg *rg);
+void flushRegisters(reg **rgs, int size);
 
 #endif // REGISTER_H_INCLUDED
